@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <launch>
   <include file="$(find hsrb_gazebo_launch)/launch/include/hsrb_gazebo_common.xml" >
-    <arg name="map" value="~/catkin_ws/src/suturo_planning/planning_simulator/worldlaunch/map.yaml" />
-    <arg name="world_name" value="~/catkin_ws/src/suturo_planning/planning_simulator/worldlaunch/hsrb_test_world.world" />
+    <arg name="map" value="$(find planning_simulator)/worldlaunch/map.yaml" />
+    <arg name="world_name" value="$(find planning_simulator)/worldlaunch/hsrb_test_world.world" />
     <arg name="robot_pos" value="-x 0 -y 0 -z 0 -Y 0" />
     <arg name="use_laser_odom" value="false" />
   </include>
