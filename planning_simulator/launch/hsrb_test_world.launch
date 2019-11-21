@@ -7,4 +7,13 @@
     <arg name="use_laser_odom" value="false" />
   </include>
   <include file="$(find rs_perception)/launch/hsr_demo_perception.launch"/>
+
+
+  <include file="$(find timed_roslaunch)/launch/timed_roslaunch.launch">
+    <arg name="time" value="15" />
+    <arg name="pkg" value="planning_simulator" />
+    <arg name="file" value="start_demo.launch" />
+  </include>
+
+
 </launch>
