@@ -6,4 +6,5 @@
     <arg name="robot_pos" value="-x 0 -y 0 -z 0 -Y 0" />
     <arg name="use_laser_odom" value="false" />
   </include>
+  <include file="$(find rs_perception)/launch/hsr_demo_perception.launch"/>
 </launch>
