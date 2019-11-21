@@ -2,7 +2,6 @@
 <launch>
   <!-- <arg name ="node_start_delay" default="10.0"/> -->
   <node pkg="planning_simulator" name="move" type="move.py"/> 
-  <node pkg="rs_perception" name="perception_subscriber" type="sub.py"/> 
   <!-- launch-prefix="bash -c 'sleep $(arg node_start_delay);$0 $@'"/> -->
   <!--<node pkg="planning_simulator" name="manipulationdemo.py" type="manipulationdemo.py"/>-->
 </launch>
