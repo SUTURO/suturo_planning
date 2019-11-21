@@ -1,4 +1,5 @@
- #!/usr/bin/env python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import hsrb_interface
 import rospy
@@ -20,13 +21,12 @@ target_to_hand = geometry.pose(x=xcoord, y=ycoord,z=zcoord)
 
 
 try:
-        # Transit to initial posture
+        #Transit to initial posture
         whole_body.move_to_neutral()
         # Move the hand to target
-        whole_body.move_to_joint_positions({'arm_lift_joint': 0.4})
         whole_body.move_end_effector_pose(target_to_hand, ref_frame_id='head_rgbd_sensor_rgb_frame')
-        # Transit to initial posture
-        whole_body.move_to_neutral()
+
+
         
 except:
         rospy.logerr('failed to touch')

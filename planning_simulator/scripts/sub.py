@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import rospy
 import json
 from robosherlock_msgs.msg import RSObjectDescriptions
