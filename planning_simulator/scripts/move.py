@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+ #!/usr/bin/env python
 
 from hsrb_interface import Robot
 import rospy
