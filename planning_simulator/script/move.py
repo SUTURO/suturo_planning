@@ -16,7 +16,7 @@ if __name__=='__main__':
     try:
 	base.go_abs(1.0, -2.0, -1.0, 180.0)
 #        base.go_abs(0.6, -0.2, 0, 180.0)	
-#        whole_body.move_to_joint_positions({'head_tilt_joint': -0.15})
+        whole_body.move_to_joint_positions({'head_tilt_joint': -0.3})
 
     except:
         rospy.logerr('Fail move_to_neutral')
