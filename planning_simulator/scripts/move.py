@@ -4,6 +4,8 @@ from hsrb_interface import Robot
 import rospy
 import math
 
+rospy.init_node('move', anonymous=True)
+
 # Preparation to use robot functions
 robot = Robot()
 base = robot.try_get('omni_base')

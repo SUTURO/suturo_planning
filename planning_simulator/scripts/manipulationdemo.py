@@ -6,9 +6,13 @@ import rospy
 import sys
 from hsrb_interface import geometry
 
+rospy.init_node('manipulationdemo', anonymous=True)
+
+
 # Preparation for using the robot functions
 robot = hsrb_interface.Robot()
 whole_body = robot.get('whole_body')
+
 
 #Commandline Input
 xcoord = float(sys.argv[1])
