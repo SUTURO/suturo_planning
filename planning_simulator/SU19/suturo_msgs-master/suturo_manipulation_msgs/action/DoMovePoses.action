@@ -1,0 +1,15 @@
+# define the goal
+string goal_msg
+geometry_msgs/PoseStamped[] list_poses
+geometry_msgs/Pose object_pose
+---
+# define the result
+string result_msg
+geometry_msgs/Pose hand_palm_link_pose
+geometry_msgs/Pose object_pose
+---
+# define feedback
+string feedback_msg
+geometry_msgs/PoseStamped[] list_poses
+geometry_msgs/Pose hand_palm_link_pose
+geometry_msgs/Pose object_pose

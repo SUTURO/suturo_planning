@@ -1,0 +1,8 @@
+#goal definition
+bool visualize
+---
+#result definition
+bool door_open
+---
+#feedback
+string feedback 

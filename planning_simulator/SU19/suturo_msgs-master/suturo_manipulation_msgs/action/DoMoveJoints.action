@@ -1,0 +1,18 @@
+# define the goal
+string goal_msg
+geometry_msgs/Pose object_pose
+geometry_msgs/Pose object_pose_to_odom
+float64 weight
+float64 width
+float64 height
+float64 depth
+string modus
+control_msgs/JointTrajectoryControllerState desired_joints_values
+---
+# define the result
+string result_msg
+control_msgs/JointTrajectoryControllerState current_joints_values
+---
+# define feedback
+float64 feedback_msg
+control_msgs/JointTrajectoryControllerState successful_joints_values

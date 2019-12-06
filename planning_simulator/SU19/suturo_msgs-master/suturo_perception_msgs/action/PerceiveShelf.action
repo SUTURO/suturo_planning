@@ -1,0 +1,9 @@
+#goal definition
+bool visualisation
+---
+#result definition
+ObjectDetectionData[] detectionData
+bool inliers_visible
+---
+#feedback
+string feedback
