@@ -3,4 +3,5 @@
   :components
   ((:module "src"
             :components
-            ((:file "package") ))))
+            ((:file "package")
+            (:file "navigation-action" :depends-on ("package"))))))
