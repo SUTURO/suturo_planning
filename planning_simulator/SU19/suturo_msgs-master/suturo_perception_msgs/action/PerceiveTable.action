@@ -1,8 +1,0 @@
-#goal definition
-bool visualisation
----
-#result definition
-ObjectDetectionData[] detectionData
----
-#feedback
-string feedback
