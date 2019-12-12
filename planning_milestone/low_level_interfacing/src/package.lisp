@@ -1,3 +1,3 @@
-(defpackage :planning-milestone
+(defpackage :low-level-interfacing
   (:nicknames :plm)
   (:use :cpl))
