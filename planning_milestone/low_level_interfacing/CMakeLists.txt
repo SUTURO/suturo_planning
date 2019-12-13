@@ -8,8 +8,17 @@ project(low_level_interfacing)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  actionlib
+  cl_tf
+  geometry_msgs
   roslisp
   std_msgs
+  tmc_msgs
+  std_msgs
+  move_base_msgs
+  control_msgs
+  suturo_perception_msgs
+  suturo_manipulation_msgs
 )
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
