@@ -4,4 +4,5 @@
   ((:module "src"
             :components
             ((:file "package")
+            (:file "manipulation-client" :depends-on ("package"))
             (:file "navigation-action" :depends-on ("package"))))))
