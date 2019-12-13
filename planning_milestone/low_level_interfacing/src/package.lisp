@@ -1,3 +1,3 @@
 (defpackage :low-level-interfacing
-  (:nicknames :llevi)
+  (:nicknames :llif)
   (:use :cpl))

@@ -1,4 +1,4 @@
-(in-package :low_level_interfaces)
+(in-package : llif)
 
 (defun trigger-perception-pipeline()
   "Triggers perception pipeline"
