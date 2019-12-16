@@ -20,6 +20,7 @@
                ;;suturo_perception_msgs-msg
                visualization_msgs-msg
                cram-json-prolog
+               std_srvs-srv
                )
   :components
   ((:module "src"
