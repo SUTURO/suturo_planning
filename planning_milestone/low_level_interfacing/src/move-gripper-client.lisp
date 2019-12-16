@@ -1,4 +1,4 @@
-;;; A client to move the robots head. This is based on the HSR
+;;; A client to move the robots gripper. This is based on the HSR
 ;;; documentation and uses the topics and actions the HSR comes with.
 ;;; This can be used separately to giskard or replaced by giskard entierly.
 (in-package :llif)
@@ -21,7 +21,7 @@ action server."
   (loop until (actionlib:wait-for-server *move-gripper-client*
                                          *move-gripper-action-timeout*))
 
-  (roslisp:ros-info (head-action) "head action client created"))
+  (roslisp:ros-info (gripper-action) "gripper action client created"))
 
 ;; NOTE most of these params have to be (vector ...)s 
 (defun make-move-gripper-action-goal (px py pz ox oy oz ow)
@@ -40,19 +40,19 @@ action server."
                 (z orientation pose) oz)))
                                                  
 (defun ensure-move-gripper-goal-reached (status pos)
-  (roslisp:ros-warn (move-head) "Status ~a" status)
+  (roslisp:ros-warn (move-gripper) "Status ~a" status)
   status
   pos
   T)
 
 
 (defun call-move-gripper-action (px py pz ox oy oz ow)
-  "Moves the head to the given position.
+  "Moves the gripper to the given position.
    `pos' a vector of two values.
    First value describes +left or -right.
    Second value describes +up and -down.
    (vector 0.0 0.0) looks straight ahead."
-  ;;  (format t "move head called with pos: ~a" pos)
+  ;;  (format t "move gripper called with pos: ~a" pos)
    (multiple-value-bind (result status)
   (actionlib:call-goal (get-move-gripper-client)
                        (make-move-gripper-action-goal px py pz ox oy oz ow
