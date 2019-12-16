@@ -1,6 +1,6 @@
 (in-package :comp)
 
-(defun init-planning()
+(defun init-interface()
   "Init all interfaces from planning to other groups"
   (print "init ros node...")
 
@@ -16,3 +16,14 @@
 
 )
 
+(defun init-planning()
+ "Initialize only local nodes for working without the real robot."
+  (print "create ros node")
+  (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
+  (print "init tf-listener")
+  (plc::get-tf-listener)
+  (print "init viz-box")
+  (lli:viz-box-init)
+  (print "init marker publisher")
+  (lli:init-marker-publisher)
+)
