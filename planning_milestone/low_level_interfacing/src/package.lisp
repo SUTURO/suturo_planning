@@ -9,4 +9,14 @@
    #:call-nav-action
    #:smash-into-appartment
    #:call-nav-action-ps
+   
+   ;; move-gripper-client
+   #:init-move-gripper-action-client
+   #:get-move-gripper-client
+   #:make-move-gripper-action-goal
+   #:call-move-gripper-action
+   #:ensure-move-gripper-goal-reached
+
+   ;; Perception-trigger
+   #:trigger-perception-pipeline-main
    ))

@@ -10,5 +10,9 @@
   ;;Init action clients
   (roslisp:ros-info (init-clients) "init navigation action client")
   (llif::init-nav-client)
+
+  (roslisp:ros-info (init-clients) "init move-grippper-client action client")
+  (llif::init-move-gripper-action-client)
+
 )
 
