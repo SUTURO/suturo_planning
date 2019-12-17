@@ -17,7 +17,7 @@
 action server."
   (setf *move-gripper-client*
         (actionlib:make-action-client "manipulation/MoveGripperAction"
-                                      "geometry_msgs/PoseStampedAction"))
+                                      "manipulation_action_msgs/MoveGripperAction"))
   (loop until (actionlib:wait-for-server *move-gripper-client*
                                          *move-gripper-action-timeout*))
 
@@ -30,6 +30,8 @@ action server."
       (get-move-gripper-client)
       ;; (cram-simple-actionlib-client::get-simple-action-client 'move-gripper-action)
     trajectory (roslisp:make-message
+                "manipulation_action_msgs/MoveGripperAction" 
+                trajectory (roslisp:make-message
                 "geometry_msgs/PoseStamped" 
                 (x position pose) px
                 (y position pose) py
@@ -37,7 +39,7 @@ action server."
                 (w orientation pose) ow
                 (x orientation pose) ox
                 (y orientation pose) oy
-                (z orientation pose) oz)))
+                (z orientation pose) oz))))
                                                  
 (defun ensure-move-gripper-goal-reached (status pos)
   (roslisp:ros-warn (move-gripper) "Status ~a" status)
