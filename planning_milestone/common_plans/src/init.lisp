@@ -11,8 +11,17 @@
   (roslisp:ros-info (init-clients) "init navigation action client")
   (llif::init-nav-client)
 
-  (roslisp:ros-info (init-clients) "init move-grippper-client action client")
+  (roslisp:ros-info (init-clients) "init move grippper action client")
   (llif::init-move-gripper-action-client)
+ 
+  (roslisp:ros-info (init-clients) "init grasp action client")
+  (llif::init-grasp-action-client)
+
+  (roslisp:ros-info (init-clients) "init place action client")
+  (llif::init-place-action-client)
+  
+  (roslisp:ros-info (init-clients) "init perceive action client ")
+  (llif::init-perceive-action-client)
 
 )
 
@@ -26,4 +35,4 @@
   (lli:viz-box-init)
   (print "init marker publisher")
   (lli:init-marker-publisher)
-)
+

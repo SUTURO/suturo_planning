@@ -1,6 +1,3 @@
-;;; A client to handle placing motions. This is based on the HSR
-;;; documentation and uses the topics and actions the HSR comes with.
-;;; This can be used separately to giskard or replaced by giskard entierly.
 (in-package :llif)
 
 (defparameter *place-action-timeout* 300.0 "in seconds")

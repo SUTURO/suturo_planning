@@ -33,4 +33,12 @@
    #:ensure-grasp-goal-reached
    #:call-grasp-action
    #:test-grasp-action 
+
+   ;;place-action-client
+   #:init-place-action-client
+   #:get-place-action-client
+   #:make-place-action-goal
+   #:ensure-grasp-goal-reached
+   #:call-place-action
+   #:test-place-action 
    ))
