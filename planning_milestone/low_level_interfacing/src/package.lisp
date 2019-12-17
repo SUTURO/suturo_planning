@@ -17,6 +17,20 @@
    #:call-move-gripper-action
    #:ensure-move-gripper-goal-reached
 
-   ;; Perception-trigger
+   ;; perception-trigger
    #:trigger-perception-pipeline-main
+   
+   ;; perceive-action-client
+   #:init-perceive-action-client
+   #:get-perceive-action-client
+   #:make-perceive-action-goal
+   #:ensure-perceive-goal-reached
+
+   ;;grasp-action-client
+   #:init-grasp-action-client
+   #:get-grasp-action-client
+   #:make-grasp-action-goal
+   #:ensure-grasp-goal-reached
+   #:call-grasp-action
+   #:test-grasp-action 
    ))
