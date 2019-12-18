@@ -17,7 +17,7 @@
                trajectory_msgs-msg
                controller_manager_msgs-msg
                sensor_msgs-msg
-               ;;suturo_perception_msgs-msg
+               suturo_perception_msgs-msg
                visualization_msgs-msg
                cram-json-prolog
                std_srvs-srv
@@ -34,4 +34,5 @@
             (:file "grasp-action-client" :depends-on ("package")) 
             (:file "place-action-client" :depends-on ("package"))
 	    (:file "marker-publisher" :depends-on ("package"))
+	    (:file "robosherlock-client" :depends-on ("package"))
             ))))
