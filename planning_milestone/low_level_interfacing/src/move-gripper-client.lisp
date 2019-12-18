@@ -23,23 +23,19 @@ action server."
 
   (roslisp:ros-info (gripper-action) "gripper action client created"))
 
-;; NOTE most of these params have to be (vector ...)s 
+;; NOTE most of these params have to be (v,,,ector ...)s 
 (defun make-move-gripper-action-goal (px py pz ox oy oz ow)
   "Creates the move-gripper-action-goal. Does not send it to the action server though."
   (actionlib:make-action-goal
       (get-move-gripper-client)
-      ;; (cram-simple-actionlib-client::get-simple-action-client 'move-gripper-action)
-    trajectory (roslisp:make-message
-                "manipulation_action_msgs/MoveGripperAction" 
-                trajectory (roslisp:make-message
-                "geometry_msgs/PoseStamped" 
-                (x position pose) px
-                (y position pose) py
-                (z position pose) pz
-                (w orientation pose) ow
-                (x orientation pose) ox
-                (y orientation pose) oy
-                (z orientation pose) oz))))
+    ;; (cram-simple-actionlib-client::get-simple-action-client 'move-gripper-action) 
+    (roslisp:make-message 
+     “geometry_msgs/PoseStamed” 
+      :pose (cl-tf::make-pose-stamped  
+             "map"
+             0.0 
+             (cl-tf:make-3d-vector px py pz) 
+             (cl-tf:make-quaternion ox oy oz 1.0)))))
                                                  
 (defun ensure-move-gripper-goal-reached (status pos)
   (roslisp:ros-warn (move-gripper) "Status ~a" status)
