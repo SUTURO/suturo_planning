@@ -29,13 +29,11 @@ action server."
   (actionlib:make-action-goal
       (get-move-gripper-client)
     ;; (cram-simple-actionlib-client::get-simple-action-client 'move-gripper-action) 
-    (roslisp:make-message 
-     “geometry_msgs/PoseStamed” 
-      :pose (cl-tf::make-pose-stamped  
-             "map"
-             0.0 
-             (cl-tf:make-3d-vector px py pz) 
-             (cl-tf:make-quaternion ox oy oz 1.0)))))
+    :goal_pose (cl-transforms-stamped:to-msg (cl-tf::make-pose-stamped  
+                                   "map"
+                                   0.0 
+                                   (cl-tf:make-3d-vector px py pz) 
+                                   (cl-tf:make-quaternion ox oy oz ow)))))
                                                  
 (defun ensure-move-gripper-goal-reached (status pos)
   (roslisp:ros-warn (move-gripper) "Status ~a" status)
@@ -56,7 +54,7 @@ action server."
                        (make-move-gripper-action-goal px py pz ox oy oz ow
                         ))
      (roslisp:ros-info (move-gripper) "move gripper action finished")
-    (ensure-move-gripper-goal-reached status pos)
+    ;;(ensure-move-gripper-goal-reached status pos)
      (values result status)))
 
 ;;NOTE 0 0 is the deafault lookig straight position.

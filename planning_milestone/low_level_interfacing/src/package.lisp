@@ -41,4 +41,12 @@
    #:ensure-grasp-goal-reached
    #:call-place-action
    #:test-place-action 
+
+   ;; text to speech client
+   :*enable-speech*
+   :*text-to-speech-action-client*
+   #:init-text-to-speech-action-client
+   #:get-text-to-speech-action-client
+   #:make-text-action-goal
+   #:call-text-to-speech-action
    ))

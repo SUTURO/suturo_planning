@@ -1,3 +1,3 @@
 (defpackage :execute-milestone1-demo
-  (:nicknames :exe)
-  (:use :cpl))
+  (:nicknames :emd)
+  (:use :roslisp :cpl))

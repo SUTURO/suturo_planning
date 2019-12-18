@@ -1,4 +1,4 @@
-(in-package : comp)
+(in-package :comp)
 
 ;;; TF ;;;
 (defparameter *tf-listener* nil)
