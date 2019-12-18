@@ -24,34 +24,43 @@ action server."
   (roslisp:ros-info (grasp-action) "grasp action client created"))
 
 ;; NOTE most of these params have to be (vector ...)s 
-(defun make-grasp-action-goal (object-frame-id)
+(defun make-grasp-action-goal (px py pz ox oy oz ow size_x size_y size_z)
   "Creates the grasp-action-goal. Does not send it to the action server though."
   (actionlib:make-action-goal
       (get-grasp-action-client)
       ;; (cram-simple-actionlib-client::get-simple-action-client 'grasp-action)
-    trajectory (roslisp:make-message
-                "manipulation_action_msgs/GraspAction" 
-                (object-frame-id) object-frame-id)))
+    :goal_pose (cl-transforms-stamped:to-msg
+                (cl-tf::make-pose-stamped  
+                 "map"
+                 0.0 
+                 (cl-tf:make-3d-vector px py pz) 
+                 (cl-tf:make-quaternion ox oy oz ow)))
+    :object_size (roslisp:make-msg
+                  "geometry_msgs/vector3"
+                  :x size_x
+                  :y size_y
+                  :z size_z)
+    ))
                                                  
-(defun ensure-grasp-goal-reached (status object-id)
+(defun ensure-grasp-goal-reached (status px py pz ox oy oz ow size_x size_y size_z)
   (roslisp:ros-warn (grasp-action) "Status ~a" status)
   status
   mode
   T)
 
 
-(defun call-grasp-action (object-id)
+(defun call-grasp-action (px py pz ox oy oz ow size_x size_y size_z)
   "object-id' object-id of frame-id of object to grasp"
   ;;  (format t "grasp called with state: ~a" state)
    (multiple-value-bind (result status)
   (actionlib:call-goal (get-grasp-action-client)
-                       (object-id
+                       (px py pz ox oy oz ow size_x size_y size_z
                         ))
      (roslisp:ros-info (grasp-action) "grasp action finished")
-    (ensure-grasp-goal-reached status object-id)
+    (ensure-grasp-goal-reached status px py pz ox oy oz ow size_x size_y size_z)
      (values result status)))
 
 ;;NOTE 0 0 is the deafault lookig straight position.
 (defun test-grasp-action ()
   "A function to test the grasp action."
-  (call-grasp-action "test-id"))
+  (call-grasp-action 1 1 1 1 1 1 1 5 5 5))
