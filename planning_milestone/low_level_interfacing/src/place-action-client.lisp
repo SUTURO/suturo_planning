@@ -13,7 +13,7 @@
   "initializes the place-action-client and makes sure it is connected to the
 action server."
   (setf *place-action-client*
-        (actionlib:make-action-client "manipulation/PlaceAction"
+        (actionlib:make-action-client "/place_server"
                                       "manipulation_action_msgs/PlaceAction"))
   (loop until (actionlib:wait-for-server *place-action-client*
                                          *place-action-timeout*))

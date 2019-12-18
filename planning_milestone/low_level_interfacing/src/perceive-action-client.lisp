@@ -16,7 +16,7 @@
   "initializes the perceive-action-client and makes sure it is connected to the
 action server."
   (setf *perceive-action-client*
-        (actionlib:make-action-client "manipulation/PercieveAction"
+        (actionlib:make-action-client "/perceive_server"
                                       "manipulation_action_msgs/PercieveAction"))
   (loop until (actionlib:wait-for-server *perceive-action-client*
                                          *perceive-action-timeout*))

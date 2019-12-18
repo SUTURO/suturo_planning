@@ -3,7 +3,7 @@
 ;;; This can be used separately to giskard or replaced by giskard entierly.
 (in-package :llif)
 
-(defparameter *move-gripper-action-timeout* 300.0 "in seconds")
+(defparameter *move-gripper-action-timeout* 60.0 "in seconds")
 (defparameter *move-gripper-client* NIL)
 
 (defun get-move-gripper-client ()
@@ -16,7 +16,7 @@
   "initializes the move-gripper-action-client and makes sure it is connected to the
 action server."
   (setf *move-gripper-client*
-        (actionlib:make-action-client "manipulation/MoveGripperAction"
+        (actionlib:make-action-client "/move_gripper_server"
                                       "manipulation_action_msgs/MoveGripperAction"))
   (loop until (actionlib:wait-for-server *move-gripper-client*
                                          *move-gripper-action-timeout*))
