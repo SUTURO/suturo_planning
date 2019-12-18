@@ -26,17 +26,11 @@ action server."
   (actionlib:make-action-goal
       (get-place-action-client)
       ;; (cram-simple-actionlib-client::get-simple-action-client 'place-action)
-    trajectory (roslisp:make-message
-                "manipulation_action_msgs/PlaceAction" 
-                trajectory (roslisp:make-message
-                "geometry_msgs/PoseStamped" 
-                (x position pose) px
-                (y position pose) py
-                (z position pose) pz
-                (w orientation pose) ow
-                (x orientation pose) ox
-                (y orientation pose) oy
-                (z orientation pose) oz))))
+      :goal_pose (cl-transforms-stamped:to-msg (cl-tf::make-pose-stamped  
+                                   "map"
+                                   0.0 
+                                   (cl-tf:make-3d-vector px py pz) 
+                                   (cl-tf:make-quaternion ox oy oz ow)))))
                                                  
 (defun ensure-place-action-goal-reached (status pos)
   (roslisp:ros-warn (place-action) "Status ~a" status)
