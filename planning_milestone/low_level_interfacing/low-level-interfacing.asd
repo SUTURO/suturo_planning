@@ -21,6 +21,7 @@
                visualization_msgs-msg
                cram-json-prolog
                std_srvs-srv
+               manipulation_action_msgs-msg
                )
   :components
   ((:module "src"
