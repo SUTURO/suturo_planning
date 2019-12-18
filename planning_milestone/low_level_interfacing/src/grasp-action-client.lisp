@@ -16,7 +16,7 @@
   "initializes the grasp-action-client and makes sure it is connected to the
 action server."
   (setf *grasp-action-client*
-        (actionlib:make-action-client "/grasps_server"
+        (actionlib:make-action-client "grasps_server"
                                       "manipulation_action_msgs/GraspAction"))
   (loop until (actionlib:wait-for-server *grasp-action-client*
                                          *grasp-action-timeout*))

@@ -16,23 +16,24 @@
   "initializes the perceive-action-client and makes sure it is connected to the
 action server."
   (setf *perceive-action-client*
-        (actionlib:make-action-client "/perceive_server"
-                                      "manipulation_action_msgs/PercieveAction"))
+        (actionlib:make-action-client "perceive_server"
+                                      "manipulation_action_msgs/PerceiveAction"))
   (loop until (actionlib:wait-for-server *perceive-action-client*
                                          *perceive-action-timeout*))
 
   (roslisp:ros-info (perceive-action) "perceive action client created"))
 
 ;; NOTE most of these params have to be (vector ...)s 
-(defun make-perceive-action-goal (torso-joint-state percieve-mode)
+(defun make-perceive-action-goal (torso-joint-state perceive_mode)
   "Creates the perceive-action-goal. Does not send it to the action server though."
   (actionlib:make-action-goal
       (get-perceive-action-client)
       ;; (cram-simple-actionlib-client::get-simple-action-client 'perceive-action)
-    trajectory (roslisp:make-message
-                "manipulation_action_msgs/PercieveAction" 
-                (torso-joint-state) torso-joint-state
-                (perceive-mode) perceive-mode)))
+     ;; (roslisp:make-message
+     ;;            "manipulation_action_msgs/PerceiveAction"
+                
+    :torso_joint_state torso-joint-state
+    :perceive_mode perceive_mode));) 
                                                  
 (defun ensure-perceive-goal-reached (status mode)
   (roslisp:ros-warn (perceive-action) "Status ~a" status)
@@ -41,16 +42,16 @@ action server."
   T)
 
 
-(defun call-perceive-action (torso-joint-state percieve-mode)
+(defun call-perceive-action (torso-joint-state perceive_mode)
   "torso-joint-state' state of torso-joint.
-   percieve-mode int value to describe percieve-mode"
+   perceive_mode int value to describe perceive_mode"
   ;;  (format t "perceive called with state: ~a" state)
    (multiple-value-bind (result status)
   (actionlib:call-goal (get-perceive-action-client)
-                       (make-perceive-action-goal torso-joint-state percieve-mode
+                       (make-perceive-action-goal torso-joint-state perceive_mode
                         ))
      (roslisp:ros-info (perceive-action) "perceive action finished")
-    (ensure-perceive-action-goal-reached status mode)
+    (ensure-perceive-goal-reached status perceive_mode)
      (values result status)))
 
 ;;NOTE 0 0 is the deafault lookig straight position.
