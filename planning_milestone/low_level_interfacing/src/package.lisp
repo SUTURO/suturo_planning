@@ -49,4 +49,9 @@
    #:get-text-to-speech-action-client
    #:make-text-action-goal
    #:call-text-to-speech-action
+
+  ;;robosherlock-client.lisp
+  #:init-robosherlock-action-client
+  #:get-robosherlock-client
+  #:call-robosherlock-pipeline
    ))

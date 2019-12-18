@@ -57,6 +57,18 @@
   (llif::init-perceive-action-client)
 )
 
+(defun init-perception()
+ "Initialize only local nodes for working without the real robot."
+  (print "create ros node")
+  (print "init tf-listener")
+  (comp::get-tf-listener)
+ 
+  ;;Init action clients
+  (roslisp:ros-info (init-clients) "init robosherlock action client")
+  (llif::init-robosherlock-action-client)
+	
+)
+
 (defun init-planning()
  "Initialize only local nodes for working without the real robot."
   (print "create ros node")
