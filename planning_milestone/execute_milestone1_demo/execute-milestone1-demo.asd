@@ -4,5 +4,6 @@
   ((:module "src"
             :components
             ((:file "package")
-            ;;(:file "execute-miltestone1-demo" :depends-on ("package")) 
+            ;;(:file "execute-miltestone1-demo" :depends-on ("package"))
+            (:file "demo-poses" :depends-on ("package"))   
             ))))
