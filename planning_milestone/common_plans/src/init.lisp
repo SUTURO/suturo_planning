@@ -22,6 +22,9 @@
   
   (roslisp:ros-info (init-clients) "init perceive action client ")
   (llif::init-perceive-action-client)
+
+  (roslisp:ros-info (init-clients) "init robosherlock action client")
+  (llif::init-robosherlock-action-client)
 )
 
 (defun init-navigation()
