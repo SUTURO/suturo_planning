@@ -22,6 +22,7 @@
                cram-json-prolog
                std_srvs-srv
                manipulation_action_msgs-msg
+               perception_msgs-msg
                )
   :components
   ((:module "src"
@@ -35,4 +36,5 @@
             (:file "place-action-client" :depends-on ("package"))
 	    (:file "marker-publisher" :depends-on ("package"))
 	    (:file "robosherlock-client" :depends-on ("package"))
+            (:file "perception-subcriber" :depends-on ("package"))
             ))))
