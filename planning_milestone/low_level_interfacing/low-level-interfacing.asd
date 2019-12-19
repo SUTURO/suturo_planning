@@ -22,7 +22,7 @@
                cram-json-prolog
                std_srvs-srv
                manipulation_action_msgs-msg
-               perception_msgs-msg
+               ;;perception_msgs-msg
                )
   :components
   ((:module "src"
