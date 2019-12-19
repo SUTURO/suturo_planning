@@ -45,7 +45,7 @@ action server."
 (defun ensure-grasp-goal-reached (status px py pz ox oy oz ow size_x size_y size_z)
   (roslisp:ros-warn (grasp-action) "Status ~a" status)
   status
-  mode
+  px py pz ox oy oz ow size_x size_y size_z
   T)
 
 
@@ -54,7 +54,7 @@ action server."
   ;;  (format t "grasp called with state: ~a" state)
    (multiple-value-bind (result status)
   (actionlib:call-goal (get-grasp-action-client)
-                       (px py pz ox oy oz ow size_x size_y size_z
+                       (make-grasp-action-goal px py pz ox oy oz ow size_x size_y size_z
                         ))
      (roslisp:ros-info (grasp-action) "grasp action finished")
     (ensure-grasp-goal-reached status px py pz ox oy oz ow size_x size_y size_z)

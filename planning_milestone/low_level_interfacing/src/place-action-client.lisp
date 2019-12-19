@@ -32,10 +32,10 @@ action server."
                                    (cl-tf:make-3d-vector px py pz) 
                                    (cl-tf:make-quaternion ox oy oz ow)))))
                                                  
-(defun ensure-place-action-goal-reached (status pos)
+(defun ensure-place-action-goal-reached (status px py pz ox oy oz ow)
   (roslisp:ros-warn (place-action) "Status ~a" status)
   status
-  pos
+  px py pz ox oy oz ow
   T)
 
 
@@ -51,7 +51,7 @@ action server."
                        (make-place-action-goal px py pz ox oy oz ow
                         ))
      (roslisp:ros-info (place-action) "place action finished")
-    (ensure-place-action-goal-reached status pos)
+    (ensure-place-action-goal-reached status px py pz ox oy oz ow)
      (values result status)))
 
 ;;NOTE 0 0 is the deafault lookig straight position.
