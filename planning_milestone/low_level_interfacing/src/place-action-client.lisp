@@ -6,7 +6,7 @@
 (defun get-place-action-client ()
   "returns the currently used move gripper client. If none yet exists,
    creates one."
-  (or *place-action-client*
+ (or *place-action-client*
       (init-place-action-client)))
 
 (defun init-place-action-client ()
@@ -45,11 +45,13 @@ action server."
    First value describes +left or -right.
    Second value describes +up and -down.
    (vector 0.0 0.0) looks straight ahead."
-  ;;  (format t "move gripper called with pos: ~a" pos)
-   (multiple-value-bind (result status)
+  ;; (format t "move gripper called with pos: ~a" pos)
+  (print "test")
+  (multiple-value-bind (result status)
   (actionlib:call-goal (get-place-action-client)
                        (make-place-action-goal px py pz ox oy oz ow
-                        ))
+                                               ))
+    
      (roslisp:ros-info (place-action) "place action finished")
     (ensure-place-action-goal-reached status px py pz ox oy oz ow)
      (values result status)))

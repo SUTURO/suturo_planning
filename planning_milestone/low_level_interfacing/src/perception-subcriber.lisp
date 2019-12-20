@@ -3,8 +3,9 @@
 (defvar *color* "red")
 
 (defun listener ()
-  (with-ros-node ("listener" :spin t)
-    (subscribe "/perception_output/planning"  "perception_msgs/RSObject" #'sorting)))
+  ;;(with-ros-node ("listener" :spin t)
+  (subscribe "/perception_output/planning"  "perception_msgs/RSObject" #'sorting))
+;;)
 
 (defun sorting(msg)
   (let ((*px* (roslisp:msg-slot-value msg :x))
@@ -15,6 +16,8 @@
         (*pd* (roslisp:msg-slot-value msg :d))
         (*confidence* (roslisp:msg-slot-value msg :confidence))
         (*color-of-object* (roslisp:msg-slot-value msg :color_name)))
+
+    (roslisp:ros-info (sorting) "~a'." *px*) 
 
     (if (equalp *color-of-object* *color*)
         (call-grasp-action *px* *py* 0.28 0.0 0.7 0.0 0.7 *pw* *ph* *pd*)

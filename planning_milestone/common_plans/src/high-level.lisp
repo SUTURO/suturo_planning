@@ -12,7 +12,7 @@
 )
 
 (defun find-object()
-(llif:call-robosherlock-pipeline)
+(llif::trigger-perception-pipeline-main)
 )
 
 (defun grasp-object(px py pz ox oy oz ow size_x size_y size_z)
@@ -28,10 +28,9 @@
 )
 
 (defun execute-m1()
+  (init-manipulation)
        (llif:listener)
-       (move-to-perception-point 0 0 0)
        (find-object)
 ;;     (grasp-object px py pz ox oy oz ow size_x size_y size_z)
-       (move-to-goal 0 0 0)
-       (place-object 0.0 0.0 0.0 0.0 0.0 0.0 0.0)
+       (place-object 1.0 0.6865 0.28 0.0 0.7 0.0 0.7)
 )

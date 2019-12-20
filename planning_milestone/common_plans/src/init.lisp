@@ -58,6 +58,10 @@
   
   (roslisp:ros-info (init-clients) "init perceive action client ")
   (llif::init-perceive-action-client)
+
+  ;;Init action clients
+  (roslisp:ros-info (init-clients) "init navigation action client")
+  (llif::init-nav-client)
 )
 
 (defun init-perception()
