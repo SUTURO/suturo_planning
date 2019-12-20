@@ -1,29 +1,37 @@
 (in-package :comp)
 
-(defun move-to-table()
-  (llif::call-nav-action 0 0 0)
+;;call-move-gripper-action
+;;make-perceive-action-goal
+;;call-grasp-action
+;;call-place-action
+;;
+;;
+
+(defun move-to-perception-point(px py pe)
+  (llif::call-nav-action px py pe)
 )
 
 (defun find-object()
-(call-robosherlock-pipeline)
+(llif:call-robosherlock-pipeline)
 )
 
-(defun grasp-object()
-
+(defun grasp-object(px py pz ox oy oz ow size_x size_y size_z)
+(llif:call-grasp-action px py pz ox oy oz ow size_x size_y size_z)
 )
 
-(defun move-to-goal()
- (llif::call-nav-action 0 0 0)
+(defun move-to-goal(px py pe)
+ (llif::call-nav-action px py pe)
 )
 
-(defun place-object()
-
+(defun place-object(px py pz ox oy oz ow)
+ (llif:call-place-action px py pz ox oy oz ow)
 )
 
 (defun execute-m1()
-       (move-totable)
+       (llif:listener)
+       (move-to-perception-point 0 0 0)
        (find-object)
-       (grasp-object)
-       (move-to-goal)
-       (place-object)
+;;     (grasp-object px py pz ox oy oz ow size_x size_y size_z)
+       (move-to-goal 0 0 0)
+       (place-object 0.0 0.0 0.0 0.0 0.0 0.0 0.0)
 )

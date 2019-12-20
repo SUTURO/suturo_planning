@@ -54,4 +54,7 @@
   #:init-robosherlock-action-client
   #:get-robosherlock-client
   #:call-robosherlock-pipeline
+  
+  ;;perception-client
+  #:listener
    ))

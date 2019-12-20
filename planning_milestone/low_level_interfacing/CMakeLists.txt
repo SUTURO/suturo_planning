@@ -20,6 +20,7 @@ find_package(catkin REQUIRED COMPONENTS
   #suturo_perception_msgs
   suturo_manipulation_msgs
   manipulation_action_msgs
+  perception_msgs
 )
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
