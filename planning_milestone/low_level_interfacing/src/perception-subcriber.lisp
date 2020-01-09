@@ -24,5 +24,6 @@
         (if (eq *check* T)
             (progn
               (call-grasp-action *px* *py* 0.28 0.0 0.7 0.0 0.7 *pw* *ph* *pd*)
-              (setf *check* nil)
+              (call-place-action -0.87 0.824 0.28 0 0.7 0 0.7)
+		(setf *check* nil)
 )))))
