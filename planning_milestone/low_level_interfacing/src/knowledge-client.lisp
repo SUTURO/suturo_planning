@@ -40,9 +40,12 @@
   "returns the list of all objects on the table"
   (roslisp:ros-info (json-prolog-client) "Getting objects on the table.")
   (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple `(and ("table_surface" ?table)
-                                                   ("objects_on_surface" ?instances ?table))
-                                             :package :lli)))
+                         (json-prolog:prolog-simple "table_surface(Table), objects_on_surface(INSTANCES, Table)"
+                                             :package :llif)
+                         ;; (json-prolog:prolog `(and ("table_surface" ?table)
+                         ;;                           ("objects_on_surface" ?instances ?table))
+                         ;;                     :package :llif)
+                         ))
          (instances (if (eq raw-response 1)
                         NIL
                         (cdr (assoc '?instances (cut:lazy-car raw-response))))))
@@ -55,11 +58,17 @@
   "returns the goal shelf (tf-frame) for an object name"
   (roslisp:ros-info (json-prolog-client) "Getting goal floor for object ~a." object-name)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
-         (rdf-urdf (format nil "~aurdfName" +srld-prefix+))
+         ;; (rdf-urdf (format nil "~aurdfName" +srld-prefix+))
          (raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple `(and ("object_goal_surface" ,knowrob-name ?surface)
-                                                   ("rdf_has_prolog" ?surface ,rdf-urdf ?urdfname))
-                                             :package :lli)))
+                         (json-prolog:prolog-simple (concatenate 'string 
+                                                                 "object_goal_surface('" knowrob-name "', SURFACE)," 
+                                                                 "object_frame_name(SURFACE, Name),"
+                                                                 "atom_concat('kitchen_description_', URDFNAME, Name)")
+                                             :package :llif)
+                         ;; (json-prolog:prolog `(and ("object_goal_surface" ,knowrob-name ?surface)
+                         ;;                           ("rdf_has_prolog" ?surface ,rdf-urdf ?urdfname))
+                         ;;                     :package :llif)
+                         ))
          (surface (if (eq raw-response 1)
                       NIL
                       (cdr (assoc '?urdfname (cut:lazy-car raw-response))))))
@@ -72,8 +81,9 @@
   (roslisp:ros-info (json-prolog-client) "Getting goal floor for object ~a." object-name)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple `("object_goal_pose" ,knowrob-name ?pose ?context)
-                                             :package :lli))))
+                         (json-prolog:prolog-simple-1 
+                          (concatenate 'string "object_goal_pose('" knowrob-name "', POSE, CONTEXT)")
+                          :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution.")
         (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
@@ -83,9 +93,11 @@
  "returns the goal shelf (tf-frame) for an object name"
   (roslisp:ros-info (json-prolog-client) "Getting all objects in shelf.")
   (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple `(and ("all_objects_in_whole_shelf" ?instances)
-                                                   ("member" ?instance ?instances))
-                                             :package :lli)))
+                         (json-prolog:prolog-simple 
+                          (concatenate 'string
+                                       "all_objects_in_whole_shelf(INSTANCES),"
+                                       "member(INSTANCE, INSTANCES)")
+                          :package :llif)))
          (instances (if (eq raw-response 1)  NIL (cdr (assoc '?instances (cut:lazy-car raw-response))))))
     (if instances
         (mapcar #'knowrob-symbol->string instances)
@@ -95,13 +107,17 @@
   "returns the dimensions of an object as list with '(depth width height)"
   (roslisp:ros-info (json-prolog-client) "Getting dimensions for object ~a." object-name)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
-         (dimension-term (format nil "~aboundingBoxSize" +knowrob-prefix+))
          (raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple `("rdf_has_prolog" ,knowrob-name ,dimension-term ?dim)
-                                             :package :lli)))
-         (dimensions (if (eq raw-response 1)
+                         (json-prolog:prolog-simple
+                          (concatenate 'string "object_dimensions('" knowrob-name "', D, W, H)")
+                          :package :llif)))
+         (raw-dimensions (if (eq raw-response 1)
                          NIL
-                         (cdr (assoc '?dim (cut:lazy-car raw-response))))))
+                         (cut:lazy-car raw-response)))
+         (dimensions (when raw-dimensions
+                       (list (cdr (assoc '?D raw-dimensions))
+                             (cdr (assoc '?W raw-dimensions))
+                             (cdr (assoc '?H raw-dimensions))))))
     (or dimensions
         (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution."))))
 
@@ -109,19 +125,20 @@
   "returns the dimensions of an object as list with '(depth width height)"
   (roslisp:ros-info (json-prolog-client) "Getting object in gripper.")
   (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple `(and ("gripper" ?gripper)
-                                                     ("objects_on_surface" ?instances ?gripper)
-                                                     ("member" ?instance ?instances))
-                                               :package :lli)))
+                         (json-prolog:prolog-simple-1 
+                          (concatenate 'string 
+                                       "gripper(Gripper),"
+                                       "objects_on_surface(Instances, Gripper),"
+                                       "member(INSTANCE, Instances)")
+                          :package :llif)))
          (instance (if (eq raw-response 1) NIL (cdr (assoc '?instance (cut:lazy-car raw-response))))))
     (if instance
         (knowrob-symbol->string instance)
         (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution."))))
 
 ;;; former planning_communication/json-prolog.lisp
-;;; +depricated?
-
-(defun prolog-objects-around-pose (pose &optional (threshold 0.3))
+#+deprecated
+((defun prolog-objects-around-pose (pose &optional (threshold 0.3))
   "checks if there are objects around a certain pose or not."
   (handler-case
       (with-slots (cl-tf:x cl-tf:y cl-tf:z) (cl-tf:origin pose)
@@ -142,4 +159,4 @@
         (and (json-prolog:prolog-simple "spawn_on_table")
              (prolog-objects-around-pose mypose))
     (simple-error () 
-      (roslisp:ros-warn (dummy-test) "Something went wrong")))))
+      (roslisp:ros-warn (dummy-test) "Something went wrong"))))))
