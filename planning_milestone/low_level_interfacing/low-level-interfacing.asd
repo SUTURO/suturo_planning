@@ -36,6 +36,6 @@
             (:file "place-action-client" :depends-on ("package"))
 	    (:file "marker-publisher" :depends-on ("package"))
 	    (:file "robosherlock-client" :depends-on ("package"))
-	 ;;   (:file "knowledge-client" :depends-on ("package"))
+	    (:file "knowledge-client" :depends-on ("package"))
             (:file "perception-subcriber" :depends-on ("package"))
             ))))
