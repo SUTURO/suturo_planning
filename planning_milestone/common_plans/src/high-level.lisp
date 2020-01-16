@@ -3,7 +3,9 @@
 
 (defun execute-m1()
   (init-manipulation)
+	;;call perceive takes torso_height and pose 
 	(llif::call-perceive-action 0 2)
+	;;call nav action takes x y z as goal position
 	(llif::call-nav-action 0.2 1 3) 
 	(llif::listener)
 	(llif::trigger-perception-pipeline-main)
