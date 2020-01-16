@@ -9,10 +9,11 @@
 (defun init-robosherlock-action-client ()
   "initializes the RoboSherlock client"
   (roslisp:ros-info (robosherlock-client)
-                    "Creating robosherlock action client for server 'extract_object_infos'.")
+                    "Creating robosherlock action client for server 'perception_server'.")
   (setf *robosherlock-action-client*
-        (actionlib:make-action-client "extract_object_infos"
+        (actionlib:make-action-client "/perception_actionserver"
                                       "suturo_perception_msgs/ExtractObjectInfoAction"))
+  (roslisp:ros-info (robosherlock-client) "'Actionlib made action client.")
   (loop until (actionlib:wait-for-server *robosherlock-action-client*
                                          *robosherlock-action-timeout*))
   (roslisp:ros-info (robosherlock-client)
@@ -25,7 +26,7 @@
   *robosherlock-action-client*)
 
 (defun call-robosherlock-pipeline (&optional
-                                     (regions-value (vector "robocup_table"))
+                                     (regions-value (string "robocup_table"))
                                      (visualisation-value 'False))
   "Calls the RoboSherlock pipeline. Aka, triggers perception to perceive.
   Expects a region to be given as a vector. E.g.
@@ -34,11 +35,10 @@
   (roslisp:ros-info (robosherlock-client) "Calling pipeline for regions ~a." regions-value)
   ;; actual call
   (format t "vector: ~a" regions-value)
-  (actionlib:call-goal (:get-robosherlock-client)
+  (actionlib:call-goal (llif::get-robosherlock-client)
                        (roslisp:make-message
-                        "suturo_perception_msgs/ExtractObjectInfoGoal"
-                        visualize visualisation-value
-                        regions regions-value)
+                        "suturo_perception_msgs/ObjectDetectionData"
+                        region regions-value)
                        :timeout *robosherlock-action-timeout*
                        :result-timeout *robosherlock-action-timeout*))
 
