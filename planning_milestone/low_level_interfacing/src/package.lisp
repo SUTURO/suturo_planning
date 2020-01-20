@@ -50,10 +50,15 @@
    #:make-text-action-goal
    #:call-text-to-speech-action
 
-  ;;robosherlock-client.lisp
+  ;;robosherlock-client-object.lisp
   #:init-robosherlock-action-client
   #:get-robosherlock-client
   #:call-robosherlock-pipeline
+
+  ;;knowledge-insertion-client.lisp
+  #:init-knowledge-action-client
+  #:get-knowledge-client
+  #:insert-knowledge-objects
   
   ;;perception-client
   #:listener
