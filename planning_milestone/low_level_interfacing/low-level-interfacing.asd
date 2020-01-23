@@ -22,7 +22,6 @@
                cram-json-prolog
                std_srvs-srv
                manipulation_action_msgs-msg
-               perception_msgs-msg
                knowledge_msgs-msg
                )
   :components
@@ -39,5 +38,4 @@
 	    (:file "robosherlock-client-object" :depends-on ("package"))
             (:file "knowledge-insertion-client" :depends-on ("package"))
 	    (:file "knowledge-client" :depends-on ("package"))
-            (:file "perception-subcriber" :depends-on ("package"))
             ))))
