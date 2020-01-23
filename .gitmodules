@@ -1,4 +1,0 @@
-[submodule "planning"]
-	path = planning
-	url = https://github.com/Plexiglas/planning.git
-	branch = planning_branch
