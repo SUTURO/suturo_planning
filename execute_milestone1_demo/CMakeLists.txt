@@ -1,0 +1,39 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(execute_milestone_02_demo)
+
+find_package(catkin REQUIRED COMPONENTS
+  roslisp
+  std_msgs
+)
+
+catkin_package(
+#  INCLUDE_DIRS include
+#  LIBRARIES planning_common
+#  CATKIN_DEPENDS roslisp std_msgs
+#  DEPENDS system_lib
+)
+
+###########
+## Build ##
+###########
+
+## Specify additional locations of header files
+## Your package locations should be listed before other locations
+include_directories(
+# include
+  ${catkin_INCLUDE_DIRS}
+)
+
+
+#############
+## Testing ##
+#############
+
+## Add gtest based cpp test target and link libraries
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_planning_common.cpp)
+# if(TARGET ${PROJECT_NAME}-test)
+#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
+# endif()
+
+## Add folders to be run by python nosetests
+# catkin_add_nosetests(test)
