@@ -30,7 +30,6 @@
             ((:file "package")
             (:file "move-gripper-client" :depends-on ("package"))
             (:file "navigation-action" :depends-on ("package"))
-            (:file "perceive-action-client" :depends-on ("package")) 
             (:file "grasp-action-client" :depends-on ("package")) 
             (:file "place-action-client" :depends-on ("package"))
 	    (:file "marker-publisher" :depends-on ("package"))

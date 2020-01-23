@@ -17,15 +17,6 @@
    #:call-move-gripper-action
    #:ensure-move-gripper-goal-reached
 
-   ;; perception-trigger
-   #:trigger-perception-pipeline-main
-   
-   ;; perceive-action-client
-   #:init-perceive-action-client
-   #:get-perceive-action-client
-   #:make-perceive-action-goal
-   #:ensure-perceive-goal-reached
-
    ;;grasp-action-client
    #:init-grasp-action-client
    #:get-grasp-action-client
@@ -50,19 +41,16 @@
    #:make-text-action-goal
    #:call-text-to-speech-action
 
-  ;;robosherlock-client-object.lisp
-  #:init-robosherlock-object-action-client
-  #:call-robosherlock-pipeline
+   ;;robosherlock-client-object.lisp
+   #:init-robosherlock-object-action-client
+   #:call-robosherlock-pipeline
 
-  ;;robosherlock-client-plane.lisp
-  #:init-robosherlock-plane-action-client
-  #:call-robosherlock-pipeline
+   ;;robosherlock-client-plane.lisp
+   #:init-robosherlock-plane-action-client
+   #:call-robosherlock-pipeline
 
-  ;;knowledge-insertion-client.lisp
-  #:init-knowledge-action-client
-  #:get-knowledge-client
-  #:insert-knowledge-objects
-  
-  ;;perception-client
-  #:listener
+   ;;knowledge-insertion-client.lisp
+   #:init-knowledge-action-client
+   #:get-knowledge-client
+   #:insert-knowledge-objects
    ))
