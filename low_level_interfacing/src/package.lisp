@@ -33,6 +33,13 @@
    #:call-place-action
    #:test-place-action 
 
+   ;;perceive-action-client 
+   #:init-perceive-action-client
+   #:get-perceive-action-client 
+   #:call-perceive-action 
+   #:make-perceive-action-goal
+   #:ensure-perceive-goal-reached 
+
    ;; text to speech client
    :*enable-speech*
    :*text-to-speech-action-client*

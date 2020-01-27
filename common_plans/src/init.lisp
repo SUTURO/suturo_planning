@@ -20,11 +20,17 @@
   (roslisp:ros-info (init-clients) "init place action client")
   (llif::init-place-action-client)
 
+  (roslisp:ros-info (init-clients) "init perceive action client")
+  (llif::init-perceive-action-client)
+
   (roslisp:ros-info (init-clients) "init robosherlock object action client")
   (llif::init-robosherlock-object-action-client)
 
   (roslisp:ros-info (init-clients) "init robosherlock plane action client")
   (llif::init-robosherlock-plane-action-client)
+ 
+  (roslisp:ros-info (init-clients) "init knowledge action client")
+  (llif::init-knowledge-action-client)
 )
 
 (defun init-navigation()
@@ -42,6 +48,7 @@
 (defun init-manipulation()
  "Initialize only local nodes for working without the real robot."
   (print "create ros node")
+
   (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
   (print "init tf-listener")
   (comp::get-tf-listener)

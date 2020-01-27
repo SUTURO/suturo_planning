@@ -3,7 +3,7 @@
 ;;; This can be used separately to giskard or replaced by giskard entierly.
 (in-package :llif)
 
-(defparameter *move-gripper-action-timeout* 60.0 "in seconds")
+(defparameter *move-gripper-action-timeout* 30.0 "in seconds")
 (defparameter *move-gripper-client* NIL)
 
 (defun get-move-gripper-client ()
