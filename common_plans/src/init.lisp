@@ -27,7 +27,7 @@
   (llif::init-robosherlock-plane-action-client)
  
   (roslisp:ros-info (init-clients) "init knowledge action client")
-  (llif:::init-knowledge-action-client)
+  (llif::init-knowledge-action-client)
 )
 
 (defun init-navigation()
