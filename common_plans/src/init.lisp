@@ -23,9 +23,6 @@
   (roslisp:ros-info (init-clients) "init robosherlock object action client")
   (llif::init-robosherlock-object-action-client)
 
-  (roslisp:ros-info (init-clients) "init robosherlock object action client")
-  (llif::init-robosherlock-object-action-client)
-
   (roslisp:ros-info (init-clients) "init robosherlock plane action client")
   (llif::init-robosherlock-plane-action-client)
  
