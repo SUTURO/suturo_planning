@@ -20,6 +20,9 @@
   (roslisp:ros-info (init-clients) "init place action client")
   (llif::init-place-action-client)
 
+  (roslisp:ros-info (init-clients) "init perceive action client")
+  (llif::init-perceive-action-client)
+
   (roslisp:ros-info (init-clients) "init robosherlock object action client")
   (llif::init-robosherlock-object-action-client)
 
