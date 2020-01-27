@@ -3,7 +3,7 @@
 ;;; This can be used separately to giskard or replaced by giskard entierly.
 (in-package :llif)
 
-(defparameter *grasp-action-timeout* 300.0 "in seconds")
+(defparameter *grasp-action-timeout* 30.0 "in seconds")
 (defparameter *grasp-action-client* NIL)
 
 (defun get-grasp-action-client ()

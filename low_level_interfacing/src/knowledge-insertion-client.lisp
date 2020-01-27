@@ -2,7 +2,7 @@
 (in-package :llif)
 
 (defvar *knowledge-action-client* NIL)
-(defparameter *knowledge-action-timeout* 120.0 "in seconds")
+(defparameter *knowledge-action-timeout* 30.0 "in seconds")
 
 (defun init-knowledge-action-client ()
   "initializes the Knowledge insertion client"

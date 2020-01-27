@@ -2,7 +2,7 @@
 (in-package :llif)
 
 (defvar *robosherlock-action-client* NIL)
-(defparameter *robosherlock-action-timeout* 120.0 "in seconds")
+(defparameter *robosherlock-action-timeout* 30.0 "in seconds")
 (defvar *robosherlock-door-client* NIL)
 
 

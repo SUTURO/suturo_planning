@@ -1,6 +1,6 @@
 (in-package :llif)
 
-(defparameter *place-action-timeout* 300.0 "in seconds")
+(defparameter *place-action-timeout* 30.0 "in seconds")
 (defparameter *place-action-client* NIL)
 
 (defun get-place-action-client ()
