@@ -121,6 +121,19 @@
     (or dimensions
         (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution."))))
 
+(defun prolog-object-pose (object-name)
+  "returns the pose of an object"
+  (roslisp:ros-info (json-prolog-client) "Getting pose for object ~a." object-name)
+  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
+         (raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple 
+                          (concatenate 'string "object_pose('" knowrob-name "', POSE)")
+                          :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution.")
+        (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
+                       ,(string-trim "'" (cdr (assoc '?context (cut:lazy-car raw-response)))))))))    
+
 (defun prolog-object-in-gripper ()
   "returns the dimensions of an object as list with '(depth width height)"
   (roslisp:ros-info (json-prolog-client) "Getting object in gripper.")
