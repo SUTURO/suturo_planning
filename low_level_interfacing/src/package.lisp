@@ -60,4 +60,14 @@
    #:init-knowledge-action-client
    #:get-knowledge-client
    #:insert-knowledge-objects
-   ))
+   
+   ;;knowledge-client
+   #:prolog-object-pose
+   #:prolog-object-in-gripper
+   #:prolog-object-dimensions
+   #:prolog-all-objects-in-shelf
+   #:prolog-object-goal-pose
+   #:prolog-object-goal
+   #:prolog-table-objects 
+   #:object-name->class 
+))
