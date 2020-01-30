@@ -20,6 +20,7 @@
              (:file "designators" :depends-on ("package"))
              ;;(:file "plans" :depends-on ("package"))
              (:file "utils" :depends-on ("package"))
-             (:file "high-level" :depends-on("package"))  
+             (:file "high-level" :depends-on("package"))
+	     (:file "next-object" :depends-on("package"))   
 
 ))))
