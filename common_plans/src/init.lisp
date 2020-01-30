@@ -4,8 +4,8 @@
   "Init all interfaces from planning to other groups"
   (print "init ros node...")
 
-  (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
-  (cram-tf::init-tf)
+  ;;(roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
+  ;;(cram-tf::init-tf)
 
   ;;Init action clients
   (roslisp:ros-info (init-clients) "init navigation action client")
@@ -26,8 +26,8 @@
   (roslisp:ros-info (init-clients) "init robosherlock object action client")
   (llif::init-robosherlock-object-action-client)
 
-  (roslisp:ros-info (init-clients) "init robosherlock plane action client")
-  (llif::init-robosherlock-plane-action-client)
+  ;;(roslisp:ros-info (init-clients) "init robosherlock plane action client")
+  ;;(llif::init-robosherlock-plane-action-client)
  
   (roslisp:ros-info (init-clients) "init knowledge action client")
   (llif::init-knowledge-action-client)
@@ -37,8 +37,8 @@
  "Initialize only local nodes for working without the real robot."
   (print "create ros node")
   (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
-  (print "init tf-listener")
-  (comp::get-tf-listener)
+  ;;(print "init tf-listener")
+  ;;(comp::get-tf-listener)
 
   ;;Init action clients
   (roslisp:ros-info (init-clients) "init navigation action client")
@@ -50,8 +50,8 @@
   (print "create ros node")
 
   (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
-  (print "init tf-listener")
-  (comp::get-tf-listener)
+  ;;(print "init tf-listener")
+  ;;(comp::get-tf-listener)
 
   ;;Init action clients
   (roslisp:ros-info (init-clients) "init move grippper action client")
@@ -71,8 +71,8 @@
 (defun init-perception()
  "Initialize only local nodes for working without the real robot."
   (print "create ros node")
-  (print "init tf-listener")
-  (comp::get-tf-listener)
+  ;;(print "init tf-listener")
+  ;;(comp::get-tf-listener)
  
   ;;Init action clients
   (roslisp:ros-info (init-clients) "init robosherlock action client")
@@ -84,6 +84,6 @@
  "Initialize only local nodes for working without the real robot."
   (print "create ros node")
   (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
-  (print "init tf-listener")
-  (comp::get-tf-listener)
+  ;;(print "init tf-listener")
+  ;;(comp::get-tf-listener)
 )
