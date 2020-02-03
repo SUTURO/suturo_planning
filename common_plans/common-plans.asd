@@ -22,6 +22,7 @@
              (:file "utils" :depends-on ("package"))
              (:file "high-level" :depends-on("package"))
 	     (:file "next-object" :depends-on("package"))   
-             (:file "grasp-object" :depends-on("package")) 
+             (:file "grasp-object" :depends-on("package"))
+             (:file "place-object" :depends-on("package")) 
 	     (:file "poiScan" :depends-on("package"))  
 ))))
