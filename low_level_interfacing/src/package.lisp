@@ -69,5 +69,6 @@
    #:prolog-object-goal-pose
    #:prolog-object-goal
    #:prolog-table-objects 
+   #:prolog-objects-around-pose
    #:object-name->class 
 ))
