@@ -1,7 +1,7 @@
 (in-package :comp)
 (defvar *goal*)
 
-(defun grasp-object (object-id)
+(defun place-object (object-id)
   (setq *goal* (llif:prolog-object-goal-pose object-id))
 
   (let ((px (nth 0 (nth 2 *pose*)))
