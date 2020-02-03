@@ -22,7 +22,6 @@
 	(llif::call-nav-action-ps (pop *poi*))
 )
 
-;; Noch den confidence Filter hinzufügen!!
 (cpl:def-cram-function scan-object ()
 	(llif::insert-knowledge-objects(get-confident-objects))
 	)
