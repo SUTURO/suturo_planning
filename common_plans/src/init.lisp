@@ -76,7 +76,7 @@
  
   ;;Init action clients
   (roslisp:ros-info (init-clients) "init robosherlock action client")
-  (llif::init-robosherlock-action-client)
+  (llif::init-robosherlock-object-action-client)
 	
 )
 
