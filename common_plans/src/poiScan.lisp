@@ -24,7 +24,7 @@
 
 ;; Noch den confidence Filter hinzufügen!!
 (cpl:def-cram-function scan-object ()
-	(llif::insert-knowledge-objects(llif::call-robosherlock-pipeline))
+	(llif::insert-knowledge-objects(get-confident-objects))
 	)
 
 (cpl:def-cram-function move-to-poi-and-scan ()
