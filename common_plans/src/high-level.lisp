@@ -1,7 +1,6 @@
 (in-package :comp)
 (defvar *perceptionData*)
-(defvar *min-confidence* 0.5)
-(defvar *color* "red")
+(defvar *object-id)
 
 (defun execute-m1()
   (init-planning)
@@ -9,41 +8,16 @@
 	(llif::call-perceive-action 0 2)
 	;;call nav action takes x y z as goal position
 	(llif::call-nav-action 0.2 1 3)
+  ;;calls perception to trigger the pipeline 
   (setq *perceptionData* (llif::call-robosherlock-pipeline))
+  ;;inserts the perception data into the knowledge base 
 	(llif::insert-knowledge-objects *perceptionData*)
-  (sorting *perceptionData*)
-	(llif::call-place-action -0.87 0.824 0.28 0 0.7 0 0.7)
+  ;; get the object id of the next object we want to grasp and place in the goal
+  (setq *object-id* (comp::next-object(table)))
+  ;;uses the object-id to grasp an object
+  (comp::grasp-action *object-id* 1)
+  ;;uses the object-id to place an object at its goal
+  (comp::place-action *object-id*)
 )
 
-(defun sorting(msg)
-  (let ((px (roslisp:msg-slot-value msg :x))
-        (py (roslisp:msg-slot-value msg :y))
-        (pz (roslisp:msg-slot-value msg :z))
-        (pw (roslisp:msg-slot-value msg :w))
-        (ph (roslisp:msg-slot-value msg :h))
-        (pd (roslisp:msg-slot-value msg :d))
-        (confidence (roslisp:msg-slot-value msg :confidence))
-        (color-of-object (roslisp:msg-slot-value msg :color_name)))
 
-    (if (equalp color-of-object *color*)
-        (llif::call-grasp-action px py (+ pz (/ pd 2)) 0.0 0.7 0.0 0.7 pw ph pd)
-)))
-
-(defun checkConfidence(msg)
-  (loop for i from 1 to (length msg) 
-  do(checkElementConfidence(aref msg i)
-  )))
-
-;;(defun checkElementConfidence(msg)
-;;(let ((*px* (roslisp:msg-slot-value msg :x))
-;;       (*py* (roslisp:msg-slot-value msg :y))
-;;        (*pz* (roslisp:msg-slot-value msg :z))
-;;        (*pw* (roslisp:msg-slot-value msg :w))
-;;        (*ph* (roslisp:msg-slot-value msg :h))
-;;        (*pd* (roslisp:msg-slot-value msg :d))
-;;        (*confidence* (roslisp:msg-slot-value msg :confidence))
-;;        (*color-of-object* (roslisp:msg-slot-value msg :color_name)))
-
-;;    (if (< *min-confidence* *confidence* )
-         
-;;)))
