@@ -9,4 +9,13 @@
    #:make-pose-stamped
    #:frame-closest-to-robot
    #:transform->grasp-side
+
+   ;;grasp-object.lisp
+   #:grasp-object
+
+   ;;place-object-lisp
+   #:place-object
+
+   ;;next-object.lisp
+   #:next-object
    ))
