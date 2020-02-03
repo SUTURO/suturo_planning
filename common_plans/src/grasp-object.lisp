@@ -1,10 +1,13 @@
 (in-package :comp)
 (defvar *dimensions*)
 (defvar *pose*)
+(defvar *class*)
 
 (defun grasp-object (object-id grasp-pose)
   (setq *dimensions* (llif:prolog-object-dimensions object-id))
   (setq *pose* (llif:prolog-object-pose object-id))
+  (setq *class* (llif:object-name->class object-id))
+  ;;say:grasping object of class *class*
   
   (let ((px (nth 0 (nth 2 *pose*)))
         (py (nth 1 (nth 2 *pose*)))
@@ -19,5 +22,6 @@
     (if (equalp grasp-pose 0)
         (llif:call-grasp-action px py pz qv1 qv2 qv3 qv4 size_x size_y size_z object-id 0))
     (if (equalp grasp-pose 1)
-    (llif:call-grasp-action px py  pz qv1 qv2 qv3 qv4 size_x size_y size_z object-id 1)))
+        (llif:call-grasp-action px py  pz qv1 qv2 qv3 qv4 size_x size_y size_z object-id 1)))
+  ;;say: Grasping object was successful 
   )
