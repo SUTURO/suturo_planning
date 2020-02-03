@@ -13,7 +13,7 @@
   ;;inserts the perception data into the knowledge base 
 	(llif::insert-knowledge-objects *perceptionData*)
   ;; get the object id of the next object we want to grasp and place in the goal
-  (setq *object-id* (comp::next-object(table)))
+  (setq *object-id* (comp::next-object table))
   ;;uses the object-id to grasp an object
   (comp::grasp-action *object-id* 1)
   ;;uses the object-id to place an object at its goal
