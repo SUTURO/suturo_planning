@@ -13,10 +13,10 @@
 ;;  (roslisp::list-to-ros-message (delete-if (lambda (obj)
 ;;   (roslisp::with-fields (confidence) obj (> confidence 0.4)) *objects*) *objects*)))
 
-(defun get-confident-objects (region)
+(defun get-confident-objects (&optional regions-value)
   (defvar *pipeline-msg* NIL)
   (defvar *object-list* NIL)
-  (setf *pipeline-msg* (llif:call-robosherlock-pipeline region))
+  (setf *pipeline-msg* (llif:call-robosherlock-pipeline regions-value))
   (setf *object-list* (roslisp::with-fields (detectiondata) *pipeline-msg* (print detectiondata))
   (roslisp::list-to-ros-message (delete-if (lambda (object)
   (roslisp::with-fields (confidence) object (> confidence 0.55)) *object-list*)
