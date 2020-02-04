@@ -2,7 +2,7 @@
 
 (defun init-interface()
   "Init all interfaces from planning to other groups"
-  (print "init ros node...")
+  (print "init the ros nodes of all needed clients")
 
   ;;(roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
   ;;(cram-tf::init-tf)
@@ -35,7 +35,7 @@
 
 (defun init-navigation()
  "Initialize only local nodes for working without the real robot."
-  (print "create ros node")
+  (print "create ros node for navigation")
   (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
   ;;(print "init tf-listener")
   ;;(comp::get-tf-listener)
@@ -47,7 +47,7 @@
 
 (defun init-manipulation()
  "Initialize only local nodes for working without the real robot."
-  (print "create ros node")
+  (print "create ros nodes for the manipulation clients")
 
   (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
   ;;(print "init tf-listener")
@@ -70,7 +70,7 @@
 
 (defun init-perception()
  "Initialize only local nodes for working without the real robot."
-  (print "create ros node")
+  (print "create ros node for perception client")
   ;;(print "init tf-listener")
   ;;(comp::get-tf-listener)
  
@@ -82,7 +82,7 @@
 
 (defun init-planning()
  "Initialize only local nodes for working without the real robot."
-  (print "create ros node")
+  (print "create ros node for planning")
   (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
   ;;(print "init tf-listener")
   ;;(comp::get-tf-listener)
