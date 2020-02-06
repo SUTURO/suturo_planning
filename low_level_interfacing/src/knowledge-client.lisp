@@ -151,7 +151,7 @@
 
 ;;; former planning_communication/json-prolog.lisp
 #+deprecated
-((defun prolog-objects-around-pose (pose &optional (threshold 0.3))
+((defun prolog-objects-around-pose (pose &optional (threshold 3.0))
   "checks if there are objects around a certain pose or not."
   (handler-case
       (with-slots (cl-tf:x cl-tf:y cl-tf:z) (cl-tf:origin pose)

@@ -38,4 +38,5 @@
             (:file "knowledge-insertion-client" :depends-on ("package"))
 	    (:file "knowledge-client" :depends-on ("package"))
             (:file "perceive-action-client" :depends-on ("package"))
+	    (:file "nlp-subscriber" :depends-on ("package"))
             ))))
