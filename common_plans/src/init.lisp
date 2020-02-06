@@ -4,7 +4,7 @@
   "Init all interfaces from planning to other groups"
   (print "init the ros nodes of all needed clients")
 
-  ;;(roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
+  (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
   ;;(cram-tf::init-tf)
 
   ;;Init action clients
@@ -71,6 +71,8 @@
 (defun init-perception()
  "Initialize only local nodes for working without the real robot."
   (print "create ros node for perception client")
+  (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
+
   ;;(print "init tf-listener")
   ;;(comp::get-tf-listener)
  
