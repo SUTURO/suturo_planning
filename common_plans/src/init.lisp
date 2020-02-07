@@ -36,7 +36,7 @@
 (defun init-navigation()
  "Initialize only local nodes for working without the real robot."
   (print "create ros node for navigation")
-  (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
+  ;;(roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
   ;;(print "init tf-listener")
   ;;(comp::get-tf-listener)
 
