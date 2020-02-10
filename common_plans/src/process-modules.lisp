@@ -3,6 +3,7 @@
 (defmacro with-hsr-process-modules (&body body)
   `(cram-process-modules:with-process-modules-running
        (comp::hsr-navigation)
+       (comp::hsr-arm)
      (cpl-impl::named-top-level (:name :top-level)
        ,@body)))
 
@@ -19,9 +20,9 @@
 
  ;;;;;;;;;;;;;;;;;;;; Arm  ;;;;;;;;;;;;;;;;;;;;;;;;
 
-(cram-process-modules:def-process-module hsr-grasp (motion-designator)
-  (roslisp:ros-info (hsr-grasp-process-modules)
-                    "hsr-grasp called with a motion designator `~a'."
+(cram-process-modules:def-process-module hsr-arm (motion-designator)
+  (roslisp:ros-info (hsr-arm-process-modules)
+                    "hsr-arm called with a motion designator `~a'."
                     motion-designator)
   (destructuring-bind (command
                        ?px
