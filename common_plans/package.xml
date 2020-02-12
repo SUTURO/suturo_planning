@@ -65,7 +65,6 @@
   <exec_depend>cram_prolog</exec_depend>
   <exec_depend>cram_designators</exec_depend>
   <exec_depend>cram_process_modules</exec_depend>
-  <exec_depend>urdf-proj</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

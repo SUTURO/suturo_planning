@@ -16,9 +16,11 @@
    ;;place-object-lisp
    #:place-object
 
-   ;;next-object.lisp
-   #:next-object
-
    ;;high-level-plans.lisp
    #:move-hsr
+
+   ;;mid-level-plans.lisp
+   #:next-object
+   #:get-pose
+   #:get-confident-objects
    ))

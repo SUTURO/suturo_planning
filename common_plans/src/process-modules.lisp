@@ -36,8 +36,7 @@
                        ?size_y
                        ?size_z
                        ?object_id
-                       ?graspmode
-                       )
+                       ?graspmode)
       (desig:reference motion-designator)
     (ecase command
       (grasping

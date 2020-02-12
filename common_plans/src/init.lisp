@@ -1,9 +1,11 @@
 (in-package :comp)
 
+;;Init all interface clients and start a ros node
 (defun init-interface()
   "Init all interfaces from planning to other groups"
   (roslisp:ros-info (init-inteface) "Initialising Interfaces:")
-  
+
+  ;;starts ros node
   (init-planning)
 
   (init-navigation)
@@ -34,14 +36,14 @@
   (roslisp:ros-info (init-interface) "init place action client")
   (llif::init-place-action-client)
   
-  ;;Init action clients
   (roslisp:ros-info (init-interface) "init navigation action client")
   (llif::init-nav-client)
 )
 
 (defun init-perception()
  "Initialize only local nodes for working without the real robot."
-  
+
+  ;;Init client
   (roslisp:ros-info (init-interface) "init robosherlock object action client")
   (llif::init-robosherlock-object-action-client)
 
@@ -51,7 +53,7 @@
 
 (defun init-planning()
  "Initialize only local nodes for working without the real robot."
-
+  ;;start rosnode named planning_node
   (roslisp:ros-info (init-interface) "Creating ROS Node 'planning_node'")
   (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
 )
