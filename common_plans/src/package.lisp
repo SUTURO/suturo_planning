@@ -18,4 +18,7 @@
 
    ;;next-object.lisp
    #:next-object
+
+   ;;high-level-plans.lisp
+   #:move-hsr
    ))

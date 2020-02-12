@@ -26,5 +26,6 @@
              (:file "place-object" :depends-on("package")) 
 	     (:file "poiScan" :depends-on("package"))
 	     (:file "select-process-modules" :depends-on("package"))
-	     (:file "process-modules" :depends-on("package")) 
+	     (:file "process-modules" :depends-on("package"))
+	     (:file "high-level-plans" :depends-on("package")) 
 ))))
