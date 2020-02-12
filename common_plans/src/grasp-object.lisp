@@ -23,5 +23,5 @@
         (llif:call-grasp-action px py pz qv1 qv2 qv3 qv4 size_x size_y size_z object-id 0))
     (if (equalp grasp-pose 1)
         (llif:call-grasp-action px py  pz qv1 qv2 qv3 qv4 size_x size_y size_z object-id 1)))
-  ;;say: Grasping object was successful 
+  ;;say: Grasping object was successful
   )

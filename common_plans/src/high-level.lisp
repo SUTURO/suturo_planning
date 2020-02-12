@@ -3,21 +3,28 @@
 (defvar *object-id*)
 
 (defun execute-m1()
-  (init-planning)
-	;;call perceive takes torso_height and pose 
-	(llif::call-perceive-action 0 2)
-	;;call nav action takes x y z as goal position
-	(llif::call-nav-action 0.2 1 3)
-  ;;calls perception to trigger the pipeline 
+
+  ;;Get into perceive position
+  (llif:call-nav-action -0.8 0.7 -1.5)
+  (llif::call-perceive-action 0)
+
+  ;;perceive
   (setq *perceptionData* (llif::call-robosherlock-pipeline))
-  ;;inserts the perception data into the knowledge base 
+
+  ;;Get into grasp position
+  (llif::call-perceive-action 1)
+  (llif::call-nav-action -0.8 0.7 3.15)
+
+  ;;Insert found objects into knowledge base
 	(llif::insert-knowledge-objects *perceptionData*)
-  ;; get the object id of the next object we want to grasp and place in the goal
+
+  ;;Get next object
   (setq *object-id* (comp:next-object "table"))
-  ;;uses the object-id to grasp an object
+
+  ;;Grasping object
   (comp:grasp-object *object-id* 1)
-  ;;uses the object-id to place an object at its goal
-  (comp:place-object *object-id*)
+  
+  ;;(comp:place-object *object-id*)
 )
 
 
