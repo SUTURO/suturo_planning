@@ -33,12 +33,12 @@
    #:call-place-action
    #:test-place-action 
 
-   ;;take_pose-action-client 
-   #:init-take_pose-action-client
-   #:get-take_pose-action-client 
-   #:call-take_pose-action 
-   #:make-take_pose-action-goal
-   #:ensure-take_pose-goal-reached 
+   ;;take-pose-action-client 
+   #:init-take-pose-action-client
+   #:get-take-pose-action-client 
+   #:call-take-pose-action 
+   #:make-take-pose-action-goal
+   #:ensure-take-pose-goal-reached 
 
    ;; text to speech client
    :*enable-speech*

@@ -40,7 +40,7 @@
   (llif::init-nav-client)
 
   (roslisp:ros-info (init-interface) "init take pose action client")
-  (llif:init-take_pose-action-client)
+  (llif:init-take-pose-action-client)
 )
 
 (defun init-perception()
