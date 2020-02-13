@@ -37,6 +37,6 @@
 	    (:file "robosherlock-client-plane" :depends-on ("package"))
             (:file "knowledge-insertion-client" :depends-on ("package"))
 	    (:file "knowledge-client" :depends-on ("package"))
-            (:file "perceive-action-client" :depends-on ("package"))
+            (:file "take_pose-action-client" :depends-on ("package"))
 	    (:file "nlp-subscriber" :depends-on ("package"))
             ))))
