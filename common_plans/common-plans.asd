@@ -22,7 +22,7 @@
              (:file "high-level" :depends-on("package"))
              (:file "grasp-object" :depends-on("package"))
              (:file "place-object" :depends-on("package")) 
-;;	     (:file "mid-level-plans" :depends-on("package"))
+	     (:file "mid-level-plans" :depends-on("package"))
 	     (:file "select-process-modules" :depends-on("package"))
 	     (:file "process-modules" :depends-on("package"))
 	     (:file "high-level-plans" :depends-on("package")) 

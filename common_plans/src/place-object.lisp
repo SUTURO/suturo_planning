@@ -2,7 +2,7 @@
 (defvar *goal*)
 (defvar *class*)
   
-(defun place-object (object-id)
+(defun place-object (object-id graspmode)
   (setq *goal* (llif:prolog-object-goal-pose object-id))
   (setq *class* (llif:object-name->class object-id))
   ;;say: place object of class *class* at *goal*
@@ -14,7 +14,7 @@
         (qv2 (nth 1 (nth 1 *pose*)))
         (qv3 (nth 2 (nth 1 *pose*)))
         (qv4 (nth 3 (nth 1 *pose*))))
-  (llif:call-place-action px py pz qv1 qv2 qv3 qv4 object-id)
+  (llif:call-place-action px py pz qv1 qv2 qv3 qv4 object-id graspmode)
     )
   ;;say: done placeing object
   )

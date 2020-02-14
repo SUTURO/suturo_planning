@@ -62,4 +62,5 @@
         ?oy
         ?oz
         ?ow
-        ?object_id)))))
+        ?object_id
+        ?graspmode)))))
