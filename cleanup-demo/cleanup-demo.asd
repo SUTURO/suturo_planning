@@ -1,7 +1,7 @@
 (defsystem cleanup-demo
   :depends-on (cram-language
                roslisp
-               common-plans
+               common-function
                low-level-interfacing)
   :components
   ((:module "src"

@@ -2,7 +2,7 @@
   :depends-on (cram-language
                roslisp
                low-level-interfacing
-               common-plans)
+               common-function)
   :components
   ((:module "src"
             :components
