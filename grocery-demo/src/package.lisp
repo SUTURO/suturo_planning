@@ -1,3 +1,7 @@
 (defpackage :grocery-demo
   (:nicknames :grocery)
-  (:use :roslisp :cpl))
+  (:use :roslisp :cpl)
+  (:export
+  ;;execute-grocery.lisp
+  #:execute-grocery
+))

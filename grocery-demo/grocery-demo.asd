@@ -2,10 +2,11 @@
   :depends-on (cram-language
                roslisp
                low-level-interfacing
-               common-function)
+               common-functions)
   :components
   ((:module "src"
             :components
             ((:file "package")
-            ;;(:file "grocery-demo" :depends-on ("package"))
+            (:file "execute-grocery" :depends-on ("package"))
+	    (:file "init" :depends-on("package"))
             ))))

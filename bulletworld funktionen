@@ -28,6 +28,8 @@ Vor map start, repl start sourcen und hsr_local
 (swank:operate-on-system-for-emacs "cram-object-knowledge" (quote load-op))
 (swank:operate-on-system-for-emacs "cram-hsrb-lab-demo" (quote load-op))
 (swank:operate-on-system-for-emacs "cram-hsrb-description" (quote load-op)) 
+(swank:operate-on-system-for-emacs "low-level-interfacing" (quote load-op)) 
+(swank:operate-on-system-for-emacs "common-plans" (quote load-op)) 
 
 (setf demo::*kitchen-urdf* NIL)
 (roslisp-utilities:startup-ros)
@@ -86,6 +88,27 @@ Vor map start, repl start sourcen und hsr_local
 (urdf-proj:with-simulated-robot (exe:perform (desig:an action (type going) (target (desig:a location (pose ?nav-goal-pose))))))
 
 
+//object placing stuff
+(llif::call-robosherlock-pipeline "robocup_shelf_2")
+(setf *pipeline-msg* *)
+(roslisp::ros-message-to-list *)
+(defvar *pipeline-1* (roslisp:with-fields (detectiondata) *pipeline-msg* (print detectiondata)))
+(delete-if (lambda (obj)
+   (roslisp::with-fields (confidence_class width height) obj (if (> confidence_class 0.4) (progn (print  confidence_class) (print height) (print width)))) *pipeline-1*) *pipeline-1*)
 
+//move with motion designator
+(comp::with-hsr-process-modules (exe:perform (desig:a motion (type going) (target (desig:a location (pose ?nav-pose))))))
+
+//more object placin 
+(btr:add-object btr:*current-bullet-world* 
+                         :primit-cylinder 'cylinder-1 '((0.5 0.5 0.05)(0 0 0 1)) 
+                         :mass 0.5 :size (cl-tf:make-3d-vector 0.035 0.035 0.1))
+
+btr:*current-bullet-world*
+(btr-utils:kill-all-objects)
+
+//physics on
+(prolog:prolog '(and (btr:bullet-world ?world)
+                              (btr:simulate ?world 10)))
 
 

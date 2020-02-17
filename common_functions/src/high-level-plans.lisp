@@ -1,4 +1,4 @@
-(in-package :comp)
+(in-package :comf)
 
 ;;;; Navigation ;;;;
 (defun try-movement () (let 
@@ -72,7 +72,7 @@
 ;;
 ;;(defun hsr-grasp ()
 ;;  (let ((?successfull-pose (try-grasp)))
-;;  (comp::with-hsr-process-modules (exe:perform (desig:a motion (type grasping) 
+;;  (comf::with-hsr-process-modules (exe:perform (desig:a motion (type grasping) 
 ;;                                                      (target (desig:a location (pose ?successfull-pose))))))
 ;;))
 

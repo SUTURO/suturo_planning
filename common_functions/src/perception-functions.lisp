@@ -1,4 +1,4 @@
-(in-package :comp)
+(in-package :comf)
 
 (defvar *objects* NIL)
 ;;(defvar *x* NIL)

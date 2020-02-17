@@ -1,9 +1,9 @@
-(in-package :comp)
+(in-package :grocery)
 (defvar *perceptionData*)
 (defvar *object-id*)
 (defvar *table-objects* NIL)
 
-(defun execute-m1()
+(defun execute-grocery()
 
   ;;Get into perceive position
   (llif:call-nav-action -0.8 0.7 -1.5)
@@ -20,12 +20,12 @@
 	(llif::insert-knowledge-objects *perceptionData*)
 
   ;;Get next object
-  (setq *object-id* (comp:next-object))
+  (setq *object-id* (comf:next-object))
 
   ;;Grasping object
-  (comp:grasp-object *object-id* 1)
+  (comf:grasp-object *object-id* 1)
   
-  ;;(comp:place-object *object-id*)
+  ;;(comf:place-object *object-id*)
   )
 
 

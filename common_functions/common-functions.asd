@@ -1,4 +1,4 @@
-(defsystem common-function
+(defsystem common-functions
   :depends-on (roslisp
                cram-language
                cl-tf
@@ -17,10 +17,10 @@
             :components
             ((:file "package")
              (:file "designators" :depends-on ("package"))
-             (:file "utils" :depends-on ("package"))
-             (:file "high-level" :depends-on("package"))
-             (:file "grasp-object" :depends-on("package"))
-             (:file "place-object" :depends-on("package")) 
-	     (:file "mid-level-plans" :depends-on("package"))
+             (:file "perception-functions" :depends-on("package"))
+             (:file "manipulation-functions" :depends-on("package"))
+             (:file "navigation-functions" :depends-on("package")) 
+             (:file "knowledge-functions" :depends-on("package"))
+	     (:file "nlp-functions" :depends-on("package"))
 	     (:file "high-level-plans" :depends-on("package")) 
 ))))
