@@ -1,7 +1,7 @@
 # planning
 Repository for planning code
 
-![](/home/tom/Schreibtisch/planning.png)
+![](./planning.png)
 
 ##Setting up the repository
 ###If you don't have ROS:
