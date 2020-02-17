@@ -2,8 +2,8 @@
 
 (defun static-command-listener ()
     (with-ros-node ("command_listener" :spin t)
-    (subscribe "static_command"  "nlp_msgs/StaticCommand" #'print)))
+    (subscribe "/suturo_speech_recognition/hard_commands"  "nlp_msgs/StaticCommand" #'print)))
 
 (defun dynamic-command-listener ()
     (with-ros-node ("command_listener" :spin t)
-    (subscribe "dynamic_command"  "nlp_msgs/DynamicCommand" #'print)))
+    (subscribe "/suturo_speech_recognition/dynamic_commands"  "nlp_msgs/DynamicCommand" #'print)))
