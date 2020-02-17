@@ -46,4 +46,5 @@
 	    (:file "select-process-modules" :depends-on("package"))
 	    (:file "process-modules" :depends-on("package"))
 	    (:file "poi-client" :depends-on("package"))
+	    (:file "text-to-speech" :depends-on("package"))
             ))))

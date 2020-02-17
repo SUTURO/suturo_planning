@@ -15,4 +15,7 @@
    #:place-object
    #:grasp-object
 
+   ;;knowledge-functions.lisp
+   #:next-object	
+
    ))

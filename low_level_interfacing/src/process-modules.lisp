@@ -37,13 +37,13 @@
                     "hsr-arm called with a motion designator `~a'."
                     motion-designator)
   (destructuring-bind (command
-                       ?px
-                       ?py
-                       ?pz
-                       ?ox
-                       ?oy
-                       ?oz
-                       ?ow
+                       ?point-x
+                       ?point-y
+                       ?point-z
+                       ?quaterion-value-1
+                       ?quaterion-value-2
+                       ?quaterion-value-3
+                       ?quaterion-value-4
                        ?size_x
                        ?size_y
                        ?size_z
@@ -53,13 +53,13 @@
     (ecase command
       (grasping
        (llif::call-grasp-action
-        ?px
-        ?py
-        ?pz
-        ?ox
-        ?oy
-        ?oz
-        ?ow
+        ?point-x
+        ?point-y
+        ?point-z
+        ?quaterion-value-1
+        ?quaterion-value-2
+        ?quaterion-value-3
+        ?quaterion-value-4
         ?size_x
         ?size_y
         ?size_z
@@ -67,12 +67,12 @@
         ?graspmode))
       (placeing
        (llif::call-place-action
-        ?px
-        ?py
-        ?pz
-        ?ox
-        ?oy
-        ?oz
-        ?ow
+        ?point-x
+        ?point-y
+        ?point-z
+        ?quaterion-value-1
+        ?quaterion-value-2
+        ?quaterion-value-3
+        ?quaterion-value-4
         ?object_id
         ?graspmode)))))

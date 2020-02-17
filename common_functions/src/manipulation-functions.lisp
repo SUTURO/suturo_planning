@@ -2,49 +2,57 @@
 
 
 (defvar *goal*)
-(defvar *class*)
+(defvar *classgrasp*)
 (defvar *dimensions*)
 (defvar *pose*)
-(defvar *class*)
+(defvar *classplace*)
 
   
 (defun place-object (object-id graspmode)
   (setq *goal* (llif:prolog-object-goal-pose object-id))
-  (setq *class* (llif:object-name->class object-id))
+  (setq *classplace* (llif:object-name->class object-id))
   ;;say: place object of class *class* at *goal*
 
-  (let ((px (nth 0 (nth 0 *pose*)))
-        (py (nth 1 (nth 0 *pose*)))
-        (pz (nth 2 (nth 0 *pose*)))
-        (qv1 (nth 0 (nth 1 *pose*)))
-        (qv2 (nth 1 (nth 1 *pose*)))
-        (qv3 (nth 2 (nth 1 *pose*)))
-        (qv4 (nth 3 (nth 1 *pose*))))
-  (llif:call-place-action px py pz qv1 qv2 qv3 qv4 object-id graspmode)
-    )
+  (let ((point-x-goal (nth 0 (nth 0 *pose*)))
+        (point-y-goal (nth 1 (nth 0 *pose*)))
+        (point-z-goal (nth 2 (nth 0 *pose*)))
+        (quaterion-value-1 (nth 0 (nth 1 *pose*)))
+        (quaterion-value-2 (nth 1 (nth 1 *pose*)))
+        (quaterion-value-3 (nth 2 (nth 1 *pose*)))
+        (quaterion-value-4 (nth 3 (nth 1 *pose*))))
+    (llif:call-place-action point-x-goal point-y-goal point-z-goal
+                            quaterion-value-1 quaterion-value-2
+                            quaterion-value-3 quaterion-value-4
+                            object-id graspmode))
   ;;say: done placeing object
   )
 
 (defun grasp-object (object-id grasp-pose)
   (setq *dimensions* (llif:prolog-object-dimensions object-id))
   (setq *pose* (llif:prolog-object-pose object-id))
-  (setq *class* (llif:object-name->class object-id))
+  (setq *classgrasp* (llif:object-name->class object-id))
   ;;say:grasping object of class *class*
   
-  (let ((px (nth 0 (nth 2 *pose*)))
-        (py (nth 1 (nth 2 *pose*)))
-        (pz (nth 2 (nth 2 *pose*)))
-        (qv1 (nth 0 (nth 3 *pose*)))
-        (qv2 (nth 1 (nth 3 *pose*)))
-        (qv3 (nth 2 (nth 3 *pose*)))
-        (qv4 (nth 3 (nth 3 *pose*)))
+  (let ((point-x-object (nth 0 (nth 2 *pose*)))
+        (point-y-object (nth 1 (nth 2 *pose*)))
+        (point-z-object (nth 2 (nth 2 *pose*)))
+        (quaterion-value-1 (nth 0 (nth 3 *pose*)))
+        (quaterion-value-2 (nth 1 (nth 3 *pose*)))
+        (quaterion-value-3 (nth 2 (nth 3 *pose*)))
+        (quaterion-value-4 (nth 3 (nth 3 *pose*)))
         (size_x (nth 0 *dimensions*))
         (size_y (nth 1 *dimensions*))
         (size_z (nth 2 *dimensions*)))
     (if (equalp grasp-pose 0)
-        (llif:call-grasp-action px py pz qv1 qv2 qv3 qv4 size_x size_y size_z object-id 0))
+        (llif:call-grasp-action point-x-object point-y-object point-z-object
+                                quaterion-value-1 quaterion-value-2
+                                quaterion-value-3 quaterion-value-4
+                                size_x size_y size_z object-id 0))
     (if (equalp grasp-pose 1)
-        (llif:call-grasp-action px py  pz qv1 qv2 qv3 qv4 size_x size_y size_z object-id 1)))
+        (llif:call-grasp-action point-x-object point-y-object point-z-object
+                                quaterion-value-1 quaterion-value-2
+                                quaterion-value-3 quaterion-value-4
+                                size_x size_y size_z object-id 1)))
   ;;say: Grasping object was successful
   )
  
