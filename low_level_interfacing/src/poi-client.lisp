@@ -31,5 +31,8 @@
 
 (defun addPoiFromTopic (poseArrayMsg) 
         (roslisp:ros-info (poi-subscriber) "added POIs to List")
-        (mapcar 'add-stamped-poi poseArrayMsg)
+        (mapcar 
+          (lambda (arg) (add-stamped-poi(cl-tf::pose->pose-stamped "map" 0.0 arg)))
+          (roslisp::with-fields (poses) poseArrayMsg)
+        )
 )
