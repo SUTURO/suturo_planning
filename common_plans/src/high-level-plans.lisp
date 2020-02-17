@@ -38,7 +38,7 @@
           
 (defun move-hsr ()
 (let ((?successfull-pose (try-movement)))
-  (comp::with-hsr-process-modules (exe:perform (desig:a motion (type going) 
+  (llif::with-hsr-process-modules (exe:perform (desig:a motion (type going) 
   (target (desig:a location (pose ?successfull-pose))))))
 ))
 
