@@ -1,6 +1,8 @@
 # planning
 Repository for planning code
 
+![](./planning.png)
+
 ##Setting up the repository
 ###If you don't have ROS:
 1. sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list'
