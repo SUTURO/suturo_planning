@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>common_plans</name>
+  <name>common_function</name>
   <version>0.0.0</version>
-  <description>The common_plans package</description>
+  <description>The common_function package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->

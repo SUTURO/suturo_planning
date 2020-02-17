@@ -1,4 +1,4 @@
-(defsystem common-plans
+(defsystem common-function
   :depends-on (roslisp
                cram-language
                cl-tf

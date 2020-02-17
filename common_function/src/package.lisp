@@ -1,4 +1,4 @@
-(defpackage :common-plans
+(defpackage :common-function
   (:nicknames :comp)
   (:use :roslisp :cl :cram-designators)
   (:import-from :cram-prolog :def-fact-group :<- :lisp-fun)

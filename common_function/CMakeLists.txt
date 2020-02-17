@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(common_plans)
+project(common_function)
 
 find_package(catkin REQUIRED COMPONENTS
   roslisp
