@@ -1,4 +1,4 @@
-(in-package :comp)
+(in-package :llif)
 
 (cram-prolog:def-fact-group available-hsr-process-modules (cpm:available-process-module
                                                             cpm:matching-process-module)

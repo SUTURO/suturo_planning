@@ -39,4 +39,6 @@
 	    (:file "knowledge-client" :depends-on ("package"))
             (:file "take-pose-action-client" :depends-on ("package"))
 	    (:file "nlp-subscriber" :depends-on ("package"))
+	    (:file "select-process-modules" :depends-on("package"))
+	    (:file "process-modules" :depends-on("package"))
             ))))

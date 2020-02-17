@@ -1,9 +1,9 @@
-(in-package :comp)
+(in-package :llif)
 
 (defmacro with-hsr-process-modules (&body body)
   `(cram-process-modules:with-process-modules-running
-       (comp::hsr-navigation)
-       (comp::hsr-arm)
+       (llif::hsr-navigation)
+       (llif::hsr-arm)
      (cpl-impl::named-top-level (:name :top-level)
        ,@body)))
 
