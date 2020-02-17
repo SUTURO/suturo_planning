@@ -18,6 +18,18 @@
        (llif::call-nav-action-ps (desig:reference target))
        ))))
 
+ ;;;;;;;;;;;;;;;;;;;; TEXT-TO-SPEACH ;;;;;;;;;;;;;;;;;;;;;;;;
+ (cram-process-modules:def-process-module text-to-speach (action-designator)
+  (roslisp:ros-info (text-to-speach-process-modules)
+                     "text-to-speach called with action designator `~a'."
+                     action-designator)
+  (destructuring-bind (command target) (desig:reference action-designator)
+    (ecase command
+      (saying
+       (llif::call-text-to-speech-action (desig:reference target))
+       ))))
+
+
  ;;;;;;;;;;;;;;;;;;;; Arm  ;;;;;;;;;;;;;;;;;;;;;;;;
 
 (cram-process-modules:def-process-module hsr-arm (motion-designator)
