@@ -20,7 +20,7 @@
         (quaterion-value-2 (nth 1 (nth 1 *pose*)))
         (quaterion-value-3 (nth 2 (nth 1 *pose*)))
         (quaterion-value-4 (nth 3 (nth 1 *pose*))))
-    (llif:call-place-action point-x-goal point-z-goal point-z-goal
+    (llif:call-place-action point-x-goal point-y-goal point-z-goal
                             quaterion-value-1 quaterion-value-2
                             quaterion-value-3 quaterion-value-4
                             object-id graspmode))
