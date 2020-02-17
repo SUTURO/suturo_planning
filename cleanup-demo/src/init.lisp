@@ -1,4 +1,4 @@
-(in-package :comp)
+(in-package :clean)
 
 ;;Init all interface clients and start a ros node
 (defun init-interface()

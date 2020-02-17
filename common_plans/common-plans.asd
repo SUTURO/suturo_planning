@@ -16,7 +16,6 @@
   ((:module "src"
             :components
             ((:file "package")
-             (:file "init" :depends-on ("package"))
              (:file "designators" :depends-on ("package"))
              (:file "utils" :depends-on ("package"))
              (:file "high-level" :depends-on("package"))

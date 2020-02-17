@@ -23,7 +23,11 @@
                std_srvs-srv
                manipulation_action_msgs-msg
                knowledge_msgs-msg
-               )
+               cram-prolog
+               cram-designators
+               cram-process-modules
+               cram-language-designator-support
+               cram-executive)
   :components
   ((:module "src"
             :components

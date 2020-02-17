@@ -1,5 +1,8 @@
 (defsystem grocery-demo
-  :depends-on (cram-language)
+  :depends-on (cram-language
+               roslisp
+               low-level-interfacing
+               common-plans)
   :components
   ((:module "src"
             :components
