@@ -45,4 +45,5 @@
 	    (:file "nlp-subscriber" :depends-on ("package"))
 	    (:file "select-process-modules" :depends-on("package"))
 	    (:file "process-modules" :depends-on("package"))
+	    (:file "text-to-speech" :depends-on("package"))
             ))))
