@@ -5,32 +5,23 @@
 (defvar *table-objects* NIL)
 
 (defun execute-cleanup()
-
-  ;;Get into perceive position
-  (llif:call-nav-action -0.8 0.7 -1.5)
-  (llif::call-take-pose-action 2)
-
-  ;;perceive
-  (setq *perceptionData* (llif::call-robosherlock-pipeline))
-
-  ;;Get into grasp position
-  (llif::call-take-pose-action 1)
-  (llif::call-nav-action -0.8 0.7 3.15)
-
-  ;;Insert found objects into knowledge base
-	(llif::insert-knowledge-objects *perceptionData*)
-
-  ;;Get next object
-  (setq *object-id* (comf:next-object))
-
-  ;;Grasping object
-  (comf:grasp-object *object-id* 1)
+  ;; Loop until x = list(goal).length, 
+  ;; Move to goal one
+  ;; Scan goal 
+  ;; x+1
   
-  ;;(comf:place-object *object-id*)
+  ;; Loop until list POI nil
+    ;; Go to POI
+    ;; Move to POI
+    ;; Scan for objects
+    ;; If objects found
+    ;; get next object
+      ;; Loop until (nextobject) nil
+      ;; get next object
+      ;; move into position to grasp next object
+      ;; grasp next object
+      ;; move to the goal of the object
+      ;; place object at goal
+      ;; update knowledge about new position of object
+    ;; remove POI from list
   )
-
-
-(defun next-object ()
-    "get the next Object to grasp"
-  (setf *table-objects* (llif:prolog-table-objects))
-  (first *table-objects*))
