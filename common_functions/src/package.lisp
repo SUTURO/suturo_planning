@@ -18,4 +18,6 @@
    ;;knowledge-functions.lisp
    #:next-object	
 
+   ;;navigation-functions.lisp
+   #:scan-object 
    ))
