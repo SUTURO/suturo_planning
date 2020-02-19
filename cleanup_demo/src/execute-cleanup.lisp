@@ -1,36 +1,36 @@
 (in-package :clean)
 
-(defvar *perceptionData*)
+(defvar *goallist*)
 (defvar *object-id*)
 (defvar *table-objects* NIL)
 
 (defun execute-cleanup()
-
-  ;;Get into perceive position
-  (llif:call-nav-action -0.8 0.7 -1.5)
-  (llif::call-take-pose-action 2)
-
-  ;;perceive
-  (setq *perceptionData* (llif::call-robosherlock-pipeline))
-
-  ;;Get into grasp position
-  (llif::call-take-pose-action 1)
-  (llif::call-nav-action -0.8 0.7 3.15)
-
-  ;;Insert found objects into knowledge base
-	(llif::insert-knowledge-objects *perceptionData*)
-
-  ;;Get next object
-  (setq *object-id* (comf:next-object))
-
-  ;;Grasping object
-  (comf:grasp-object *object-id* 1)
+  ;; Loop over goal list
+  ;; Move to goal one
+  ;; Scan goal
+  (setq *goallist* (list (cl-tf::make-pose-stamped "map" 0 
+                                               (cl-tf:make-3d-vector 2 3 0) 
+                                               (cl-tf::make-quaternion 0 0 0 1))))
+  (mapcar
+   (lambda (arg)
+    (llif::call-nav-action-ps arg)
+     ;;this should not be a direct call but a (move-hsr(i))
+     ;;move-hsr but it at this point doesn't take a argument
+     (comf:scan-object)) 
+     *goallist*)
   
-  ;;(comf:place-object *object-id*)
+  ;; Loop until list POI nil
+    ;; Go to POI
+    ;; Move to POI
+    ;; Scan for objects
+    ;; If objects found
+    ;; get next object
+      ;; Loop until (nextobject) nil
+      ;; get next object
+      ;; move into position to grasp next object
+      ;; grasp next object
+      ;; move to the goal of the object
+      ;; place object at goal
+      ;; update knowledge about new position of object
+    ;; remove POI from list
   )
-
-
-(defun next-object ()
-    "get the next Object to grasp"
-  (setf *table-objects* (llif:prolog-table-objects))
-  (first *table-objects*))

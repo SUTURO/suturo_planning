@@ -4,4 +4,7 @@
   (:export
    ;;execute-cleanup.lisp
    #:execute-cleanup
+   
+   ;;demo.lisp
+   #:demo
 ))
