@@ -29,7 +29,8 @@ Vor map start, repl start sourcen und hsr_local
 (swank:operate-on-system-for-emacs "cram-hsrb-lab-demo" (quote load-op))
 (swank:operate-on-system-for-emacs "cram-hsrb-description" (quote load-op)) 
 (swank:operate-on-system-for-emacs "low-level-interfacing" (quote load-op)) 
-(swank:operate-on-system-for-emacs "common-plans" (quote load-op)) 
+(swank:operate-on-system-for-emacs "common-functions" (quote load-op)) 
+(swank:operate-on-system-for-emacs "cram-hsrb-pick-demo" (quote load-op))
 
 (setf demo::*kitchen-urdf* NIL)
 (roslisp-utilities:startup-ros)
