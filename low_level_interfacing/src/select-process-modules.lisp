@@ -13,7 +13,12 @@
   (cram-prolog:<- (cpm:matching-process-module ?desig hsr-arm)
       (desig:desig-prop ?desig (:type :grasping)))
 
+  (cram-prolog:<- (cpm:matching-process-module ?desig hsr-text-to-speach)
+      (desig:desig-prop ?desig (:type :say)))
+
   (cram-prolog:<- (cpm:matching-process-module ?desig hsr-arm)
       (desig:desig-prop ?desig (:type :placing))))
+
+
 
 

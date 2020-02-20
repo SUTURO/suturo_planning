@@ -19,13 +19,13 @@
        ))))
 
  ;;;;;;;;;;;;;;;;;;;; TEXT-TO-SPEACH ;;;;;;;;;;;;;;;;;;;;;;;;
- (cram-process-modules:def-process-module text-to-speach (action-designator)
+ (cram-process-modules:def-process-module hsr-text-to-speach (action-designator)
   (roslisp:ros-info (text-to-speach-process-modules)
-                     "text-to-speach called with action designator `~a'."
-                     action-designator)
-  (destructuring-bind (command target) (desig:reference action-designator)
+                     "text-to-speach called with motion designator `~a'."
+                     motion-designator)
+  (destructuring-bind (command target) (desig:reference motion-designator)
     (ecase command
-      (saying
+      (say
        (llif::call-text-to-speech-action (desig:reference target))
        ))))
 
