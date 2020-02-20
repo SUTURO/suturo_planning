@@ -8,7 +8,6 @@
   (cram-prolog:<- (cpm:matching-process-module ?desig  hsr-navigation)
     (desig:desig-prop ?desig (:type :going)))
 
-<<<<<<< HEAD
   (cram-prolog:<- (cpm:available-process-module hsr-arm))
 
   (cram-prolog:<- (cpm:matching-process-module ?desig hsr-arm)
@@ -27,5 +26,5 @@
 
   ;; (cram-prolog:<- (cpm:matching-process-module ?desig hsr-arm)
   ;;     (desig:desig-prop ?desig (:type :placing))))
-)
+
 
