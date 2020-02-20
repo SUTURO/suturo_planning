@@ -8,15 +8,27 @@
                  (cl-tf:make-3d-vector px py pz) 
                  (cl-tf:make-quaternion ox oy oz ow))))
 
-(defparameter *poi* (list
-        ()))
+(defparameter *poi* (list ()))
 
-;; Mit BulletWorld eine geeignete Position neben dem punkt finden
-;;(defun nearestPoi (point) 
-     ;;(mapcar 
-     ;;    (lambda (arg) 
-     ;;        (list (cl-tf::v-dist (cl-tf::origin point) (cl-tf::origin arg)) (arg))
-     ;;)*poi*))
+
+(defun closestPoi (point)
+  (closestPointInList point *poi*))
+
+(defun closestPointInList (point stampedList)
+ (cond
+       ((null stampedList) nil)
+
+       ((null (rest stampedList)) (first stampedList))
+
+       ((null (first stampedList)) (closestPointInList point (rest stampedList)))
+
+       ((< 
+          (cl-tf::v-dist (cl-tf::origin point) (cl-tf::origin (first stampedList))) 
+          (cl-tf::v-dist (cl-tf::origin point) (cl-tf::origin (second stampedList)))
+        )
+        (closestPointInList point (cons (first stampedList) 
+                       (rest (rest stampedList)))))
+       (t (closestPointInList point (rest stampedList))))) 
 
 (defun add-poi (px py pz ox oy oz ow)
 	(defparameter *poi* (append *poi* (list(make-poi px py pz ox oy oz ow))))
@@ -47,4 +59,6 @@
             )(coerce poses 'list)
         )
     )
+  (roslisp:ros-info (poi-subscriber) "closest point to zero? xD ~a" (closestPoi
+  (cl-tf::make-pose-stamped "map" 0.0 (cl-tf::make-3d-vector 0 0 0) (cl-tf::make-quaternion 0 0.7 0 0.7) )))
 )
