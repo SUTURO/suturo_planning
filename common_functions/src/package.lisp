@@ -14,10 +14,12 @@
    ;;manipulation-functions.lisp
    #:place-object
    #:grasp-object
+   #:create-place-list
 
    ;;knowledge-functions.lisp
    #:next-object	
 
    ;;navigation-functions.lisp
    #:scan-object 
+   #:move-to-poi-and-scan
    ))
