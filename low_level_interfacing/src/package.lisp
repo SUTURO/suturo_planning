@@ -70,7 +70,8 @@
    #:prolog-object-goal
    #:prolog-table-objects 
    #:prolog-objects-around-pose
-   #:object-name->class 
+   #:object-name->class
+   #:next-object
    
   ;;process-module
 
