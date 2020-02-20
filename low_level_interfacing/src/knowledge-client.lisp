@@ -103,6 +103,19 @@
         (mapcar #'knowrob-symbol->string instances)
         (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution."))))
 
+(defun prolog-next-object ()
+ "returns the next object to grasp"
+  (roslisp:ros-info (json-prolog-client) "Getting next object to grasp.")
+  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
+         (raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple-1 
+                          (concatenate 'string "next_object('')")
+                          :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution.")
+        (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
+                       ,(string-trim "'" (cdr (assoc '?context (cut:lazy-car raw-response)))))))))
+
 (defun prolog-object-dimensions (object-name)
   "returns the dimensions of an object as list with '(depth width height)"
   (roslisp:ros-info (json-prolog-client) "Getting dimensions for object ~a." object-name)
@@ -121,6 +134,7 @@
     (or dimensions
         (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution."))))
 
+;;; Work in progress. Do not use! 
 (defun prolog-object-pose (object-name)
   "returns the pose of an object"
   (roslisp:ros-info (json-prolog-client) "Getting pose for object ~a." object-name)

@@ -1,5 +1,7 @@
 (in-package :clean)
 
+(defparameter *tf-listener* nil)
+
 ;;Init all interface clients and start a ros node
 (defun init-interface()
   "Init all interfaces from planning to other groups"
@@ -55,8 +57,9 @@
 )
 
 (defun init-planning()
- "Initialize only local nodes for working without the real robot."
+  "Initialize only local nodes for working without the real robot."  
   ;;start rosnode named planning_node
   (roslisp:ros-info (init-interface) "Creating ROS Node 'planning_node'")
   (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
 )
+
