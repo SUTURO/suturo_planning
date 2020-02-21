@@ -1,4 +1,5 @@
 (in-package :comf)
+(defvar *place-list* nil)
 
 ;;;; Navigation ;;;;
 (defun try-movement () (let 
@@ -70,10 +71,48 @@
 ;;                     (target (desig:a location (pose ?actual-object-pose)))))
 ;;            ?actual-object-pose))))))
 ;;
-;;(defun hsr-grasp ()
-;;  (let ((?successfull-pose (try-grasp)))
-;;  (comf::with-hsr-process-modules (exe:perform (desig:a motion (type grasping) 
-;;                                                      (target (desig:a location (pose ?successfull-pose))))))
-;;))
+(defun grasp-hsr (object-id grasp-pose)    
+  (cpl:with-retry-counters ((grasping-retry 3))
+   (cpl:with-failure-handling
+      (((or common-fail:low-level-failure 
+                cl::simple-error
+         cl::simple-type-error)
+       (e)
+         (scan-object
+          ;;closet function i currently know of that allows me
+          ;;to trigger perception for this
+          )
+       (cpl:do-retry grasping-retry
+         (roslisp:ros-warn (grasp-fail)
+                                 "~%Failed to grasp the object~%")
+         (cpl:retry))
+
+         (roslisp:ros-warn (going-demo movement-fail)
+                            "~%No more retries~%")))
+ (comf:grasp-object object-id grasp-pose))))
 
 ;;;; Place ;;;;
+(defun place-hsr (object-id grasp-pose)
+  (let ((?place-position (comf:create-place-list object-id grasp-pose)))
+
+                         
+ (cpl:with-retry-counters ((grasping-retry 4))
+   (cpl:with-failure-handling
+      (((or common-fail:low-level-failure 
+                cl::simple-error
+         cl::simple-type-error)
+       (e)
+       (setf ?place-position (cdr ?place-position))
+       (cpl:do-retry grasping-retry
+         (roslisp:ros-warn (grasp-fail)
+                                 "~%Failed to grasp the object~%")
+         (cpl:retry))
+         (let ((?actual-place-position (car ?place-position)))
+           (llif::with-hsr-process-modules
+             (exe:perform (desig:a motion (type placeing)
+                                   (target (desig:a location
+                                                    (pose ?actual-place-position))))))
+           ;;(if (retry>1)
+           ;;trigger perception)
+                       )))))))
+   
