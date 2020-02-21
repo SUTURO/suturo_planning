@@ -9,5 +9,4 @@
             ((:file "package")
             (:file "init" :depends-on ("package"))
             (:file "execute-cleanup" :depends-on("package"))
-            (:file "demo" :depends-on("package"))
             ))))
