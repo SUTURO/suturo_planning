@@ -43,6 +43,7 @@
 
 (defun poi-listener ()
   (subscribe "object_finder" "geometry_msgs/PoseArray" #'addPoiFromTopic)
+  ;;(with-ros-node ("listener" :spin t)
   (roslisp:ros-info (poi-subscriber) "POI Subscriber started")
 )
 
@@ -58,6 +59,6 @@
             )(coerce poses 'list)
         )
     )
-  (roslisp:ros-info (poi-subscriber) "closest point to zero? xD ~a" (closestPoi
-  (cl-tf::make-pose-stamped "map" 0.0 (cl-tf::make-3d-vector 0 0 0) (cl-tf::make-quaternion 0 0.7 0 0.7) )))
+  ;;(roslisp:ros-info (poi-subscriber) "closest point to zero? xD ~a" (closestPoi
+  ;;(cl-tf::make-pose-stamped "map" 0.0 (cl-tf::make-3d-vector 0 0 0) (cl-tf::make-quaternion 0 0.7 0 0.7) )))
 )
