@@ -42,8 +42,7 @@
 
 
 (defun poi-listener ()
-  (with-ros-node ("listener" :spin t)
-    (subscribe "object_finder" "geometry_msgs/PoseArray" #'addPoiFromTopic))
+  (subscribe "object_finder" "geometry_msgs/PoseArray" #'addPoiFromTopic)
   (roslisp:ros-info (poi-subscriber) "POI Subscriber started")
 )
 

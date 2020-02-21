@@ -11,6 +11,15 @@
 		  (cl-tf::v- *currentOrigin* *goalOrigin*) 
 		  (/ *poiDistance* (cl-tf::v-dist *currentOrigin* *goalOrigin*)))))
 
+	
+	(setf *orientation* (+ 1.57 (atan (/ (cl-tf::y *goalOrigin*) (cl-tf::x *goalOrigin*)))))
+
+	(llif::call-nav-action-ps(cl-tf:make-pose-stamped
+		                frame-id
+		                (roslisp::ros-time)
+		                *newgoalOrigin*
+		                (cl-tf:euler->quaternion :ax 0.0 :ay 0.0 :az *orientation*)))
+
 	;;going designator call + rotation calculation
 	;;(llif::call-nav-action-ps)
 )
