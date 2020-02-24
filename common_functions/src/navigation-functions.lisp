@@ -7,6 +7,9 @@
 (defparameter *orientation* Nil)
 (defparameter *newgoalstamped* Nil)
 
+(defvar *pose*)
+
+
 ;;(cpl:def-cram-function move-to-poi ()
 (defun move-to-poi ()
         ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
@@ -42,3 +45,34 @@
 	(move-to-poi)
 	(scan-object)
 )
+
+(defun create-move-position-list(object-id)
+    (setq *pose* (llif:prolog-object-pose object-id))
+    (let 
+  	((?nav-pose (list (cl-tf::make-pose-stamped "map" 0 
+                                                (cl-tf:make-3d-vector
+                                                 (+ (nth 0 (nth 2 *pose*)) 0.5) ;;x-cordinate
+                                                 (nth 1 (nth 2 *pose*))  ;;y-cordinate
+                                                 0) 
+                                               (cl-tf::make-quaternion 0 0 0 1)) 
+                     (cl-tf::make-pose-stamped "map" 0 
+                                               (cl-tf:make-3d-vector
+                                                (- (nth 0 (nth 2 *pose*)) 0.5) 
+                                                (nth 1 (nth 2 *pose*))
+                                                1) 
+                                                (cl-tf::make-quaternion 0 0 0 1))
+                     (cl-tf::make-pose-stamped "map" 0 
+                                               (cl-tf:make-3d-vector
+                                                (nth 0 (nth 2 *pose*))
+                                                (+ (nth 1 (nth 2 *pose*)) 0.5)
+                                                3)
+                                               (cl-tf::make-quaternion 0 0 0 1))
+                     (cl-tf::make-pose-stamped "map" 0 
+                                               (cl-tf:make-3d-vector
+                                                (nth 0 (nth 2 *pose*))
+                                                (- (nth 1 (nth 2 *pose*)) 0.5)
+                                                4)
+                                               (cl-tf::make-quaternion 0 0 0 1))
+                     )))
+        ?nav-pose
+      ))

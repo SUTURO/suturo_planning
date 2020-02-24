@@ -7,6 +7,7 @@
 (defvar *pose* nil)
 (defvar *classplace* nil)
 (defvar *list*)
+(defvar *result*)
 
 ;;@author Jan Schimpf
 ;;todo add checks for nil;
@@ -15,9 +16,8 @@
 
 (defun place-object (place-list)
     (llif:call-place-action (nth 0 place-list) (nth 1 place-list) (nth 2 place-list)
-                            (nth 3 place-list) (nth 0 place-list)
-                            quaterion-value-3 quaterion-value-4
-                            object-id graspmode))
+                            (nth 3 place-list) (nth 4 place-list) (nth 5 place-list)
+                            (nth 6 place-list) (nth 9 place-list) (nth 10 place-list)))
   ;;say: done placeing object
   
 
@@ -32,7 +32,6 @@
   (setq *classgrasp* (llif:object-name->class object-id))
        
   ;;say:grasping object of class *class*
- 
   (let ((point-x-object (nth 0 (nth 2 *pose*)))
         (point-y-object (nth 1 (nth 2 *pose*)))
         (point-z-object (nth 2 (nth 2 *pose*)))
@@ -43,17 +42,12 @@
         (size_x (nth 0 *dimensions*))
         (size_y (nth 1 *dimensions*))
         (size_z (nth 2 *dimensions*)))
-    (if (equalp grasp-pose 0)
-        (llif:call-grasp-action point-x-object point-y-object point-z-object
+        (let ((?result (list point-x-object point-y-object point-z-object
                                 quaterion-value-1 quaterion-value-2
                                 quaterion-value-3 quaterion-value-4
-                                size_x size_y size_z object-id 0))
-    (if (equalp grasp-pose 1)
-        (llif:call-grasp-action point-x-object point-y-object point-z-object
-                                quaterion-value-1 quaterion-value-2
-                                quaterion-value-3 quaterion-value-4
-                                size_x size_y size_z object-id 1)))
-       )
+                                size_x size_y size_z object-id grasp-pose)))
+          ?result)))
+
        ;;say: Grasping object was successful
 
 (defun create-place-list (object-id grasp-pose)
