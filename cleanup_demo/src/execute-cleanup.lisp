@@ -45,12 +45,12 @@
   (setf *goallist* (list (cl-tf::make-pose-stamped "map" 0 
                                                (cl-tf:make-3d-vector 2 3 0) 
                                                (cl-tf::make-quaternion 0 0 0 1))))
-  (mapcar
-   (lambda (arg)
+  (mapcar 
+    (lambda (arg)
     (;;comf:hsr-move arg)
      ;;this should not be a direct call but a (move-hsr(i))
      ;;move-hsr but it at this point doesn't take a argument
-     (comf:scan-object)) 
+     comf:scan-object)) 
      *goallist*)
   )
 
