@@ -1,5 +1,6 @@
 (in-package :llif)
 
+;;make-point sound better
 (defun make-poi (px py pz ox oy oz ow)
 		(cl-transforms-stamped:to-msg
                 (cl-tf::make-pose-stamped  
@@ -7,7 +8,7 @@
                  0.0 
                  (cl-tf:make-3d-vector px py pz) 
                  (cl-tf:make-quaternion ox oy oz ow))))
-
+;;defparemeter once on the top of the file 
 (defparameter *poi* (list ()))
 
 
@@ -15,15 +16,18 @@
   (closestPointInList point *poi*))
 
 (defun closestPointInList (point stampedList)
+	"example ..."	;;some comments what the function doeS?
+	
  (cond
        ((null stampedList) nil)
-
+	;;indent region.. control + alt + \ i think 
        ((null (rest stampedList)) (first stampedList))
-
+	;;leerzeilen nur bei gedankenspruengen..
        ((null (first stampedList)) (closestPointInList point (rest stampedList)))
 
        ((< 
-          (cl-tf::v-dist (cl-tf::origin point) (cl-tf::origin (first stampedList))) 
+          (cl-tf::v-dist (cl-tf::origin point) ;;next line
+			 (cl-tf::origin (first stampedList))) 
           (cl-tf::v-dist (cl-tf::origin point) (cl-tf::origin (second stampedList)))
         )
         (closestPointInList point (cons (first stampedList) 
@@ -31,7 +35,8 @@
        (t (closestPointInList point (rest stampedList))))) 
 
 (defun add-poi (px py pz ox oy oz ow)
-	(defparameter *poi* (append *poi* (list(make-poi px py pz ox oy oz ow))))
+	(defparameter *poi* (append *poi*  ;;next line
+				    (list(make-poi px py pz ox oy oz ow))))
         ;;(append *poi* (make-poi px py pz ox oy oz ow))
 )
 
@@ -40,7 +45,7 @@
 )
 
 
-
+;;point..
 (defun poi-listener ()
   (subscribe "object_finder" "geometry_msgs/PoseArray" #'addPoiFromTopic)
   ;;(with-ros-node ("listener" :spin t)
