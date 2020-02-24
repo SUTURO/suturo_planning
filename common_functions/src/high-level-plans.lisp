@@ -112,7 +112,7 @@
              (exe:perform (desig:a motion (type placeing)
                                    (target (desig:a location
                                                     (pose ?actual-place-position))))))
-           ;;(if (retry>1)
+           ;;(if (grasping-retry>1)
            ;;trigger perception)
                        )))))))
    

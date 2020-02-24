@@ -15,9 +15,8 @@
 
 (defun place-object (place-list)
     (llif:call-place-action (nth 0 place-list) (nth 1 place-list) (nth 2 place-list)
-                            (nth 3 place-list) (nth 0 place-list)
-                            quaterion-value-3 quaterion-value-4
-                            object-id graspmode))
+                            (nth 3 place-list) (nth 4 place-list) (nth 5 place-list)
+                            (nth 6 place-list) (nth 9 place-list) (nth 10 place-list)))
   ;;say: done placeing object
   
 
