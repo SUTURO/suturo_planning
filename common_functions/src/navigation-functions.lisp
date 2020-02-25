@@ -6,22 +6,12 @@
 (defparameter *newgoalOrigin* Nil)
 (defparameter *orientation* Nil)
 (defparameter *newgoalstamped* Nil)
-(defparameter *listOfPoi* Nil)
 ;;difference between defvar and defparemeter do you really need defvar?
 (defvar *pose*)
 
 
 ;;(cpl:def-cram-function move-to-poi ()
-(defun move-to-poi ()
-        ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
-	;;please indent region...
-	
-        (setf *listOfPoi* (mapcar (lambda (listelem) (pose-with-distance-to-point *poiDistance* listelem)) 
-                                 (llif::sortedPoiByDistance
-					(cl-tf::transform-stamped->pose-stamped
-					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")))))
-        (llif::call-take-pose-action 2)
-)
+;;moved to high level
 
 
 (defun pose-with-distance-to-point (distance point)
