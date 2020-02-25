@@ -1,7 +1,6 @@
 (in-package :llif)
 
-;;make-point sound better
-(defun make-poi (px py pz ox oy oz ow)
+(defun make-point (px py pz ox oy oz ow)
 		(cl-transforms-stamped:to-msg
                 (cl-tf::make-pose-stamped  
                  "map"
@@ -16,7 +15,7 @@
   (closestPointInList point *poi*))
 
 (defun closestPointInList (point stampedList)
-	"example ..."	;;some comments what the function doeS?
+	"returns the closest Poi in relation of the given point"
 	
  (cond
        ((null stampedList) nil)
@@ -34,10 +33,21 @@
                        (rest (rest stampedList)))))
        (t (closestPointInList point (rest stampedList))))) 
 
+
+(defun sortedPoiByDistance (point) 
+   (sort (copy-list *poi*)
+         (lamda (ers zwei) 
+                 (< 
+	           (cl-tf::v-dist (cl-tf::origin point)
+			 (cl-tf::origin ers)) 
+                   (cl-tf::v-dist (cl-tf::origin point) 
+                         (cl-tf::origin zwei))) )))
+
+
 (defun add-poi (px py pz ox oy oz ow)
 	(defparameter *poi* (append *poi*  ;;next line
-				    (list(make-poi px py pz ox oy oz ow))))
-        ;;(append *poi* (make-poi px py pz ox oy oz ow))
+				    (list(make-point px py pz ox oy oz ow))))
+        ;;(append *poi* (make-point px py pz ox oy oz ow))
 )
 
 (defun add-stamped-poi (stamped)
@@ -45,8 +55,8 @@
 )
 
 
-;;point..
-(defun poi-listener ()
+
+(defun point-listener ()
   (subscribe "object_finder" "geometry_msgs/PoseArray" #'addPoiFromTopic)
   ;;(with-ros-node ("listener" :spin t)
   (roslisp:ros-info (poi-subscriber) "POI Subscriber started")
