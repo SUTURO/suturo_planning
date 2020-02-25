@@ -14,4 +14,4 @@
           (print confidence_class)
           (print confidence_class))))
       *objects*))
-    *objects*))
+    *objects*)

@@ -36,7 +36,7 @@
 
 (defun sortedPoiByDistance (point) 
    (sort (copy-list *poi*)
-         (lamda (ers zwei) 
+         (lambda (ers zwei) 
                  (< 
 	           (cl-tf::v-dist (cl-tf::origin point)
 			 (cl-tf::origin ers)) 
