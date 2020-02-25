@@ -14,17 +14,24 @@
 (defun move-to-poi ()
         ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
 	;;please indent region...
+        (move-with-distance-to-point *poiDistance* (llif::closestPoi
+					  (cl-tf::transform-stamped->pose-stamped
+					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
+        (llif::call-take-pose-action 2)
+)
+
+
+(defun move-with-distance-to-point (distance point)
+
         (setf *currentOrigin* (cl-tf::origin (cl-tf::transform-stamped->pose-stamped ;;new line ..
 					      (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
-        (setf *goalOrigin* (cl-tf::origin(llif::closestPoi ;;new line..
-					  (cl-tf::transform-stamped->pose-stamped ;;new line
-					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")))))
+        (setf *goalOrigin* (cl-tf::origin point))
 	(setf *newgoalOrigin* (cl-tf::v+ *goalOrigin* 
 		(cl-tf::v* 
 		  (cl-tf::v- *currentOrigin* *goalOrigin*) 
-		  (/ *poiDistance* (cl-tf::v-dist *currentOrigin* *goalOrigin*)))))
+		  (/ distance (cl-tf::v-dist *currentOrigin* *goalOrigin*)))))
 
-	;;what is 1.57 where does it come from?
+	;;what is 1.57 where does it come from? its the half of PI
 	(setf *orientation* (+ 1.57 (atan (/ (cl-tf::y *goalOrigin*) (cl-tf::x *goalOrigin*)))))
         (setf *newgoalstamped* (cl-tf:make-pose-stamped
 		                "map"
@@ -34,13 +41,7 @@
 
         (roslisp:ros-info (poi-subscriber) "going to: ~a" *newgoalstamped*)
 
-	(llif::call-nav-action-ps *newgoalstamped*)
-
-	(llif::call-take-pose-action 2) ;;******
-	;;going designator call + rotation calculation
-	;;(llif::call-nav-action-ps)
-;;bracket please at the end of the line above see: ******
-)
+	(llif::call-nav-action-ps *newgoalstamped*))
 
 (cpl:def-cram-function scan-object ()
 	(llif::insert-knowledge-objects(get-confident-objects))
@@ -81,3 +82,17 @@
                      ))) ;;bracket :(
         ?nav-pose
       ))  ;;bracket :(
+
+(defun move-to-table ()
+        (setf *currentOrigin* (cl-tf::origin (cl-tf::transform-stamped->pose-stamped
+					      (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
+        (setf *tablePose* Nil) ;; insert knowledge function for getting table pose
+        ;; add table-width to goal to insert distance (-x)
+        (llif::call-nav-action-ps *tablePose*))
+
+(defun move-to-shelf()
+        (setf *currentOrigin* (cl-tf::origin (cl-tf::transform-stamped->pose-stamped
+					      (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
+        (setf *shelfPose* Nil) ;; insert knowledge function for getting shelf pose
+        ;; add shelf-depth to goal to insert distance (+y)
+        (llif::call-nav-action-ps *shelfPose*))
