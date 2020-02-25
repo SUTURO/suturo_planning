@@ -81,3 +81,17 @@
                      ))) ;;bracket :(
         ?nav-pose
       ))  ;;bracket :(
+
+(defun move-to-table ()
+        (setf *currentOrigin* (cl-tf::origin (cl-tf::transform-stamped->pose-stamped
+					      (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
+        (setf *tablePose* Nil) ;; insert knowledge function for getting table pose
+        ;; add table-width to goal to insert distance (-x)
+        (llif::call-nav-action-ps *tablePose*))
+
+(defun move-to-shelf()
+        (setf *currentOrigin* (cl-tf::origin (cl-tf::transform-stamped->pose-stamped
+					      (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
+        (setf *shelfPose* Nil) ;; insert knowledge function for getting shelf pose
+        ;; add shelf-depth to goal to insert distance (+y)
+        (llif::call-nav-action-ps *shelfPose*))
