@@ -1,5 +1,6 @@
 (in-package :comf)
 (defvar *place-list* nil)
+(defparameter *listOfPoi* Nil)
 
 ;;;; Navigation ;;;;
 (defun try-movement () (let 
@@ -12,6 +13,35 @@
                      (cl-tf::make-pose-stamped "map" 0 
                                                (cl-tf:make-3d-vector 1.097 0.556 0)
                                                (cl-tf::make-quaternion 0 0 0 1)))))
+
+(urdf-proj:with-simulated-robot (cpl:with-retry-counters ((going-retry 3))
+      (cpl:with-failure-handling
+          (((or common-fail:low-level-failure 
+                cl::simple-error
+                cl::simple-type-error)
+               (e)
+             
+             (setf ?nav-pose (cdr ?nav-pose))
+             
+             (cpl:do-retry going-retry
+               (roslisp:ros-warn (going-demo movement-fail)
+                                 "~%Failed to move to given position~%")
+               (cpl:retry))
+             
+             (roslisp:ros-warn (going-demo movement-fail)
+                               "~%No more retries~%")))
+        
+          (let ((?actual-nav-pose (car ?nav-pose))) 
+          (cram-executive:perform
+           (desig:an action
+                     (type going)
+                     (target (desig:a location (pose ?actual-nav-pose)))))
+            ?actual-nav-pose))))))
+
+
+;;;;;;;;;;;;;;;;;;;;Try Movement with List ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun try-movement-stampedList (listStamped) (let 
+	(?nav-pose listStamped)
 
 (urdf-proj:with-simulated-robot (cpl:with-retry-counters ((going-retry 3))
       (cpl:with-failure-handling
@@ -134,3 +164,15 @@
     ;; (llif::with-hsr-process-modules (exe:perform (desig:a motion (type grasping)
     ;; (target (desig:a location (grasp-object object-id grasp-mode)))))
          ))))))
+
+
+(defun move-to-poi ()
+        ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
+	;;please indent region...
+	
+        (setf *listOfPoi* (mapcar (lambda (listelem) (comf::pose-with-distance-to-point *poiDistance* listelem)) 
+                                 (llif::sortedPoiByDistance
+					(cl-tf::transform-stamped->pose-stamped
+					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")))))
+        (try-movement-stampedList *listOfPoi*)
+        (llif::call-take-pose-action 2))

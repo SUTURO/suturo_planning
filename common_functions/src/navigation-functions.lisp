@@ -11,18 +11,10 @@
 
 
 ;;(cpl:def-cram-function move-to-poi ()
-(defun move-to-poi ()
-        ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
-	;;please indent region...
-	
-        (move-with-distance-to-point *poiDistance* (llif::closestPoi
-					  (cl-tf::transform-stamped->pose-stamped
-					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
-        (llif::call-take-pose-action 2)
-)
+;;moved to high level
 
 
-(defun move-with-distance-to-point (distance point)
+(defun pose-with-distance-to-point (distance point)
 
         (setf *currentOrigin* (cl-tf::origin (cl-tf::transform-stamped->pose-stamped ;;new line ..
 					      (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
@@ -42,7 +34,7 @@
 
         (roslisp:ros-info (poi-subscriber) "going to: ~a" *newgoalstamped*)
 
-	(llif::call-nav-action-ps *newgoalstamped*))
+	*newgoalstamped*)
 
 (cpl:def-cram-function scan-object ()
 	(llif::insert-knowledge-objects(get-confident-objects))
