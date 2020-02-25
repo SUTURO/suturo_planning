@@ -11,7 +11,9 @@
      (roslisp::with-fields 
       (confidence_class) obj 
       (if (> confidence_class 0.6) 
-          (print confidence_class)
-          (print confidence_class))))
+          (roslisp::ros-info 
+            (perception-functions) "Object confidence high enough")
+          (roslisp::ros-info 
+            (perception-functions) "Object confidence to low"))))
       *objects*))
     *objects*)
