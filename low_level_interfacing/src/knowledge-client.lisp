@@ -106,15 +106,14 @@
 (defun prolog-next-object ()
  "returns the next object to grasp"
   (roslisp:ros-info (json-prolog-client) "Getting next object to grasp.")
-  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
-         (raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple-1 
-                          (concatenate 'string "next_object('')")
-                          :package :llif))))
-    (if (eq raw-response 1)
-        (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution.")
-        (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
-                       ,(string-trim "'" (cdr (assoc '?context (cut:lazy-car raw-response)))))))))
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple 
+                          "next_object(OBJECT)"
+                          :package :llif)))
+    (object (if (eq raw-response 1) NIL (cdr (assoc '?object (cut:lazy-car raw-response))))))
+    (if object
+        (knowrob-symbol->string object)
+        (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution."))))
 
 (defun prolog-object-dimensions (object-name)
   "returns the dimensions of an object as list with '(depth width height)"
@@ -134,7 +133,6 @@
     (or dimensions
         (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution."))))
 
-;;; Work in progress. Do not use! 
 (defun prolog-object-pose (object-name)
   "returns the pose of an object"
   (roslisp:ros-info (json-prolog-client) "Getting pose for object ~a." object-name)
@@ -153,10 +151,7 @@
   (roslisp:ros-info (json-prolog-client) "Getting object in gripper.")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple-1 
-                          (concatenate 'string 
-                                       "gripper(Gripper),"
-                                       "objects_on_surface(Instances, Gripper),"
-                                       "member(INSTANCE, Instances)")
+                                       "gripper(Gripper)"
                           :package :llif)))
          (instance (if (eq raw-response 1) NIL (cdr (assoc '?instance (cut:lazy-car raw-response))))))
     (if instance
