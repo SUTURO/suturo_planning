@@ -57,27 +57,27 @@
     (let 
   	((?nav-pose (list (cl-tf::make-pose-stamped "map" 0 
                                                 (cl-tf:make-3d-vector
-                                                 (+ (nth 0 (nth 2 *pose*)) 0.5) ;;x-cordinate
+                                                 (- (nth 0 (nth 2 *pose*)) 0.5) ;;x-cordinate
                                                  (nth 1 (nth 2 *pose*))  ;;y-cordinate
                                                  0) 
                                                (cl-tf::make-quaternion 0 0 0 1)) 
                      (cl-tf::make-pose-stamped "map" 0 
                                                (cl-tf:make-3d-vector
-                                                (- (nth 0 (nth 2 *pose*)) 0.5) 
+                                                (+ (nth 0 (nth 2 *pose*)) 0.5) 
                                                 (nth 1 (nth 2 *pose*))
-                                                1) 
+                                                3.14) 
                                                 (cl-tf::make-quaternion 0 0 0 1))
                      (cl-tf::make-pose-stamped "map" 0 
                                                (cl-tf:make-3d-vector
                                                 (nth 0 (nth 2 *pose*))
                                                 (+ (nth 1 (nth 2 *pose*)) 0.5)
-                                                3)
+                                                1.57)
                                                (cl-tf::make-quaternion 0 0 0 1))
                      (cl-tf::make-pose-stamped "map" 0 
                                                (cl-tf:make-3d-vector
                                                 (nth 0 (nth 2 *pose*))
                                                 (- (nth 1 (nth 2 *pose*)) 0.5)
-                                                4)
+                                                -1.57)
                                                (cl-tf::make-quaternion 0 0 0 1))
                      ))) ;;bracket :(
         ?nav-pose
