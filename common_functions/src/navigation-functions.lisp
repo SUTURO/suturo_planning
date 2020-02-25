@@ -14,6 +14,7 @@
 (defun move-to-poi ()
         ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
 	;;please indent region...
+	
         (move-with-distance-to-point *poiDistance* (llif::closestPoi
 					  (cl-tf::transform-stamped->pose-stamped
 					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
