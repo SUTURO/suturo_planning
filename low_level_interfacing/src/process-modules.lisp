@@ -66,7 +66,7 @@
        ?size_z
        ?object_id
        ?graspmode))
-     (placeing
+     (placing
       (llif::call-place-action
        ?point-x
        ?point-y
