@@ -146,6 +146,33 @@
         (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
                        ,(string-trim "'" (cdr (assoc '?context (cut:lazy-car raw-response)))))))))    
 
+(defun prolog-table-pose ()
+  "returns the pose of the table"
+  (roslisp:ros-info (json-prolog-client) "Getting pose from table")
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple 
+                          (concatenate 'string "table_surface(OBJECT),"
+                                               "surface_pose_in_map(OBJECT, [TRANSLATION, ROTATION])")
+                          :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution.")
+        (values-list `(,(cdr (assoc '?translation (cut:lazy-car raw-response)))
+                       ,(string-trim "'" (cdr (assoc '?context (cut:lazy-car raw-response)))))))))
+
+(defun prolog-shelf-pose ()
+  "returns the pose of the shelf"
+  (roslisp:ros-info (json-prolog-client) "Getting pose from shelf")
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple 
+                          (concatenate 'string "shelf_floors(OBJECTS),"
+                                               "member(OBJECT, OBJECTS),"
+                                               "surface_pose_in_map(OBJECT, [TRANSLATION, ROTATION])")
+                          :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution.")
+        (values-list `(,(cdr (assoc '?translation (cut:lazy-car raw-response)))
+                       ,(string-trim "'" (cdr (assoc '?context (cut:lazy-car raw-response)))))))))                                                  
+
 (defun prolog-object-in-gripper ()
   "returns the dimensions of an object as list with '(depth width height)"
   (roslisp:ros-info (json-prolog-client) "Getting object in gripper.")
