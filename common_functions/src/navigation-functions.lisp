@@ -17,6 +17,7 @@
         (move-with-distance-to-point *poiDistance* (llif::closestPoi
 					  (cl-tf::transform-stamped->pose-stamped
 					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
+        (llif::call-take-pose-action 2)
 )
 
 
@@ -40,9 +41,7 @@
 
         (roslisp:ros-info (poi-subscriber) "going to: ~a" *newgoalstamped*)
 
-	(llif::call-nav-action-ps *newgoalstamped*)
-
-	(llif::call-take-pose-action 2))
+	(llif::call-nav-action-ps *newgoalstamped*))
 
 (cpl:def-cram-function scan-object ()
 	(llif::insert-knowledge-objects(get-confident-objects))
