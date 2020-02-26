@@ -152,14 +152,15 @@
            (comf::grasp-hsr object-id grasp-mode)
          )))))))
 
-;;@author ...
+;;@author Philipp Klein
 (defun move-to-poi ()
         ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
 	;;please indent region...
-	
+	(roslisp:ros-info (move-poi) "Move to POI started")
         (setf *listOfPoi* (mapcar (lambda (listelem) (comf::pose-with-distance-to-point *poiDistance* listelem)) 
                                  (llif::sortedPoiByDistance
 					(cl-tf::transform-stamped->pose-stamped
 					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")))))
+        (roslisp:ros-info (poi-subscriber) "Gefundene POI sortiert nach entfernung: ~a" *listOfPoi*)
         (try-movement-stampedList *listOfPoi*)
         (llif::call-take-pose-action 2))
