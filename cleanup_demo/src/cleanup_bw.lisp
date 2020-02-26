@@ -18,4 +18,5 @@
                          :mass 0.5 :size (cl-tf:make-3d-vector width depth height)))
                     (3 (btr:add-object btr:*current-bullet-world* 
                          :primit-cylinder 'cylinder-1 '((0.5 0.5 0.05)(0 0 0 1)) 
-                         :mass 0.5 :size (cl-tf:make-3d-vector width depth height))))))))
+                         :mass 0.5 :size (cl-tf:make-3d-vector width depth height))))) 
+          )))

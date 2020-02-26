@@ -77,7 +77,7 @@
                         (target (desig:a location
                                          (pose ?successfull-pose))))))
     
-    (llif::with-hsr-process-modules
+    (with-hsr-process-modules
       (exe:perform ?desig))
 ))
 

@@ -45,7 +45,4 @@
 	          (:file "nlp-subscriber" :depends-on ("package"))
 	          (:file "poi-client" :depends-on("package"))
 	          (:file "text-to-speech" :depends-on("package"))
-            ;;select process modules and process modules depend on each other
-            (:file "select-process-modules" :depends-on("package"))
-	          (:file "process-modules" :depends-on("package"))
             ))))

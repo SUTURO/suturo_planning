@@ -1,10 +1,10 @@
-(in-package :llif)
+(in-package :comf)
 
 (defmacro with-hsr-process-modules (&body body)
   `(cram-process-modules:with-process-modules-running
-       (llif::hsr-navigation
-        llif::hsr-arm
-        llif::hsr-text-to-speach
+       (hsr-navigation
+        hsr-arm
+        hsr-text-to-speach
         )
      (cpl-impl::named-top-level (:name :top-level)
        ,@body)))
@@ -17,7 +17,7 @@
    (destructuring-bind (command target) (desig:reference motion-designator)
      (format t "command ~a target ~a" command target)
     (ecase command
-      (comf::going
+      (going
        (llif::call-nav-action-ps (desig:reference target)))
 
     )))
@@ -29,7 +29,7 @@
                      motion-designator)
   (destructuring-bind (command text) (desig:reference motion-designator)
     (ecase command
-      (comf::say
+      (say
        (llif::call-text-to-speech-action text)
        ))))
 
@@ -55,7 +55,7 @@
                       ?grasp-mode)
      (desig:reference motion-designator)
    (ecase command
-     (comf::grasping
+     (grasping
       (llif::call-grasp-action
        ?point-x
        ?point-y
@@ -69,7 +69,7 @@
        ?size-z
        ?object-id
        ?grasp-mode))
-     (comf::placing
+     (placing
       (llif::call-place-action
        ?point-x
        ?point-y
