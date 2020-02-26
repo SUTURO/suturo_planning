@@ -26,7 +26,7 @@
   (roslisp:ros-info (text-to-speach-process-modules)
                      "text-to-speach called with motion designator `~a'."
                      motion-designator)
-  (destructuring-bind (command target) (desig:reference motion-designator)
+  (destructuring-bind (command text) (desig:reference motion-designator)
     (ecase command
       (comf::say
        (llif::call-text-to-speech-action (desig:reference target))
@@ -47,11 +47,11 @@
                       ?quaterion-value-2
                       ?quaterion-value-3
                       ?quaterion-value-4
-                      ?size_x
-                      ?size_y
-                      ?size_z
-                      ?object_id
-                      ?graspmode)
+                      ?size-x
+                      ?size-y
+                      ?size-z
+                      ?object-id
+                      ?grasp-mode)
      (desig:reference motion-designator)
    (ecase command
      (comf::grasping
@@ -63,11 +63,11 @@
        ?quaterion-value-2
        ?quaterion-value-3
        ?quaterion-value-4
-       ?size_x
-       ?size_y
-       ?size_z
-       ?object_id
-       ?graspmode))
+       ?size-x
+       ?size-y
+       ?size-z
+       ?object-id
+       ?grasp-mode))
      (placing
       (llif::call-place-action
        ?point-x
@@ -77,7 +77,7 @@
        ?quaterion-value-2
        ?quaterion-value-3
        ?quaterion-value-4
-       ?object_id
-       ?graspmode)))))
+       ?object-id
+       ?grasp-mode)))))
 
 

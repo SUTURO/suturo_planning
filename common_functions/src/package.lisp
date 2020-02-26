@@ -10,7 +10,9 @@
 
    ;;perception-functions.lisp
    #:get-confident-objects
-
+   #:looking
+   #:detecting
+   
    ;;manipulation-functions.lisp
    #:place-object
    #:grasp-object

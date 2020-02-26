@@ -82,32 +82,7 @@
 ))
 
 ;;;; Grasp ;;;;;
-;; (defun try-grasp (position) 
-;;   (let ((?grasp position)
-       
-;;         (urdf-proj:with-simulated-robot
-;;           (cpl:with-retry-counters ((grasping-retry 3))
-;;             (cpl:with-failure-handling
-;;                 (((or common-fail:low-level-failure 
-;;                       cl::simple-error
-;;                       cl::simple-type-error)                
-;;                      (e)
-;;                    (setf ?grasp (cdr ?grasp))
-;;                    (cpl:do-retry grasping-retry
-;;                      (roslisp:ros-warn (going-demo movement-fail)
-;;                                        "~%Failed to grasp object~%")
-;;                      (cpl:retry))
-;;                    (roslisp:ros-warn (going-demo movement-fail)
-;;                                      "~%No more retries~%")))
-;;               (let ((?current-grasp-position (car ?grasp)))
-                
-;;                 (cram-executive:perform
-;;                  (desig:an action
-;;                            (type grasping)
-;;                            (target (desig:a location (pose ?current-grasp-position)))))
-;;                 ?current-grasp-position)))))))
-
-
+;;@author Jan Schimpf
 (defun grasp-hsr (object-id grasp-pose)    
   (cpl:with-retry-counters ((grasping-retry 3))
    (cpl:with-failure-handling
@@ -125,13 +100,14 @@
          (cpl:retry))
 
          (roslisp:ros-warn (going-demo movement-fail)
-                            "~%No more retries~%")))
- (comf:grasp-object object-id grasp-pose))))
+                           "~%No more retries~%")))
+     (comf:grasp-object object-id grasp-pose))))
 
 ;;;; Place ;;;;
+;;@author Jan Schimpf
+
 (defun place-hsr (object-id grasp-pose)
   (let ((?place-position (comf:create-place-list object-id grasp-pose)))
-
                          
  (cpl:with-retry-counters ((grasping-retry 4))
    (cpl:with-failure-handling
@@ -145,15 +121,15 @@
                                  "~%Failed to grasp the object~%")
          (cpl:retry))
          (let ((?actual-place-position (car ?place-position)))
-           (llif::with-hsr-process-modules
-             (exe:perform (desig:a motion (type placeing)
-                                   (target (desig:a location
-                                                    (pose ?actual-place-position))))))
+         (place-object ?actual-place-position)
                        )))))))
    
 
 ;;;;Move-to-Grasp;;;;
-(defun move-to-grasp(object-id grasp-mode)
+;;@author Jan Schimpf
+(defvar *obj-pos*)
+(defvar *obj-class*)
+(defun move-to-grasp (object-id grasp-mode)
   (let ((?move-positions (create-move-position-list object-id)))
    (cpl:with-retry-counters ((grasping-retry 4))
    (cpl:with-failure-handling
@@ -166,15 +142,17 @@
          (roslisp:ros-warn (grasp-fail)
                                  "~%Failed to grasp the object~%")
          (cpl:retry))
-    ;; (let ((?successfull-pose (try-movement (car move-positions))))
-    ;; (try-grasp ((llif:prolog-object-pose object-id)))
-    ;; (llif::with-hsr-process-modules (exe:perform (desig:a motion (type going) 
-    ;; (target (desig:a location (pose ?successfull-pose))))))
-    ;; (llif::with-hsr-process-modules (exe:perform (desig:a motion (type grasping)
-    ;; (target (desig:a location (grasp-object object-id grasp-mode)))))
-         ))))))
+         (let ((?successfull-pose (try-movement-stampedList ?move-positions)))
+           (comf:looking *obj-pos*)
+           (comf:detecting)
+           (llif::with-hsr-process-modules (exe:perform
+                                            (desig:a motion (type going)
+                                                     (target (desig:a location
+                                                                      (pose ?successfull-pose))))))
+           (grasp-hsr object-id grasp-mode)
+         )))))))
 
-
+;;@author ...
 (defun move-to-poi ()
         ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
 	;;please indent region...
