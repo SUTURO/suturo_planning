@@ -90,7 +90,7 @@
                 cl::simple-error
          cl::simple-type-error)
        (e)
-         (scan-object
+         (comf::scan-object
           ;;closet function i currently know of that allows me
           ;;to trigger perception for this
           )
@@ -101,7 +101,7 @@
 
          (roslisp:ros-warn (going-demo movement-fail)
                            "~%No more retries~%")))
-     (comf:grasp-object object-id grasp-pose))))
+     (comf::grasp-object object-id grasp-pose))))
 
 ;;;; Place ;;;;
 ;;@author Jan Schimpf
@@ -121,7 +121,7 @@
                                  "~%Failed to grasp the object~%")
          (cpl:retry))
          (let ((?actual-place-position (car ?place-position)))
-         (comf:place-object ?actual-place-position)
+         (comf::place-object ?actual-place-position)
                        )))))))
    
 
@@ -143,13 +143,13 @@
                                  "~%Failed to grasp the object~%")
          (cpl:retry))
          (let ((?successfull-pose (try-movement-stampedList ?move-positions)))
-           (comf:looking *obj-pos*)
-           (comf:detecting)
+           (comf::looking *obj-pos*)
+           (comf::detecting)
            (llif::with-hsr-process-modules (exe:perform
                                             (desig:a motion (type going)
                                                      (target (desig:a location
                                                                       (pose ?successfull-pose))))))
-           (comf:grasp-hsr object-id grasp-mode)
+           (comf::grasp-hsr object-id grasp-mode)
          )))))))
 
 ;;@author ...
