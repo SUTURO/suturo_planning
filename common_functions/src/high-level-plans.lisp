@@ -121,7 +121,7 @@
                                  "~%Failed to grasp the object~%")
          (cpl:retry))
          (let ((?actual-place-position (car ?place-position)))
-         (place-object ?actual-place-position)
+         (comf:place-object ?actual-place-position)
                        )))))))
    
 
@@ -149,7 +149,7 @@
                                             (desig:a motion (type going)
                                                      (target (desig:a location
                                                                       (pose ?successfull-pose))))))
-           (grasp-hsr object-id grasp-mode)
+           (comf:grasp-hsr object-id grasp-mode)
          )))))))
 
 ;;@author ...
