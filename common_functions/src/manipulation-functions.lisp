@@ -42,7 +42,7 @@
                     (:size-z ?size-z)
                     (:object-id ?object-id)
                     (:grasp-mode ?grasp-mode))))
-    (llif::with-hsr-process-modules (exe:perform
+    (comf::with-hsr-process-modules (exe:perform
                                      place))))
   ;;say: done placeing object
   
@@ -84,7 +84,7 @@
                     (:size-z ?size-z)
                     (:object-id ?object-id)
                     (:grasp-mode ?grasp-mode))))
-    (llif::with-hsr-process-modules (exe:perform
+    (comf::with-hsr-process-modules (exe:perform
                                      grasp))))
                                           
 
