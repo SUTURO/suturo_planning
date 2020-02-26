@@ -8,16 +8,19 @@
 (defvar *classplace* nil)
 (defvar *list*)
 (defvar *result*)
+(defvar ?place-list)
 
 ;;@author Jan Schimpf
 ;;todo add checks for nil;
 ;;add the text to speech: what class the object we place has,
 ;; the name of the goal and if the action is done;
-
 (defun place-object (place-list)
-    (llif:call-place-action (nth 0 place-list) (nth 1 place-list) (nth 2 place-list)
-                            (nth 3 place-list) (nth 4 place-list) (nth 5 place-list)
-                            (nth 6 place-list) (nth 9 place-list) (nth 10 place-list)))
+  (setf ?place-list place-list)
+  (llif::with-hsr-process-modules (exe:perform
+                                   (desig:a motion (type placing)
+                                            (target (desig:a location
+                                                             (pose ?place-list))))))
+)
   ;;say: done placeing object
   
 
@@ -46,10 +49,12 @@
                                 quaterion-value-1 quaterion-value-2
                                 quaterion-value-3 quaterion-value-4
                                 size_x size_y size_z object-id grasp-pose)))
-          ?result)))
+          (llif::with-hsr-process-modules (exe:perform
+                                           (desig:a motion (type grasping)
+                                                    (target (desig:a location
+                                                                     (pose ?result)))))))))
 
-       ;;say: Grasping object was successful
-
+;;@author Jan Schimpf
 (defun create-place-list (object-id grasp-pose)
   (setf *dimensions* (llif:prolog-object-dimensions object-id))
   (setf *pose* (llif:prolog-object-pose object-id))
