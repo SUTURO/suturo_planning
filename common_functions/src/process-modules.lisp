@@ -5,6 +5,7 @@
        (hsr-navigation
         hsr-arm
         hsr-text-to-speach
+        hsr-perceive
         )
      (cpl-impl::named-top-level (:name :top-level)
        ,@body)))
@@ -31,6 +32,18 @@
     (ecase command
       (say
        (llif::call-text-to-speech-action text)
+       ))))
+
+
+ ;;;;;;;;;;;;;;;;;;;; Perceive ;;;;;;;;;;;;;;;;;;;;;;;;
+ (cram-process-modules:def-process-module hsr-perceive (motion-designator)
+  (roslisp:ros-info (perceive-process-modules)
+                     "perceive called with motion designator `~a'."
+                     motion-designator)
+  (destructuring-bind (command plane) (desig:reference motion-designator)
+    (ecase command
+      (perceive
+       (llif::call-robosherlock-pipeline plane)
        ))))
 
 
