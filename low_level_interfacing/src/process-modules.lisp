@@ -24,10 +24,10 @@
   (roslisp:ros-info (text-to-speach-process-modules)
                      "text-to-speach called with motion designator `~a'."
                      motion-designator)
-  (destructuring-bind (command target) (desig:reference motion-designator)
+  (destructuring-bind (command text) (desig:reference motion-designator)
     (ecase command
       (say
-       (llif::call-text-to-speech-action (desig:reference target))
+       (llif::call-text-to-speech-action (desig:reference text))
        ))))
 
 
