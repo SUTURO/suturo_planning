@@ -6,12 +6,12 @@
                actionlib
                geometry_msgs-msg
                tmc_msgs-msg
-               low-level-interfacing
                cram-prolog
                cram-designators
                cram-process-modules
                cram-language-designator-support
-               cram-executive)
+               cram-executive
+               low-level-interfacing)
   :components
   ((:module "src"
             :components
@@ -21,6 +21,7 @@
              (:file "manipulation-functions" :depends-on("package"))
              (:file "navigation-functions" :depends-on("package")) 
              (:file "knowledge-functions" :depends-on("package"))
-	     (:file "nlp-functions" :depends-on("package"))
-	     (:file "high-level-plans" :depends-on("package")) 
+             (:file "nlp-functions" :depends-on("package"))
+             ;;high level plans depends on every other file in here
+             (:file "high-level-plans" :depends-on("package")) 
 ))))

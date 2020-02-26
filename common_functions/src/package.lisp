@@ -7,6 +7,8 @@
    ;;high-level-plans.lisp
    #:move-hsr
    #:hsr-grasp
+   #:grasp-hsr
+   
 
    ;;perception-functions.lisp
    #:get-confident-objects

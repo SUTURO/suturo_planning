@@ -1,4 +1,5 @@
 *.fasl
 cram-bulletworld-cheat-sheet
 *.lisp#
+#*
 planning

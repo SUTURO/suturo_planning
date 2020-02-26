@@ -14,10 +14,12 @@
   (roslisp:ros-info (hsr-navigation-process-modules)
                      "hsr-navigation called with motion designator `~a'."
                      motion-designator)
-  (destructuring-bind (command target) (desig:reference motion-designator)
+   (destructuring-bind (command target) (desig:reference motion-designator)
+     (format t "command ~a target ~a" command target)
     (ecase command
-      (going
+      (comf::going
        (llif::call-nav-action-ps (desig:reference target)))
+
     )))
 
  ;;;;;;;;;;;;;;;;;;;; TEXT-TO-SPEACH ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -53,7 +55,7 @@
                       ?grasp-mode)
      (desig:reference motion-designator)
    (ecase command
-     (grasping
+     (comf::grasping
       (llif::call-grasp-action
        ?point-x
        ?point-y
@@ -67,7 +69,7 @@
        ?size-z
        ?object-id
        ?grasp-mode))
-     (placing
+     (comf::placing
       (llif::call-place-action
        ?point-x
        ?point-y
@@ -78,3 +80,5 @@
        ?quaterion-value-4
        ?object-id
        ?grasp-mode)))))
+
+

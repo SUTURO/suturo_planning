@@ -40,25 +40,26 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;Try Movement with List ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun try-movement-stampedList (listStamped) (let 
-	(?nav-pose listStamped)
+(defun try-movement-stampedList (listStamped)
+  (let (?nav-pose listStamped)
 
-(urdf-proj:with-simulated-robot (cpl:with-retry-counters ((going-retry 3))
-      (cpl:with-failure-handling
-          (((or common-fail:low-level-failure 
-                cl::simple-error
-                cl::simple-type-error)
-               (e)
+    (urdf-proj:with-simulated-robot
+      (cpl:with-retry-counters ((going-retry 3))
+        (cpl:with-failure-handling
+            (((or common-fail:low-level-failure 
+                  cl::simple-error
+                  cl::simple-type-error)
+                 (e)
+               
+               (setf ?nav-pose (cdr ?nav-pose))
              
-             (setf ?nav-pose (cdr ?nav-pose))
+               (cpl:do-retry going-retry
+                 (roslisp:ros-warn (going-demo movement-fail)
+                                   "~%Failed to move to given position~%")
+                 (cpl:retry))
              
-             (cpl:do-retry going-retry
                (roslisp:ros-warn (going-demo movement-fail)
-                                 "~%Failed to move to given position~%")
-               (cpl:retry))
-             
-             (roslisp:ros-warn (going-demo movement-fail)
-                               "~%No more retries~%")))
+                                 "~%No more retries~%")))
         
           (let ((?actual-nav-pose (car ?nav-pose))) 
           (cram-executive:perform
@@ -68,9 +69,16 @@
             ?actual-nav-pose))))))
           
 (defun move-hsr ()
-(let ((?successfull-pose (try-movement)))
-  (llif::with-hsr-process-modules (exe:perform (desig:a motion (type going) 
-  (target (desig:a location (pose ?successfull-pose))))))
+  (let* ((?successfull-pose (cl-tf::make-pose-stamped "map" 0 
+                                               (cl-tf:make-3d-vector 1.097 0.556 0)
+                                               (cl-tf::make-quaternion 0 0 0 1)))
+        (?desig (desig:a motion
+                        (type going) 
+                        (target (desig:a location
+                                         (pose ?successfull-pose))))))
+    
+    (llif::with-hsr-process-modules
+      (exe:perform ?desig))
 ))
 
 ;;;; Grasp ;;;;;
@@ -113,7 +121,7 @@
                                  "~%Failed to grasp the object~%")
          (cpl:retry))
          (let ((?actual-place-position (car ?place-position)))
-         (place-object ?actual-place-position)
+         (comf:place-object ?actual-place-position)
                        )))))))
    
 
@@ -141,7 +149,7 @@
                                             (desig:a motion (type going)
                                                      (target (desig:a location
                                                                       (pose ?successfull-pose))))))
-           (grasp-hsr object-id grasp-mode)
+           (comf:grasp-hsr object-id grasp-mode)
          )))))))
 
 ;;@author ...
