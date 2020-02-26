@@ -2,8 +2,8 @@
 
 (defmacro with-hsr-process-modules (&body body)
   `(cram-process-modules:with-process-modules-running
-       (llif::hsr-navigation
-        llif::hsr-arm
+       (hsr-navigation
+        hsr-arm
         )
      (cpl-impl::named-top-level (:name :top-level)
        ,@body)))
@@ -13,20 +13,22 @@
   (roslisp:ros-info (hsr-navigation-process-modules)
                      "hsr-navigation called with motion designator `~a'."
                      motion-designator)
-  (destructuring-bind (command target) (desig:reference motion-designator)
+   (destructuring-bind (command target) (desig:reference motion-designator)
+     (format t "command ~a target ~a" command target)
     (ecase command
-      (going
+      (comf::going
        (llif::call-nav-action-ps (desig:reference target)))
+
     )))
 
  ;;;;;;;;;;;;;;;;;;;; TEXT-TO-SPEACH ;;;;;;;;;;;;;;;;;;;;;;;;
- (cram-process-modules:def-process-module hsr-text-to-speach (action-designator)
+ (cram-process-modules:def-process-module hsr-text-to-speach (motion-designator)
   (roslisp:ros-info (text-to-speach-process-modules)
                      "text-to-speach called with motion designator `~a'."
                      motion-designator)
   (destructuring-bind (command target) (desig:reference motion-designator)
     (ecase command
-      (say
+      (comf::say
        (llif::call-text-to-speech-action (desig:reference target))
        ))))
 
@@ -52,7 +54,7 @@
                       ?graspmode)
      (desig:reference motion-designator)
    (ecase command
-     (grasping
+     (comf::grasping
       (llif::call-grasp-action
        ?point-x
        ?point-y
@@ -77,3 +79,5 @@
        ?quaterion-value-4
        ?object_id
        ?graspmode)))))
+
+
