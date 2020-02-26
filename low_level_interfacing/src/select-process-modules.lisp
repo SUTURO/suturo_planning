@@ -4,7 +4,8 @@
                                                             cpm:matching-process-module)
 
   (cram-prolog:<- (cpm:available-process-module hsr-navigation))
- 
+  (cram-prolog:<- (cpm:available-process-module hsr-text-to-speach))
+  
   (cram-prolog:<- (cpm:matching-process-module ?desig  hsr-navigation)
     (desig:desig-prop ?desig (:type :going)))
 

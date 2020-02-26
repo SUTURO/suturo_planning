@@ -4,6 +4,7 @@
   `(cram-process-modules:with-process-modules-running
        (llif::hsr-navigation
         llif::hsr-arm
+        llif::hsr-text-to-speach
         )
      (cpl-impl::named-top-level (:name :top-level)
        ,@body)))
@@ -20,14 +21,14 @@
     )))
 
  ;;;;;;;;;;;;;;;;;;;; TEXT-TO-SPEACH ;;;;;;;;;;;;;;;;;;;;;;;;
- (cram-process-modules:def-process-module hsr-text-to-speach (action-designator)
+ (cram-process-modules:def-process-module hsr-text-to-speach (motion-designator)
   (roslisp:ros-info (text-to-speach-process-modules)
                      "text-to-speach called with motion designator `~a'."
                      motion-designator)
   (destructuring-bind (command text) (desig:reference motion-designator)
     (ecase command
-      (say
-       (llif::call-text-to-speech-action (desig:reference text))
+      (comf::say
+       (llif::call-text-to-speech-action text)
        ))))
 
 
