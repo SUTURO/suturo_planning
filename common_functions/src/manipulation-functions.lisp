@@ -152,7 +152,7 @@
                     (:size-z ?size-z)
                     (:object-id ?object-id)
                     (:grasp-mode ?grasp-mode))))
-    (comf::with-hsr-process-modules (exe:perform
+    (with-hsr-process-modules (exe:perform
                                      grasp)))
   )
 
