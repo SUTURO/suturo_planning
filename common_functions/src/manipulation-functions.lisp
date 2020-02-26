@@ -15,12 +15,35 @@
 ;;add the text to speech: what class the object we place has,
 ;; the name of the goal and if the action is done;
 (defun place-object (place-list)
-  (setf ?place-list place-list)
-  (llif::with-hsr-process-modules (exe:perform
-                                   (desig:a motion (type placing)
-                                            (target (desig:a location
-                                                             (pose ?place-list))))))
-)
+ (setf ?place-list place-list)
+ (let* ((?point-x-object (nth 0 place-list))
+        (?point-y-object (nth 1 place-list))
+        (?point-z-object (nth 2 place-list))
+        (?quaterion-value-1 (nth 3 place-list))
+        (?quaterion-value-2 (nth 4 place-list))
+        (?quaterion-value-3 (nth 5 place-list))
+        (?quaterion-value-4 (nth 6 place-list))
+        (?size-x (nth 7 place-list))
+        (?size-y (nth 8 place-list))
+        (?size-z (nth 9 place-list))
+        (?object-id (nth 10 place-list))
+        (?grasp-mode (nth 11 place-list))
+   (place (desig:a motion
+                    (:type :placing)
+                    (:point-x ?point-x-object)
+                    (:point-y ?point-y-object)
+                    (:point-z ?point-z-object)
+                    (:quaterion-value-1 ?quaterion-value-1)
+                    (:quaterion-value-2 ?quaterion-value-2)
+                    (:quaterion-value-3 ?quaterion-value-3)
+                    (:quaterion-value-4 ?quaterion-value-4)
+                    (:size-x ?size-x)
+                    (:size-y ?size-y)
+                    (:size-z ?size-z)
+                    (:object-id ?object-id)
+                    (:grasp-mode ?grasp-mode))))
+    (llif::with-hsr-process-modules (exe:perform
+                                     place))))
   ;;say: done placeing object
   
 
