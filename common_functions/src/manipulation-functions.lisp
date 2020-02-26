@@ -35,24 +35,35 @@
   (setq *classgrasp* (llif:object-name->class object-id))
        
   ;;say:grasping object of class *class*
-  (let ((point-x-object (nth 0 (nth 2 *pose*)))
-        (point-y-object (nth 1 (nth 2 *pose*)))
-        (point-z-object (nth 2 (nth 2 *pose*)))
-        (quaterion-value-1 (nth 0 (nth 3 *pose*)))
-        (quaterion-value-2 (nth 1 (nth 3 *pose*)))
-        (quaterion-value-3 (nth 2 (nth 3 *pose*)))
-        (quaterion-value-4 (nth 3 (nth 3 *pose*)))
-        (size_x (nth 0 *dimensions*))
-        (size_y (nth 1 *dimensions*))
-        (size_z (nth 2 *dimensions*)))
-        (let ((?result (list point-x-object point-y-object point-z-object
-                                quaterion-value-1 quaterion-value-2
-                                quaterion-value-3 quaterion-value-4
-                                size_x size_y size_z object-id grasp-pose)))
-          (llif::with-hsr-process-modules (exe:perform
-                                           (desig:a motion (type grasping)
-                                                    (target (desig:a location
-                                                                     (pose ?result)))))))))
+  (let* ((?point-x-object (nth 0 (nth 2 *pose*)))
+        (?point-y-object (nth 1 (nth 2 *pose*)))
+        (?point-z-object (nth 2 (nth 2 *pose*)))
+        (?quaterion-value-1 (nth 0 (nth 3 *pose*)))
+        (?quaterion-value-2 (nth 1 (nth 3 *pose*)))
+        (?quaterion-value-3 (nth 2 (nth 3 *pose*)))
+        (?quaterion-value-4 (nth 3 (nth 3 *pose*)))
+        (?size-x (nth 0 *dimensions*))
+        (?size-y (nth 1 *dimensions*))
+        (?size-z (nth 2 *dimensions*))
+        (?object-id object-id)
+        (?grasp-mode grasp-pose)
+        (grasp (desig:a motion
+                    (:type :grasping)
+                    (:point-x ?point-x-object)
+                    (:point-y ?point-y-object)
+                    (:point-z ?point-z-object)
+                    (:quaterion-value-1 ?quaterion-value-1)
+                    (:quaterion-value-2 ?quaterion-value-2)
+                    (:quaterion-value-3 ?quaterion-value-3)
+                    (:quaterion-value-4 ?quaterion-value-4)
+                    (:size-x ?size-x)
+                    (:size-y ?size-y)
+                    (:size-z ?size-z)
+                    (:object-id ?object-id)
+                    (:grasp-mode ?grasp-mode))))
+    (llif::with-hsr-process-modules (exe:perform
+                                     grasp))))
+                                          
 
 ;;@author Jan Schimpf
 (defun create-place-list (object-id grasp-pose)

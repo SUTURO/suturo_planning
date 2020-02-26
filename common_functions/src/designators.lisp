@@ -80,8 +80,8 @@
   ;;;;;;;;;;;;;;;;;;;; ARM ;;;;;;;;;;;;;;;;;;;;;;;;
   (cram-prolog:<- (desig:motion-grounding ?designator (grasping ?point-x
                       ?point-y  ?point-z ?quaterion-value-1 ?quaterion-value-2
-                      ?quaterion-value-3 ?quaterion-value-4 ?size_x ?size_y
-                      ?size_z ?object_id ?graspmode))
+                      ?quaterion-value-3 ?quaterion-value-4 ?size-x ?size-y
+                      ?size-z ?object-id ?grasp-mode))
     (desig:desig-prop ?designator (:type :grasping))
     (desig:desig-prop ?designator (:point-x ?point-x))
     (desig:desig-prop ?designator (:point-y ?point-y))
@@ -90,16 +90,16 @@
     (desig:desig-prop ?designator (:quaterion-value-2 ?quaterion-value-2))
     (desig:desig-prop ?designator (:quaterion-value-3 ?quaterion-value-3))
     (desig:desig-prop ?designator (:quaterion-value-4 ?quaterion-value-4))
-    (desig:desig-prop ?designator (:size_x ?size_x))
-    (desig:desig-prop ?designator (:size_y ?size_y))
-    (desig:desig-prop ?designator (:size_z ?size_z))
-    (desig:desig-prop ?designator (:object_id ?object_id))
-    (desig:desig-prop ?designator (:grasp_mode ?grasp_mode)))
+    (desig:desig-prop ?designator (:size-x ?size-x))
+    (desig:desig-prop ?designator (:size-y ?size-y))
+    (desig:desig-prop ?designator (:size-z ?size-z))
+    (desig:desig-prop ?designator (:object-id ?object-id))
+    (desig:desig-prop ?designator (:grasp-mode ?grasp-mode)))
 
   (cram-prolog:<- (desig:motion-grounding ?designator (placing ?point-x
                       ?point-y  ?point-z ?quaterion-value-1 ?quaterion-value-2
-                      ?quaterion-value-3 ?quaterion-value-4 ?size_x ?size_y
-                      ?size_z ?object_id ?graspmode))
+                      ?quaterion-value-3 ?quaterion-value-4 ?size-x ?size-y
+                      ?size-z ?object-id ?grasp-mode))
     (desig:desig-prop ?designator (:type :placing))
     (desig:desig-prop ?designator (:point-x ?point-x))
     (desig:desig-prop ?designator (:point-y ?point-y))
@@ -108,11 +108,11 @@
     (desig:desig-prop ?designator (:quaterion-value-2 ?quaterion-value-2))
     (desig:desig-prop ?designator (:quaterion-value-3 ?quaterion-value-3))
     (desig:desig-prop ?designator (:quaterion-value-4 ?quaterion-value-4))
-    (desig:desig-prop ?designator (:size_x ?size_x))
-    (desig:desig-prop ?designator (:size_y ?size_y))
-    (desig:desig-prop ?designator (:size_z ?size_z))
-    (desig:desig-prop ?designator (:object_id ?object_id))
-    (desig:desig-prop ?designator (:grasp_mode ?grasp_mode)))
+    (desig:desig-prop ?designator (:size-x ?size-x))
+    (desig:desig-prop ?designator (:size-y ?size-y))
+    (desig:desig-prop ?designator (:size-z ?size-z))
+    (desig:desig-prop ?designator (:object-id ?object-id))
+    (desig:desig-prop ?designator (:grasp-mode ?grasp-mode)))
 
   (cram-prolog:<- (desig:motion-grounding ?designator (perceiving ?pose ?weight
                                                                  ?width ?height

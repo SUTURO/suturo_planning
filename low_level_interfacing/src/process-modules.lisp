@@ -45,11 +45,11 @@
                       ?quaterion-value-2
                       ?quaterion-value-3
                       ?quaterion-value-4
-                      ?size_x
-                      ?size_y
-                      ?size_z
-                      ?object_id
-                      ?graspmode)
+                      ?size-x
+                      ?size-y
+                      ?size-z
+                      ?object-id
+                      ?grasp-mode)
      (desig:reference motion-designator)
    (ecase command
      (grasping
@@ -61,11 +61,11 @@
        ?quaterion-value-2
        ?quaterion-value-3
        ?quaterion-value-4
-       ?size_x
-       ?size_y
-       ?size_z
-       ?object_id
-       ?graspmode))
+       ?size-x
+       ?size-y
+       ?size-z
+       ?object-id
+       ?grasp-mode))
      (placing
       (llif::call-place-action
        ?point-x
@@ -75,5 +75,5 @@
        ?quaterion-value-2
        ?quaterion-value-3
        ?quaterion-value-4
-       ?object_id
-       ?graspmode)))))
+       ?object-id
+       ?grasp-mode)))))
