@@ -18,26 +18,28 @@
 ;;       *objects*))
 ;;   *objects*)
 
+(defparameter *list* nil)
+
 ;;@author Torge Olliges
 (defun get-confident-objects ()
            (roslisp:with-fields (detectiondata) *perception-msg*
              (loop for elem across detectiondata do
                (roslisp:with-fields (confidence_class) elem
                  (if (< confidence_class 0.5) (print "to smol") 
-                     (setf *test-list* (list *test-list* elem))))))
+                     (setf *list* (list *list* elem))))))
   )
 
 
-(defun get-confident-objects ()
-  (roslisp:with-fields (detectiondata) *objects*
-    (delete-if
-     (lambda (confidence_class) 
-       (if (> confidence_class 0.6) 
-           (roslisp::ros-info 
-            (perception-functions) "Object confidence high enough")
-           (roslisp::ros-info 
-            (perception-functions) "Object confidence to low")))
-     detectiondata)))
+;; (defun get-confident-objects ()
+;;   (roslisp:with-fields (detectiondata) *objects*
+;;     (delete-if
+;;      (lambda (confidence_class) 
+;;        (if (> confidence_class 0.6) 
+;;            (roslisp::ros-info 
+;;             (perception-functions) "Object confidence high enough")
+;;            (roslisp::ros-info 
+;;             (perception-functions) "Object confidence to low")))
+;;      detectiondata)))
      
 
 
