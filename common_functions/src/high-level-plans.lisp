@@ -41,7 +41,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;Try Movement with List ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun try-movement-stampedList (listStamped)
-  (let (?nav-pose listStamped)
+  (let ((?nav-pose listStamped))
 
     (urdf-proj:with-simulated-robot
       (cpl:with-retry-counters ((going-retry 3))
@@ -152,14 +152,26 @@
            (comf::grasp-hsr object-id grasp-mode)
          )))))))
 
-;;@author ...
+;;@author Philipp Klein
 (defun move-to-poi ()
         ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
 	;;please indent region...
-	
+	(roslisp:ros-info (move-poi) "Move to POI started")
         (setf *listOfPoi* (mapcar (lambda (listelem) (comf::pose-with-distance-to-point *poiDistance* listelem)) 
                                  (llif::sortedPoiByDistance
 					(cl-tf::transform-stamped->pose-stamped
 					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")))))
-        (try-movement-stampedList *listOfPoi*)
-        (llif::call-take-pose-action 2))
+        ;;(roslisp:ros-info (poi-subscriber) "Gefundene POI sortiert nach entfernung: ~a" *listOfPoi*)
+	(roslisp:ros-info (move-poi) "Move to POIs: ~a"  *listOfPoi*)
+	(let* ((?successfull-pose (try-movement-stampedList *listOfPoi*))
+		(?desig (desig:a motion
+		                (type going) 
+		                (target (desig:a location
+		                                 (pose ?successfull-pose))))))
+	    
+	    (with-hsr-process-modules
+	      (exe:perform ?desig)))
+        (llif::call-take-pose-action 2)
+)
+
+

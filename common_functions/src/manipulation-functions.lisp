@@ -42,7 +42,7 @@
                     (:size-z ?size-z)
                     (:object-id ?object-id)
                     (:grasp-mode ?grasp-mode))))
-    (llif::with-hsr-process-modules (exe:perform
+    (comf::with-hsr-process-modules (exe:perform
                                      place))))
   ;;say: done placeing object
   
@@ -84,7 +84,7 @@
                     (:size-z ?size-z)
                     (:object-id ?object-id)
                     (:grasp-mode ?grasp-mode))))
-    (llif::with-hsr-process-modules (exe:perform
+    (comf::with-hsr-process-modules (exe:perform
                                      grasp))))
                                           
 
@@ -124,4 +124,65 @@
                                 quaterion-value-3 quaterion-value-4
                                 size_x size_y size_z object-id grasp-pose)
                         ))))
-  
+
+(defun test-grasp()
+    (let* ((?point-x-object 1)
+        (?point-y-object 1)
+        (?point-z-object 0.5)
+        (?quaterion-value-1 0)
+        (?quaterion-value-2 0.7)
+        (?quaterion-value-3 0)
+        (?quaterion-value-4 0.7)
+        (?size-x 0.1)
+        (?size-y 0.1)
+        (?size-z 0.1)
+        (?object-id "box")
+        (?grasp-mode 0)
+        (grasp (desig:a motion
+                    (:type :grasping)
+                    (:point-x ?point-x-object)
+                    (:point-y ?point-y-object)
+                    (:point-z ?point-z-object)
+                    (:quaterion-value-1 ?quaterion-value-1)
+                    (:quaterion-value-2 ?quaterion-value-2)
+                    (:quaterion-value-3 ?quaterion-value-3)
+                    (:quaterion-value-4 ?quaterion-value-4)
+                    (:size-x ?size-x)
+                    (:size-y ?size-y)
+                    (:size-z ?size-z)
+                    (:object-id ?object-id)
+                    (:grasp-mode ?grasp-mode))))
+    (with-hsr-process-modules (exe:perform
+                                     grasp)))
+  )
+
+(defun test-place()
+     (let* ((?point-x-object 1)
+        (?point-y-object 1)
+        (?point-z-object 0.5)
+        (?quaterion-value-1 0)
+        (?quaterion-value-2 0.7)
+        (?quaterion-value-3 0)
+        (?quaterion-value-4 0.7)
+        (?size-x 0.1)
+        (?size-y 0.1)
+        (?size-z 0.1)
+        (?object-id "box")
+        (?grasp-mode 0)
+        (place (desig:a motion
+                    (:type :placing)
+                    (:point-x ?point-x-object)
+                    (:point-y ?point-y-object)
+                    (:point-z ?point-z-object)
+                    (:quaterion-value-1 ?quaterion-value-1)
+                    (:quaterion-value-2 ?quaterion-value-2)
+                    (:quaterion-value-3 ?quaterion-value-3)
+                    (:quaterion-value-4 ?quaterion-value-4)
+                    (:size-x ?size-x)
+                    (:size-y ?size-y)
+                    (:size-z ?size-z)
+                    (:object-id ?object-id)
+                    (:grasp-mode ?grasp-mode))))
+    (comf::with-hsr-process-modules (exe:perform
+                                     place)))
+  )

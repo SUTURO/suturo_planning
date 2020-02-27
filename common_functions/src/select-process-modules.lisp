@@ -5,9 +5,13 @@
 
   (cram-prolog:<- (cpm:available-process-module hsr-navigation))
   (cram-prolog:<- (cpm:available-process-module hsr-text-to-speach))
+  (cram-prolog:<- (cpm:available-process-module hsr-perceive))
   
   (cram-prolog:<- (cpm:matching-process-module ?desig  hsr-navigation)
     (desig:desig-prop ?desig (:type :going)))
+
+  (cram-prolog:<- (cpm:matching-process-module ?desig  hsr-perceive)
+    (desig:desig-prop ?desig (:type :perceive)))
 
   (cram-prolog:<- (cpm:available-process-module hsr-arm))
 

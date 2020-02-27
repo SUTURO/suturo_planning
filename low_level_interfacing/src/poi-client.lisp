@@ -34,8 +34,8 @@
        (t (closestPointInList point (rest stampedList))))) 
 
 
-(defun sortedPoiByDistance (point) 
-   (sort (copy-list *poi*)
+(defun sortedPoiByDistance (point)  
+   (sort (copy-list (remove-if #'null *poi*))
          (lambda (ers zwei) 
                  (< 
 	           (cl-tf::v-dist (cl-tf::origin point)

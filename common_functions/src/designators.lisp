@@ -156,7 +156,7 @@
     (desig:desig-prop ?designator (:text ?text)))
 
   ;;;;;;;;;;;;;;;;;;;; PERCEPTION ;;;;;;;;;;;;;;;;;;;;;;;;
-  (cram-prolog:<- (desig:motion-grounding ?designator (perceive ?surface-list))
+  (cram-prolog:<- (desig:motion-grounding ?designator (perceive ?surface-name))
     (desig:desig-prop ?designator (:type :perceive))
-    (desig:desig-prop ?designator (:surface ?surface-list)))
+    (desig:desig-prop ?designator (:surface ?surface-name)))
 )
