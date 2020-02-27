@@ -1,6 +1,6 @@
 (in-package :comf)
 
-(defparameter *poiDistance* 0.5)
+(defparameter *poiDistance* 1)
 (defparameter *currentOrigin* Nil)
 (defparameter *goalOrigin* Nil)
 (defparameter *newgoalOrigin* Nil)
