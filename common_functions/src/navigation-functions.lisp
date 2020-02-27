@@ -78,10 +78,18 @@
 
 (defun move-to-table ()
         (setf *currentOrigin* (cl-tf::origin (cl-tf::transform-stamped->pose-stamped
-					      (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
-        (setf *tablePose* Nil) ;; insert knowledge function for getting table pose
+        					      (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
+        (defparameter *goalPose* nil)  
+        (defparameter *newX* nil)                                            
+        (defparameter *tablePose* (llif::prolog-table-pose)) ;; insert knowledge function for getting table pose
+        (roslisp::with-fields (x y z) *tablePose* (setf *newX* (cl-tf::make-3d-vector (x y z))))
+                                               ;; (setf *goalPose* (cl-tf::make-pose-stamped "map" 0 
+                                               ;; (cl-tf::make-3d-vector (*goalX* y z) (cl-tf::make-quaternion 0 0 0 1))))))
+        (setf *goalPose* (cl-tf::make-pose-stamped "map" 0
+                                        (cl-tf::make-3d-vector (- (cl-tf::x *newX*) 0.95) (cl-tf::y *newX*) (cl-tf::z *newX*))))
         ;; add table-width to goal to insert distance (-x)
-        (llif::call-nav-action-ps *tablePose*))
+
+        (llif::call-nav-action-ps *goalPose*))
 
 (defun move-to-shelf()
         (setf *currentOrigin* (cl-tf::origin (cl-tf::transform-stamped->pose-stamped

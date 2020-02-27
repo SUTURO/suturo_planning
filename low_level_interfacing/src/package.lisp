@@ -72,6 +72,7 @@
    #:prolog-objects-around-pose
    #:object-name->class
    #:next-object
+   #:prolog-table-pose
    
   ;;process-module
 
