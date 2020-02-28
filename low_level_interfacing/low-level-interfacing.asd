@@ -35,6 +35,7 @@
             (:file "move-gripper-client" :depends-on ("package"))
             (:file "navigation-action" :depends-on ("package"))
             (:file "grasp-action-client" :depends-on ("package")) 
+            (:file "obstacle-map-subscriber" :depends-on ("package")) 
             (:file "place-action-client" :depends-on ("package"))
 	          (:file "marker-publisher" :depends-on ("package"))
 	          (:file "robosherlock-client-object" :depends-on ("package"))

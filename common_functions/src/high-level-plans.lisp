@@ -67,6 +67,12 @@
                      (type going)
                      (target (desig:a location (pose ?actual-nav-pose)))))
             ?actual-nav-pose))))))
+
+(defun try-movement-with-points-around-robot-list (listStamped)   )
+;;Für jede Position werden positionen davon im umkreis von der breite vom roboter berechnet wenn alle ereichbar sind, wird die position zurück gebeben
+
+
+
           
 (defun move-hsr ()
   (let* ((?successfull-pose (cl-tf::make-pose-stamped "map" 0 

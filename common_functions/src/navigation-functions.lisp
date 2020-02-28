@@ -6,6 +6,8 @@
 (defparameter *newgoalOrigin* Nil)
 (defparameter *orientation* Nil)
 (defparameter *newgoalstamped* Nil)
+(defparameter *radians* Nil)
+(defparameter *alternatePositions* Nil)
 ;;difference between defvar and defparemeter do you really need defvar?
 (defvar *pose*)
 
@@ -14,7 +16,7 @@
 ;;moved to high level
 
 
-(defun pose-with-distance-to-point (distance point)
+(defun pose-with-distance-to-point (distance point amountAlternatePositions)
 
         (setf *currentOrigin* (cl-tf::origin (cl-tf::transform-stamped->pose-stamped ;;new line ..
 					      (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
@@ -26,6 +28,8 @@
 
 	;;what is 1.57 where does it come from? its the half of PI
 	(setf *orientation* (+ 1.57 (atan (/ (cl-tf::y *goalOrigin*) (cl-tf::x *goalOrigin*)))))
+        
+        ;;;;; Direct Position ;;;;;;;;;;;
         (setf *newgoalstamped* (cl-tf:make-pose-stamped
 		                "map"
 		                (roslisp::ros-time)
@@ -33,6 +37,28 @@
 		                (cl-tf:euler->quaternion :ax 0.0 :ay 0.0 :az *orientation*)))
 
         (roslisp:ros-info (poi-subscriber) "going to: ~a" *newgoalstamped*)
+
+        ;;;;;; Alternative Positions in Circle around Point ;;;;;;;;;
+
+	;;(setf *radians* (mapcar (lambda (listelem) (* (/ 6.28319 amountAlternatePositions) listelem)) 
+	;;	                         (number-sequence 1 amountAlternatePositions)))
+
+
+	;;(setf *alternatePositions* (mapcar (lambda (listelem) (
+	;;	
+	;;		(cl-tf:make-pose-stamped
+	;;	                "map"
+	;;	                (roslisp::ros-time)
+	;;	                (cl-tf::make-3d-vector 
+        ;;                          (+ (* distance (cos listelem)) (cl-tf::x *goalOrigin*)) 
+        ;;                          (+ (* distance (cos listelem)) (cl-tf::x *goalOrigin*))
+        ;;                          0)
+	;;	                (cl-tf:euler->quaternion :ax 0.0 :ay 0.0 :az *orientation*))
+	;;	        )) 
+	;;*radians*))
+
+       ;;(number-sequence 1 amountAlternatePositions)
+       ;;(/ 6.28319 amountAlternatePositions)
 
 	*newgoalstamped*)
 
