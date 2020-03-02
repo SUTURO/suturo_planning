@@ -15,6 +15,8 @@
   (init-manipulation)
 
   (init-perception)
+
+  (init-knowledge)
 )
 
 (defun init-navigation()
@@ -23,6 +25,12 @@
   ;;Init action clients
   (roslisp:ros-info (init-interface) "init navigation action client")
   (llif::init-nav-client)
+  )
+
+(defun init-knowledge()
+  ;;Init action clients
+  (roslisp:ros-info (init-interface) "init knowledge client")
+  (llif::init-knowledge-action-client)
 )
 
 (defun init-manipulation()
