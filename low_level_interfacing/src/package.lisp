@@ -71,10 +71,7 @@
    #:prolog-table-objects 
    #:prolog-objects-around-pose
    #:object-name->class
-   #:next-object
    #:prolog-table-pose
-   
-  ;;process-module
+   #:prolog-next-object
 
-  ;;select-process-module
 ))

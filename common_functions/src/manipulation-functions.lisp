@@ -55,7 +55,6 @@
 (defun grasp-object (object-id grasp-pose)
   (setq *dimensions* (llif:prolog-object-dimensions object-id))
   (setq *pose* (llif:prolog-object-pose object-id))
-  (setq *classgrasp* (llif:object-name->class object-id))
        
   ;;say:grasping object of class *class*
   (let* ((?point-x-object (nth 0 (nth 2 *pose*)))
@@ -128,7 +127,7 @@
 (defun test-grasp()
     (let* ((?point-x-object 1)
         (?point-y-object 1)
-        (?point-z-object 0.5)
+        (?point-z-object 0.3)
         (?quaterion-value-1 0)
         (?quaterion-value-2 0.7)
         (?quaterion-value-3 0)
@@ -137,7 +136,7 @@
         (?size-y 0.1)
         (?size-z 0.1)
         (?object-id "box")
-        (?grasp-mode 0)
+        (?grasp-mode 1)
         (grasp (desig:a motion
                     (:type :grasping)
                     (:point-x ?point-x-object)
@@ -159,7 +158,7 @@
 (defun test-place()
      (let* ((?point-x-object 1)
         (?point-y-object 1)
-        (?point-z-object 0.5)
+        (?point-z-object 0.3)
         (?quaterion-value-1 0)
         (?quaterion-value-2 0.7)
         (?quaterion-value-3 0)
@@ -168,7 +167,7 @@
         (?size-y 0.1)
         (?size-z 0.1)
         (?object-id "box")
-        (?grasp-mode 0)
+        (?grasp-mode 1)
         (place (desig:a motion
                     (:type :placing)
                     (:point-x ?point-x-object)
