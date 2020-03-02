@@ -40,7 +40,7 @@
   "returns the list of all objects on the table"
   (roslisp:ros-info (json-prolog-client) "Getting objects on the table.")
   (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple "table_surface(Table), objects_on_surface(INSTANCES, Table)"
+                         (json-prolog:prolog-simple "all_objects_on_tables(INSTANCES)"
                                              :package :llif)
                          ;; (json-prolog:prolog `(and ("table_surface" ?table)
                          ;;                           ("objects_on_surface" ?instances ?table))
@@ -151,8 +151,8 @@
   (roslisp:ros-info (json-prolog-client) "Getting pose from table")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
-                          (concatenate 'string "table_surface(OBJECT),"
-                                               "surface_pose_in_map(OBJECT, [TRANSLATION, ROTATION])")
+                          (concatenate 'string "rdf_urdf_name(TABLE, Table_2_center),"
+                                               "surface_pose_in_map(TABLE, [TRANSLATION, ROTATION])")
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution.")
@@ -164,9 +164,8 @@
   (roslisp:ros-info (json-prolog-client) "Getting pose from shelf")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
-                          (concatenate 'string "shelf_floors(OBJECTS),"
-                                               "member(OBJECT, OBJECTS),"
-                                               "surface_pose_in_map(OBJECT, [TRANSLATION, ROTATION])")
+                          (concatenate 'string "rdf_urdf_name(SHELF, Shelf_floor_0_piece),"
+                                               "surface_pose_in_map(SHELF, [TRANSLATION, ROTATION])")
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution.")
