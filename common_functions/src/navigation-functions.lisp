@@ -1,6 +1,5 @@
 (in-package :comf)
 
-(defparameter *poiDistance* 1)
 (defparameter *currentOrigin* Nil)
 (defparameter *goalOrigin* Nil)
 (defparameter *newgoalOrigin* Nil)
@@ -40,27 +39,29 @@
 
         ;;;;;; Alternative Positions in Circle around Point ;;;;;;;;;
 
-	;;(setf *radians* (mapcar (lambda (listelem) (* (/ 6.28319 amountAlternatePositions) listelem)) 
-	;;	                         (number-sequence 1 amountAlternatePositions)))
+	(setf *radians* (mapcar (lambda (listelem) (* (/ 6.28319 amountAlternatePositions) listelem)) 
+		                         (loop :for n :from 1 :below amountAlternatePositions :collect n)))
 
 
-	;;(setf *alternatePositions* (mapcar (lambda (listelem) (
-	;;	
-	;;		(cl-tf:make-pose-stamped
-	;;	                "map"
-	;;	                (roslisp::ros-time)
-	;;	                (cl-tf::make-3d-vector 
-        ;;                          (+ (* distance (cos listelem)) (cl-tf::x *goalOrigin*)) 
-        ;;                          (+ (* distance (cos listelem)) (cl-tf::x *goalOrigin*))
-        ;;                          0)
-	;;	                (cl-tf:euler->quaternion :ax 0.0 :ay 0.0 :az *orientation*))
-	;;	        )) 
-	;;*radians*))
+	(setf *alternatePositions* (mapcar (lambda (listelem) (
+		
+			cl-tf:make-pose-stamped
+		                "map"
+		                (roslisp::ros-time)
+		                (cl-tf::make-3d-vector 
+                                  (+ (* distance (cos listelem)) (cl-tf::x *goalOrigin*)) 
+                                  (+ (* distance (sin listelem)) (cl-tf::y *goalOrigin*))
+                                  0)
+		                (cl-tf:euler->quaternion :ax 0.0 :ay 0.0 :az *orientation*)
+		        )) 
+	*radians*))
 
        ;;(number-sequence 1 amountAlternatePositions)
        ;;(/ 6.28319 amountAlternatePositions)
 
-	*newgoalstamped*)
+	(llif::sortedStampedByDistance (cl-tf::transform-stamped->pose-stamped ;;new line ..
+					(cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))
+                                (append (list *newgoalstamped*) *alternatePositions*)))
 
 (cpl:def-cram-function scan-object ()
 	(llif::insert-knowledge-objects(get-confident-objects))
@@ -69,6 +70,12 @@
 (cpl:def-cram-function move-to-poi-and-scan ()
 	(move-to-poi)
 	(scan-object)
+)
+
+(defun flatten (l)
+  (cond ((null l) nil)
+        ((atom l) (list l))
+        (t (loop for a in l appending (flatten a))))
 )
 
 (defun create-move-position-list(object-id)

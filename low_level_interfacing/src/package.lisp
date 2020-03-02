@@ -73,6 +73,9 @@
    #:object-name->class
    #:next-object
    #:prolog-table-pose
+
+   ;;poi-client
+   #:sortedStampedByDistance
    
   ;;process-module
 

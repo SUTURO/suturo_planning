@@ -1,6 +1,7 @@
 (in-package :comf)
 (defvar *place-list* nil)
 (defparameter *listOfPoi* Nil)
+(defparameter *poiDistance* 0.75)
 
 ;;;; Navigation ;;;;
 (defun try-movement () (let 
@@ -40,7 +41,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;Try Movement with List ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun try-movement-stampedList (listStamped)
+(defun try-movement-stampedlist (listStamped)
   (let ((?nav-pose listStamped))
 
     (urdf-proj:with-simulated-robot
@@ -163,13 +164,19 @@
         ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
 	;;please indent region...
 	(roslisp:ros-info (move-poi) "Move to POI started")
-        (setf *listOfPoi* (mapcar (lambda (listelem) (comf::pose-with-distance-to-point *poiDistance* listelem)) 
+        (setf *listOfPoi* (mapcar (lambda (listelem) (comf::pose-with-distance-to-point *poiDistance* listelem 10)) 
                                  (llif::sortedPoiByDistance
 					(cl-tf::transform-stamped->pose-stamped
 					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")))))
-        ;;(roslisp:ros-info (poi-subscriber) "Gefundene POI sortiert nach entfernung: ~a" *listOfPoi*)
-	(roslisp:ros-info (move-poi) "Move to POIs: ~a"  *listOfPoi*)
-	(let* ((?successfull-pose (try-movement-stampedList *listOfPoi*))
+
+	;;(roslisp:ros-info (move-poi) "Move to POIs: ~a"  *listOfPoi*)
+
+        ;;filter points that dont work, because of the obstacle map
+	(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* ))
+
+	(mapcar (lambda (listelem) ( roslisp:ros-info (move-poi) "Poi with all Alternative Points: ~a"  listelem)) *listOfPoi*)
+
+	(let* ((?successfull-pose (try-movement-stampedList (flatten *listOfPoi*)))
 		(?desig (desig:a motion
 		                (type going) 
 		                (target (desig:a location
