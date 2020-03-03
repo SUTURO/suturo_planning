@@ -1,7 +1,5 @@
 (in-package :comf)
 
-(defvar *objects* NIL)
-
 ;;@author Torge Olliges
 ;; (defun get-confident-objects (&optional (regions-value (string "robocup_table")))
 ;;   (setf *objects* (llif::call-robosherlock-pipeline regions-value))
@@ -18,30 +16,25 @@
 ;;       *objects*))
 ;;   *objects*)
 
-(defparameter *list* nil)
-
 ;;@author Torge Olliges
-(defun get-confident-objects ()
-           (roslisp:with-fields (detectiondata) *perception-msg*
-             (loop for elem across detectiondata do
-               (roslisp:with-fields (confidence_class) elem
-                 (if (< confidence_class 0.5) (print "to smol") 
-                     (setf *list* (list *list* elem))))))
+(defun get-confident-objects(perception-msg)
+ (roslisp::with-fields (detectiondata) perception-msg
+  (delete-if 
+   (lambda (object) 
+    (roslisp::with-fields (confidence_class confidence_shape confidence_color) object 
+     (if (> confidence_class 0.5) 
+         (detectiondata)
+         (if (> confidence_shape 0.5) 
+           (detectiondata)
+           (if (> confidence_color 0.5) 
+               (detectiondata)
+               (print "neither class shape or color confidence is high enough"))))
+      )
+    )
+   detectiondata
   )
-
-
-;; (defun get-confident-objects ()
-;;   (roslisp:with-fields (detectiondata) *objects*
-;;     (delete-if
-;;      (lambda (confidence_class) 
-;;        (if (> confidence_class 0.6) 
-;;            (roslisp::ros-info 
-;;             (perception-functions) "Object confidence high enough")
-;;            (roslisp::ros-info 
-;;             (perception-functions) "Object confidence to low")))
-;;      detectiondata)))
-     
-
+ )
+)
 
 ;;@author Jan Schimpf
 ;; uses the Simulation to look at a object-position
