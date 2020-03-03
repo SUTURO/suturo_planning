@@ -134,7 +134,7 @@
 ;;;;Move-to-Grasp;;;;
 ;;@author Jan Schimpf
 (defvar *obj-pos*)
-(defvar *obj-class*)
+
 (defun move-to-grasp (object-id grasp-mode)
   (let ((?move-positions (create-move-position-list object-id)))
    (cpl:with-retry-counters ((grasping-retry 4))
@@ -149,6 +149,7 @@
                                  "~%Failed to grasp the object~%")
          (cpl:retry))
          (let ((?successfull-pose (try-movement-stampedList ?move-positions)))
+           
            (comf::looking *obj-pos*)
            (comf::detecting)
            (llif::with-hsr-process-modules (exe:perform
@@ -215,6 +216,11 @@
 		                  (target (desig:a location
 		                                   (pose ?goal-pose))))))
 	    
+<<<<<<< HEAD
 	       (with-hsr-process-modules
 	        (exe:perform ?desig))))
  
+=======
+	      (with-hsr-process-modules
+	      (exe:perform ?desig))) 
+>>>>>>> cf28a8bf02af43bbe7099ea49b1c25a76114cb0b
