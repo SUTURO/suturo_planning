@@ -216,11 +216,7 @@
 		                  (target (desig:a location
 		                                   (pose ?goal-pose))))))
 	    
-<<<<<<< HEAD
 	       (with-hsr-process-modules
 	        (exe:perform ?desig))))
  
-=======
-	      (with-hsr-process-modules
-	      (exe:perform ?desig))) 
->>>>>>> cf28a8bf02af43bbe7099ea49b1c25a76114cb0b
+
