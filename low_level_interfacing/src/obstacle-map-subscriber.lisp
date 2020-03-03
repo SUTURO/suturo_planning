@@ -5,7 +5,7 @@
 
 
 (defun obstacle-map-listener ()
-  (subscribe "dynamic_obstacle_map_ref" "nav_msgs/OccupancyGrid" #'saveObstacleMap)
+  (subscribe "map" "nav_msgs/OccupancyGrid" #'saveObstacleMap)
   ;;(with-ros-node ("listener" :spin t)
   (roslisp:ros-info (obstacle-map-subscriber) "Map Subscribed")
 )
@@ -29,7 +29,7 @@
                   (/
                   (- (cl-tf::y vect3) y)resolution) width)
                  (/ (- (cl-tf::x vect3) x)resolution))))
-    (if (> (length data) *indexs*) (aref data *indexs*) 100 )
+    (if (> (length data) *indexs*) (aref data *indexs*) 111 )
 ))
 
 (defun robot-in-obstacle-stamped (point) 

@@ -171,6 +171,16 @@
 
 	;;(roslisp:ros-info (move-poi) "Move to POIs: ~a"  *listOfPoi*)
 
+
+
+
+	(publish-msg (advertise "removed" "geometry_msgs/PoseArray")
+               :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
+               :poses (make-array (length (flatten (mapcar (lambda (listelem) (remove-if #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* )))
+                                  :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
+                                                            (flatten (mapcar (lambda (listelem) (remove-if #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* ))))) )
+
+
         ;;filter points that dont work, because of the obstacle map
 	(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if-not #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* ))
 
