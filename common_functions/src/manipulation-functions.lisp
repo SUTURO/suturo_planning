@@ -83,6 +83,7 @@
                     (:size-z ?size-z)
                     (:object-id ?object-id)
                     (:grasp-mode ?grasp-mode))))
+    (format t "desig: ~a" grasp)
     (comf::with-hsr-process-modules (exe:perform
                                      grasp))))
                                           
