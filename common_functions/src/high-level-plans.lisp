@@ -134,7 +134,7 @@
 ;;;;Move-to-Grasp;;;;
 ;;@author Jan Schimpf
 (defvar *obj-pos*)
-(defvar *obj-class*)
+
 (defun move-to-grasp (object-id grasp-mode)
   (let ((?move-positions (create-move-position-list object-id)))
    (cpl:with-retry-counters ((grasping-retry 4))
@@ -149,6 +149,7 @@
                                  "~%Failed to grasp the object~%")
          (cpl:retry))
          (let ((?successfull-pose (try-movement-stampedList ?move-positions)))
+           
            (comf::looking *obj-pos*)
            (comf::detecting)
            (llif::with-hsr-process-modules (exe:perform
@@ -184,22 +185,29 @@
 ;;@author Tom-Eric Lehmkuhl
 (defun move-to-table ()
         (roslisp:ros-info (move-poi) "Move to table started")
-        (defparameter *goalPose* nil)  
+        ;;(defparameter *goalPose* nil)  
         (defparameter *postion* nil)                                            
         (defparameter *tablePose* (llif::prolog-table-pose)) ;; insert knowledge function for getting table pose
-        (roslisp::with-fields (x y z) *tablePose* (setf *postion* (cl-tf::make-3d-vector (x y z))))
+        ;;(roslisp::with-fields (x y z) *tablePose* (setf *postion* (cl-tf::make-3d-vector (x y z))))
 
         ;; add table-width to goal to insert distance (-x)
-        (setf *goalPose* (cl-tf::make-pose-stamped "map" 0
-                                        (cl-tf::make-3d-vector (- (cl-tf::x *postion*) 0.95) (cl-tf::y *postion*) (cl-tf::z *postion*))))
+        (setf ?goalPose (cl-tf::make-pose-stamped "map" 0
+                                        (cl-tf::make-3d-vector (+ (first *tablePose*) 0.95) (second *tablePose*) (third *tablePose*)) (cl-tf::make-quaternion 0 0 0 1)))
 
-        (desig:a motion
-		                (type going) 
-		                (target (desig:a location
-		                                 (pose *goalPose*))))
+         ;;(desig:a motion
+		     ;;            (type going) 
+		     ;;            (target (desig:a location
+		     ;;                             (pose *goalPose*))))
+	    
+	       ;;(with-hsr-process-modules
+	      ;;(exe:perform desig))) 
+         (let* ((?desig (desig:a motion
+		                 (type going) 
+		                 (target (desig:a location
+		                                  (pose ?goalPose))))))
 	    
 	      (with-hsr-process-modules
-	      (exe:perform ?desig))) 
+	       (exe:perform ?desig))))
 
 ;;@author Tom-Eric Lehmkuhl
 (defun move-to-shelf()

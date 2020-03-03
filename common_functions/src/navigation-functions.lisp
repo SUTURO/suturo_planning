@@ -71,6 +71,7 @@
 	(scan-object)
 )
 
+;;@Author Jan Schimpf
 (defun create-move-position-list(object-id)
     (setq *pose* (llif:prolog-object-pose object-id))
     (let 
