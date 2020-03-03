@@ -189,41 +189,32 @@
         (defparameter *tablePose* (llif::prolog-table-pose)) ;; insert knowledge function for getting table pose
         ;;(roslisp::with-fields (x y z) *tablePose* (setf *postion* (cl-tf::make-3d-vector (x y z))))
 
-        ;; add table-width to goal to insert distance (-x)
-        (setf ?goalPose (cl-tf::make-pose-stamped "map" 0
-                                        (cl-tf::make-3d-vector (+ (first *tablePose*) 0.95) (second *tablePose*) (third *tablePose*)) (cl-tf::make-quaternion 0 0 0 1)))
-
-         ;;(desig:a motion
-		     ;;            (type going) 
-		     ;;            (target (desig:a location
-		     ;;                             (pose *goalPose*))))
+        (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
+                            (cl-tf::make-3d-vector (+ (first *tablePose*) 0.95) 
+                              (second *tablePose*) (third *tablePose*)) (cl-tf::make-quaternion 0 0 1 0)))
+         (?desig (desig:a motion
+		                  (type going) 
+		                  (target (desig:a location
+		                                   (pose ?goal-pose))))))
 	    
-	       ;;(with-hsr-process-modules
-	      ;;(exe:perform desig))) 
-         (let* ((?desig (desig:a motion
-		                 (type going) 
-		                 (target (desig:a location
-		                                  (pose ?goalPose))))))
-	    
-	      (with-hsr-process-modules
-	       (exe:perform ?desig))))
+	       (with-hsr-process-modules
+	        (exe:perform ?desig))))
 
 ;;@author Tom-Eric Lehmkuhl
 (defun move-to-shelf()
-        (roslisp:ros-info (move-poi) "Move to shelf started")
-        (defparameter *goalPose* nil)  
+        (roslisp:ros-info (move-poi) "Move to shelf started")  
         (defparameter *postion* nil)                                            
-        (defparameter *shelfPose* (llif::prolog-table-pose)) ;; insert knowledge function for getting shelf pose
-        (roslisp::with-fields (x y z) *shelfPose* (setf *postion* (cl-tf::make-3d-vector (x y z))))
+        (defparameter *shelfPose* (llif::prolog-shelf-pose)) ;; insert knowledge function for getting shelf pose
         
         ;; add shelf-depth to goal to insert distance (+y)
-        (setf *goalPose* (cl-tf::make-pose-stamped "map" 0
-                                        (cl-tf::make-3d-vector (cl-tf::x *postion*) (+ (cl-tf::y *postion*) 0.36) (cl-tf::z *postion*))))
-
-        (desig:a motion
-		                (type going) 
-		                (target (desig:a location
-		                                 (pose *goalPose*))))
+        (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
+                            (cl-tf::make-3d-vector (first *tablePose*) 
+                              (- (second *tablePose*) 0.36) (third *tablePose*)) (cl-tf::make-quaternion 0 0 -0.7 0.7)))
+         (?desig (desig:a motion
+		                  (type going) 
+		                  (target (desig:a location
+		                                   (pose ?goal-pose))))))
 	    
-	      (with-hsr-process-modules
-	      (exe:perform ?desig))) 
+	       (with-hsr-process-modules
+	        (exe:perform ?desig))))
+ 
