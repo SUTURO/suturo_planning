@@ -192,7 +192,7 @@
 
         (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
                             (cl-tf::make-3d-vector (+ (first *tablePose*) 0.95) 
-                              (second *tablePose*) (third *tablePose*)) (cl-tf::make-quaternion 0 0 1 0)))
+                              (second *tablePose*) 0) (cl-tf::make-quaternion 0 0 1 0)))
          (?desig (desig:a motion
 		                  (type going) 
 		                  (target (desig:a location
@@ -209,8 +209,8 @@
         
         ;; add shelf-depth to goal to insert distance (+y)
         (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
-                            (cl-tf::make-3d-vector (first *tablePose*) 
-                              (- (second *tablePose*) 0.36) (third *tablePose*)) (cl-tf::make-quaternion 0 0 -0.7 0.7)))
+                            (cl-tf::make-3d-vector (+ (first *shelfPose*) 0.225) 
+                              (+ (second *shelfPose*) 0.87) 0) (cl-tf::make-quaternion 0 0 -0.7 0.7)))
          (?desig (desig:a motion
 		                  (type going) 
 		                  (target (desig:a location
