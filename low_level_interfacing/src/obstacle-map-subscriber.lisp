@@ -40,23 +40,23 @@
      (circle-is-in-obstacle point 0.23 8)
 )
 
-;;Berechnet ob der Kreis mit dem radius von der obstaclemap gestört wird
+
 (defun circle-is-in-obstacle (point radius amountPointOnCircle) 
 
-	(setf *radians* (mapcar (lambda (listelem) (* (/ 6.28319 amountPointOnCircle) listelem)) 
-		                         (loop :for n :from 1 :below amountPointOnCircle :collect n)))
+	;;(setf *radians* (mapcar (lambda (listelem) (* (/ 6.28319 amountPointOnCircle) listelem)) 
+	;;	                         (loop :for n :from 1 :below amountPointOnCircle :collect n)))
 
 
-	(setf *obstacleValues* (mapcar (lambda (listelem) 
-		                (getMapPoint (cl-tf::make-3d-vector 
-                                  (+ (* radius (cos listelem)) (cl-tf::x point)) 
-                                  (+ (* radius (sin listelem)) (cl-tf::y point))
-                                  0))
-		        ) 
-	*radians*))
-         
-        (= 0 (+ (apply '+ *obstacleValues* )  (getMapPoint point) ))
+	;;(setf *obstacleValues* (mapcar (lambda (listelem) 
+	;;	                (getMapPoint (cl-tf::make-3d-vector 
+        ;;                          (+ (* radius (cos listelem)) (cl-tf::x point)) 
+        ;;                          (+ (* radius (sin listelem)) (cl-tf::y point))
+        ;;                          0))
+	;;	        ) 
+	;;*radians*))
+        (roslisp:ros-info (obstacle-filter) "value: ~a" (getMapPoint point))
+        (< (getMapPoint point) 66 ))
 
 
-)
+
 

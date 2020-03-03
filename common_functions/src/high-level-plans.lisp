@@ -172,19 +172,37 @@
 	;;(roslisp:ros-info (move-poi) "Move to POIs: ~a"  *listOfPoi*)
 
         ;;filter points that dont work, because of the obstacle map
-	(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* ))
+	(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if-not #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* ))
 
 	(mapcar (lambda (listelem) ( roslisp:ros-info (move-poi) "Poi with all Alternative Points: ~a"  listelem)) *listOfPoi*)
 
-	(let* ((?successfull-pose (try-movement-stampedList (flatten *listOfPoi*)))
-		(?desig (desig:a motion
-		                (type going) 
-		                (target (desig:a location
-		                                 (pose ?successfull-pose))))))
-	    
-	    (with-hsr-process-modules
-	      (exe:perform ?desig)))
-        (llif::call-take-pose-action 2)
+
+	(publish-msg (advertise "origins" "geometry_msgs/PoseArray")
+               :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map")
+               :poses (make-array (length (llif::sortedPoiByDistance
+					(cl-tf::transform-stamped->pose-stamped
+					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
+                                  :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
+                                                            (llif::sortedPoiByDistance
+					(cl-tf::transform-stamped->pose-stamped
+					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")))))) )
+
+
+        (publish-msg (advertise "poi_debug" "geometry_msgs/PoseArray")
+               :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
+               :poses (make-array (length (flatten *listOfPoi*))
+                                  :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
+                                                            (flatten *listOfPoi*)))) )
+
+	;;(let* ((?successfull-pose (try-movement-stampedList (flatten *listOfPoi*)))
+	;;	(?desig (desig:a motion
+	;;	                (type going) 
+	;;	                (target (desig:a location
+	;;	                                 (pose ?successfull-pose))))))
+	;;    
+	;;    (with-hsr-process-modules
+	;;      (exe:perform ?desig)))
+        ;;(llif::call-take-pose-action 2)
 )
 
 

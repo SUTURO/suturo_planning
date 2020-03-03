@@ -35,13 +35,15 @@
 		                *newgoalOrigin*
 		                (cl-tf:euler->quaternion :ax 0.0 :ay 0.0 :az *orientation*)))
 
-        (roslisp:ros-info (poi-subscriber) "going to: ~a" *newgoalstamped*)
+        ;;(roslisp:ros-info (poi-subscriber) "going to: ~a" *newgoalstamped*)
 
         ;;;;;; Alternative Positions in Circle around Point ;;;;;;;;;
 
 	(setf *radians* (mapcar (lambda (listelem) (* (/ 6.28319 amountAlternatePositions) listelem)) 
 		                         (loop :for n :from 1 :below amountAlternatePositions :collect n)))
 
+
+        (roslisp:ros-info (poi-subscriber) "radians: ~a" *radians*)
 
 	(setf *alternatePositions* (mapcar (lambda (listelem) (
 		
@@ -52,16 +54,27 @@
                                   (+ (* distance (cos listelem)) (cl-tf::x *goalOrigin*)) 
                                   (+ (* distance (sin listelem)) (cl-tf::y *goalOrigin*))
                                   0)
-		                (cl-tf:euler->quaternion :ax 0.0 :ay 0.0 :az *orientation*)
+		                (cl-tf:euler->quaternion :ax 0.0 :ay 0.0 :az (
+                                      let* (
+                                           (y (- (cl-tf::y *goalOrigin*) (+ (* distance (sin listelem)) (cl-tf::y *goalOrigin*)))) 
+                                           (x (- (cl-tf::x *goalOrigin*) (+ (* distance (cos listelem)) (cl-tf::x *goalOrigin*))))
+                                           (atanValue (atan (/ y x)))
+                                          )
+                                         
+                                       (if (< x 0) (- atanValue 1.57) (+ atanValue 1.57) ) 
+                                     ))
 		        )) 
 	*radians*))
 
        ;;(number-sequence 1 amountAlternatePositions)
        ;;(/ 6.28319 amountAlternatePositions)
 
-	(llif::sortedStampedByDistance (cl-tf::transform-stamped->pose-stamped ;;new line ..
-					(cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))
+       ;;(append (list *newgoalstamped* point) *alternatePositions*))
+
+       (llif::sortedStampedByDistance (cl-tf::transform-stamped->pose-stamped ;;new line ..
+				(cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))
                                 (append (list *newgoalstamped*) *alternatePositions*)))
+
 
 (cpl:def-cram-function scan-object ()
 	(llif::insert-knowledge-objects(get-confident-objects))
