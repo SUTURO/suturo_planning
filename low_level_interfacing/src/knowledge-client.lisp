@@ -35,6 +35,17 @@
   "returns the class of the given object name"
   (subseq object-name 0 (position #\_ object-name)))
 
+(defun knowledge-set-tables-source ()
+  (roslisp:ros-info (json-prolog-client) "Set tables as source")
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple "make_tables_source."
+                                             :package :llif))))))
+
+(defun knowledge-set-ground-source ()
+  (roslisp:ros-info (json-prolog-client) "Set ground as source")
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple "make_ground_source."
+                                             :package :llif))))))
 
 (defun prolog-table-objects ()
   "returns the list of all objects on the table"
@@ -59,7 +70,7 @@
   (roslisp:ros-info (json-prolog-client) "Getting goal floor for object ~a." object-name)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          ;; (rdf-urdf (format nil "~aurdfName" +srld-prefix+))
-         (raw-response (with-safe-prolog
+         (raw-response (with-safe-prolog  
                          (json-prolog:prolog-simple (concatenate 'string 
                                                                  "object_goal_surface('" knowrob-name "', SURFACE)," 
                                                                  "object_frame_name(SURFACE, Name),"
@@ -151,7 +162,7 @@
   (roslisp:ros-info (json-prolog-client) "Getting pose from table")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
-                          (concatenate 'string "rdf_urdf_name(TABLE, Table_2_center),"
+                          (concatenate 'string "rdf_urdf_name(TABLE, table_2_center),"
                                                "surface_pose_in_map(TABLE, [TRANSLATION, ROTATION])")
                           :package :llif))))
     (if (eq raw-response 1)
@@ -164,7 +175,7 @@
   (roslisp:ros-info (json-prolog-client) "Getting pose from shelf")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
-                          (concatenate 'string "rdf_urdf_name(SHELF, Shelf_floor_0_piece),"
+                          (concatenate 'string "rdf_urdf_name(SHELF, shelf_floor_0_piece),"
                                                "surface_pose_in_map(SHELF, [TRANSLATION, ROTATION])")
                           :package :llif))))
     (if (eq raw-response 1)
