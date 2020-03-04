@@ -3,8 +3,9 @@
 (defparameter *listOfPoi* Nil)
 
 ;;;; Navigation ;;;;
-(defun try-movement () (let 
-	((?nav-pose (list (cl-tf::make-pose-stamped "map" 0 
+;;@author Torge Olliges 
+(defun try-movement () 
+(let ((?nav-pose (list (cl-tf::make-pose-stamped "map" 0 
                                                (cl-tf:make-3d-vector 2 3 0) 
                                                (cl-tf::make-quaternion 0 0 0 1)) 
                      (cl-tf::make-pose-stamped "map" 0 
@@ -40,6 +41,7 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;Try Movement with List ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;@author Torge Olliges, Phillip Klein
 (defun try-movement-stampedList (listStamped)
   (let ((?nav-pose listStamped))
 
@@ -73,11 +75,16 @@
 
 
 
-          
-(defun move-hsr ()
-  (let* ((?successfull-pose (cl-tf::make-pose-stamped "map" 0 
-                                               (cl-tf:make-3d-vector 1.097 0.556 0)
-                                               (cl-tf::make-quaternion 0 0 0 1)))
+;;@author Torge Olliges      
+(defun move-hsr (nav-goal-pose-stamped)
+  (let* ((?successfull-pose (try-movement-stampedList 
+				(list (cl-tf::make-pose-stamped "map" 0 
+                                      	(cl-tf:make-3d-vector 2 3 0) 
+                                      	(cl-tf::make-quaternion 0 0 0 1)) 
+                     		      (cl-tf::make-pose-stamped "map" 0 
+                                   	(cl-tf:make-3d-vector 2 3 0) 
+                                        (cl-tf::make-quaternion 0 0 0 1))
+		      		      nav-goal-pose))
         (?desig (desig:a motion
                         (type going) 
                         (target (desig:a location
