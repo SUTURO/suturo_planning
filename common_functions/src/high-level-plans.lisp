@@ -160,6 +160,10 @@
            (comf::grasp-hsr object-id grasp-mode)
          )))))))
 
+(defun reachable-in-simulator (stamp) 
+    (null (try-movement-stampedlist (list stamp)))
+)
+
 ;;@author Philipp Klein
 (defun move-to-poi ()
         ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
@@ -196,16 +200,17 @@
         ;;filter points that dont work, because of the obstacle map
 	(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if-not #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* ))
 
-	(mapcar (lambda (listelem) ( roslisp:ros-info (move-poi) "Poi with all Alternative Points: ~a"  listelem)) *listOfPoi*)
 
-        (setf *li2* (llif::sortedPoiByDistance
-					(cl-tf::transform-stamped->pose-stamped
-					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
+	;;remove empty lists
+	(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if #'null listelem)) *listOfPoi* ))
 
-	(publish-msg (advertise "origins" "geometry_msgs/PoseArray")
-               :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map")
-               :poses (make-array (length *li2*)
-                                  :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose *li2*))) )
+	;;filter each point that isnt reachable in the simulator
+	(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if-not #'reachable-in-simulator listelem)) *listOfPoi* ))
+
+        ;;Limit Point per Poi to 2
+        (setf *listOfPoi* (mapcar (lambda (listelem) (
+		if (> (length listelem) 2) (subseq listelem 0 2) listelem
+                     )) *listOfPoi* ))
 
 
         (publish-msg (advertise "poi_debug" "geometry_msgs/PoseArray")

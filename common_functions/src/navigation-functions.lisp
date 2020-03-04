@@ -25,18 +25,6 @@
 		  (cl-tf::v- *currentOrigin* *goalOrigin*) 
 		  (/ distance (cl-tf::v-dist *currentOrigin* *goalOrigin*)))))
 
-	;;what is 1.57 where does it come from? its the half of PI
-	(setf *orientation* (+ 1.57 (atan (/ (cl-tf::y *goalOrigin*) (cl-tf::x *goalOrigin*)))))
-        
-        ;;;;; Direct Position ;;;;;;;;;;;
-        (setf *newgoalstamped* (cl-tf:make-pose-stamped
-		                "map"
-		                (roslisp::ros-time)
-		                *newgoalOrigin*
-		                (cl-tf:euler->quaternion :ax 0.0 :ay 0.0 :az *orientation*)))
-
-        ;;(roslisp:ros-info (poi-subscriber) "going to: ~a" *newgoalstamped*)
-
         ;;;;;; Alternative Positions in Circle around Point ;;;;;;;;;
 
 	(setf *radians* (mapcar (lambda (listelem) (* (/ 6.28319 amountAlternatePositions) listelem)) 
@@ -73,7 +61,7 @@
 
        (llif::sortedStampedByDistance (cl-tf::transform-stamped->pose-stamped ;;new line ..
 				(cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))
-                                (append (list *newgoalstamped*) *alternatePositions*)))
+                                *alternatePositions*))
 
 
 (cpl:def-cram-function scan-object ()
