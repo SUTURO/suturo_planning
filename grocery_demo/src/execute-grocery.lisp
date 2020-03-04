@@ -12,26 +12,30 @@
   ;;    (cram-language:wait-for *state-fluent*)
   ;;    (loop do
   ;;      (cram-language:sleep 0.1)))
+  (llif::call-text-to-speech-action "Fuck off mate i am working now.")
 
   ;;move to shelf
-  (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
-  (comf::move-to-shelf)
+  (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way, you fucker.")
+  (comf::move-to-shelf t)
   ;;perceive shelf put objects into knowledge and bulletworld
   (llif::call-text-to-speech-action "I am perceiving the first shelf now.")
   (llif::call-take-pose-action 2)
   (setf *perception-objects* (llif::call-robosherlock-pipeline "robocup_shelf_0"))
+  (print *perception-objects*)
   (llif::insert-knowledge-objects *perception-objects*)
   (grocery::spawn-btr-objects *perception-objects*)
 
   (llif::call-text-to-speech-action "I am perceiving the second shelf now.")
   (llif::call-take-pose-action 2)
   (setf *perception-objects* (llif::call-robosherlock-pipeline "robocup_shelf_1"))
+  (print *perception-objects*)
   (llif::insert-knowledge-objects *perception-objects*)
   (grocery::spawn-btr-objects *perception-objects*)
 
   (llif::call-text-to-speech-action "I am perceiving the third shelf now.")
   (llif::call-take-pose-action 3)
   (setf *perception-objects* (llif::call-robosherlock-pipeline "robocup_shelf_2"))
+  (print *perception-objects*)
   (llif::insert-knowledge-objects *perception-objects*)
   (grocery::spawn-btr-objects *perception-objects*)
 
@@ -40,8 +44,8 @@
   (llif::call-take-pose-action 1)
 
   ;;move to table
-  (llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way.")
-  (comf::move-to-table)
+  (llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way, you fucker.")
+  (comf::move-to-table t)
 
   ;;perceiving the table
   (llif::call-text-to-speech-action "I am perceiving the table now.")
@@ -50,23 +54,25 @@
   (llif::insert-knowledge-objects *perception-objects*)
   (grocery::spawn-btr-objects *perception-objects*)
   (llif::call-text-to-speech-action "I am done perceiving the table now.")
+  (llif::call-take-pose-action 1)
 
   ;;(cram-language:pursue
       ;;(cram-language:wait-for *objects*)
       (loop do
         ;;move to table
         (llif::call-text-to-speech-action "I am getting into a position to grasp from.")
-        (comf::move-to-table)
+        (comf::move-to-table NIL)
 
         ;;query for next object
         (setf *next-object* (llif::prolog-next-object))
+        (llif::call-text-to-speech-action *next-object*)
         ;;grasp object
         (llif::call-text-to-speech-action "I'm going to grasp the object now.")
-        (comf::grasp-hsr *next-object* 1)
+        (comf::grasp-object *next-object* 1)
         (llif::call-text-to-speech-action "I have grapsed the object")
 
         ;;move to shelf
-        (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
+        (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way, you fucker.")
         (comf::move-to-shelf)
 
         ;;check for correct position depending on other objects in shelf

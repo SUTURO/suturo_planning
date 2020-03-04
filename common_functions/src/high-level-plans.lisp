@@ -183,7 +183,9 @@
 
 
 ;;@author Tom-Eric Lehmkuhl
-(defun move-to-table ()
+(defun move-to-table ( &optional
+                                     (turn (Boolean Nil)))
+     
         (roslisp:ros-info (move-poi) "Move to table started")
         ;;(defparameter *goalPose* nil)  
         (defparameter *postion* nil)                                            
@@ -191,8 +193,8 @@
         ;;(roslisp::with-fields (x y z) *tablePose* (setf *postion* (cl-tf::make-3d-vector (x y z))))
 
         (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
-                            (cl-tf::make-3d-vector (+ (first *tablePose*) 0.95) 
-                              (second *tablePose*) 0) (cl-tf::make-quaternion 0 0 1 0)))
+                            (cl-tf::make-3d-vector (+ (first *tablePose*) 0.7) ;;0.7 was previously 0.95
+                              (second *tablePose*) 0) (if turn (cl-tf::make-quaternion 0 0 -0.7 0.7) (cl-tf::make-quaternion 0 0 1 0))))
          (?desig (desig:a motion
 		                  (type going) 
 		                  (target (desig:a location
@@ -202,15 +204,16 @@
 	        (exe:perform ?desig))))
 
 ;;@author Tom-Eric Lehmkuhl
-(defun move-to-shelf()
+(defun move-to-shelf ( &optional
+                                     (turn (Boolean Nil)))
         (roslisp:ros-info (move-poi) "Move to shelf started")  
         (defparameter *postion* nil)                                            
         (defparameter *shelfPose* (llif::prolog-shelf-pose)) ;; insert knowledge function for getting shelf pose
         
         ;; add shelf-depth to goal to insert distance (+y)
         (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
-                            (cl-tf::make-3d-vector (+ (first *shelfPose*) 0.225) 
-                              (+ (second *shelfPose*) 0.87) 0) (cl-tf::make-quaternion 0 0 -0.7 0.7)))
+                            (cl-tf::make-3d-vector (+ (first *shelfPose*) 0.1) ;;was previously 0.225
+                              (+ (second *shelfPose*) 0.87) 0) (if turn (cl-tf::make-quaternion 0 0 0 1) (cl-tf::make-quaternion 0 0 -0.7 0.7))))
          (?desig (desig:a motion
 		                  (type going) 
 		                  (target (desig:a location

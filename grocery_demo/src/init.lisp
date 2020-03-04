@@ -11,6 +11,8 @@
   ;;starts ros node
   (init-planning)
 
+  (init-tts)
+
   (init-navigation)
 
   (init-manipulation)
@@ -53,6 +55,11 @@
 
   (roslisp:ros-info (init-interface) "init take pose action client")
   (llif:init-take-pose-action-client)
+)
+
+(defun init-tts()
+  ;;init action client
+  (llif::init-text-to-speech-action-client)
 )
 
 (defun init-perception()
