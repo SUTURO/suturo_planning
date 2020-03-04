@@ -35,7 +35,7 @@
   (llif::insert-knowledge-objects *perception-objects*)
   (grocery::spawn-btr-objects *perception-objects*)
 
-  (llif::call-text-to-speech "I am done perceiving the shelf now.")
+  (llif::call-text-to-speech-action "I am done perceiving the shelf now.")
   ;;back to base position
   (llif::call-take-pose-action 1)
 
@@ -51,8 +51,8 @@
   (grocery::spawn-btr-objects *perception-objects*)
   (llif::call-text-to-speech-action "I am done perceiving the table now.")
 
-  (cram-language:pursue
-      (cram-language:wait-for *objects*)
+  ;;(cram-language:pursue
+      ;;(cram-language:wait-for *objects*)
       (loop do
         ;;move to table
         (llif::call-text-to-speech-action "I am getting into a position to grasp from.")
@@ -78,7 +78,7 @@
         (llif::call-text-to-speech-action "I have placed the object now.")
 
         ;;back to base position
-        (llif::call-take-pose-action 1)))
+        (llif::call-take-pose-action 1));;)
 
         ;;query for knowledge if objects left
         ;;(if (= (length (llif::prolog-table-objects)) 0) (set *no-objects* true)

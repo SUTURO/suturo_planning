@@ -1,11 +1,9 @@
-(in-package :grocery)
-
-(defparameter *perception-msg* nil)
+(in-package :clean)
 
 ;;@author Torge Olliges
 ;;spawns detected objects in the bulletworld
-(defun spawn-btr-objects ()
-  (roslisp:with-fields (detectiondata) *perception-msg*
+(defun spawn-btr-objects (perception-msg)
+  (roslisp:with-fields (detectiondata) perception-msg
     (loop for elem across detectiondata do
       (roslisp::with-fields (width height depth shape pose) elem
         (roslisp::with-fields (pose) pose
