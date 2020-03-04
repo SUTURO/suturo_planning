@@ -17,6 +17,7 @@
   (init-perception)
 
   (init-knowledge)
+  (init-tts)
 )
 
 (defun init-navigation()
@@ -65,7 +66,10 @@
   ;;(roslisp:ros-info (init-clients) "init robosherlock plane action client")
   ;;(llif::init-robosherlock-plane-action-client)
 )
-
+(defun init-tts()
+  ;;init action client
+  (llif::init-text-to-speech-action-client)
+)
 (defun init-planning()
   "Initialize only local nodes for working without the real robot."  
   ;;start rosnode named planning_node

@@ -113,7 +113,7 @@
 ;;@author Jan Schimpf
 
 (defun place-hsr (object-id grasp-pose)
-  (let ((?place-position (comf:create-place-list object-id grasp-pose)))
+ (let ((?place-position (comf:create-place-list object-id grasp-pose)))
                          
  (cpl:with-retry-counters ((grasping-retry 4))
    (cpl:with-failure-handling
@@ -127,7 +127,7 @@
                                  "~%Failed to grasp the object~%")
          (cpl:retry))
          (let ((?actual-place-position (car ?place-position)))
-         (comf::place-object ?actual-place-position)
+         (comf::place-object-test ?actual-place-position)
                        )))))))
    
 

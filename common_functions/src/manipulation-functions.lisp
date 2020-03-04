@@ -46,8 +46,36 @@
                     (:grasp-mode ?grasp-mode))))
     (comf::with-hsr-process-modules (exe:perform
                                      place))))
-  ;;say: done placeing object
-  
+
+(defun place-object-test (place-list)
+  (let* ((?point-x-object (nth 0 place-list))
+        (?point-y-object (nth 1 place-list))
+        (?point-z-object (nth 2 place-list))
+        (?quaterion-value-1 (nth 0 place-list))
+        (?quaterion-value-2 (nth 1 place-list))
+        (?quaterion-value-3 (nth 2 place-list))
+        (?quaterion-value-4 (nth 3 place-list))
+        (?size-x (nth 0 place-list))
+        (?size-y (nth 1 place-list))
+        (?size-z (nth 2 place-list))
+        (?object-id object-id)
+        (?grasp-mode grasp-pose)
+   (place (desig:a motion
+                    (:type :placing)
+                    (:point-x ?point-x-object)
+                    (:point-y ?point-y-object)
+                    (:point-z ?point-z-object)
+                    (:quaterion-value-1 ?quaterion-value-1)
+                    (:quaterion-value-2 ?quaterion-value-2)
+                    (:quaterion-value-3 ?quaterion-value-3)
+                    (:quaterion-value-4 ?quaterion-value-4)
+                    (:size-x ?size-x)
+                    (:size-y ?size-y)
+                    (:size-z ?size-z)
+                    (:object-id ?object-id)
+                    (:grasp-mode ?grasp-mode))))
+    (comf::with-hsr-process-modules (exe:perform
+                                     place))))  
 
 ;;@author Jan Schimpf
 ;;todo add checks for nil;
@@ -102,89 +130,28 @@
         (quaterion-value-2 (nth 1 (nth 1 *goal*)))
         (quaterion-value-3 (nth 2 (nth 1 *goal*)))
         (quaterion-value-4 (nth 3 (nth 1 *goal*)))
-        (size_x (nth 0 *dimensions*))
-        (size_y (nth 1 *dimensions*))
-        (size_z (nth 2 *dimensions*))
+        (size-x (nth 0 *dimensions*))
+        (size-y (nth 1 *dimensions*))
+        (size-z (nth 2 *dimensions*))
         (?list (list (list point-x-object point-y-object point-z-object
                                 quaterion-value-1 quaterion-value-2
                                 quaterion-value-3 quaterion-value-4
-                                size_x size_y size_z object-id grasp-pose)
+                                size-x size-y size-z object-id grasp-pose)
                         (list (+ point-x-object 0.05) point-y-object point-z-object
                                 quaterion-value-1 quaterion-value-2
                                 quaterion-value-3 quaterion-value-4
-                                size_x size_y size_z object-id grasp-pose)
+                                size-x size-y size-z object-id grasp-pose)
                         (list (- point-x-object 0.05) point-y-object point-z-object
                                 quaterion-value-1 quaterion-value-2
                                 quaterion-value-3 quaterion-value-4
-                                size_x size_y size_z object-id grasp-pose)
+                                size-x size-y size-z object-id grasp-pose)
                         (list point-x-object (+ point-y-object 0.05) point-z-object
                                 quaterion-value-1 quaterion-value-2
                                 quaterion-value-3 quaterion-value-4
-                                size_x size_y size_z object-id grasp-pose)
+                                size-x size-y size-z object-id grasp-pose)
                         (list point-x-object (- point-y-object 0.05) point-z-object
                                 quaterion-value-1 quaterion-value-2
                                 quaterion-value-3 quaterion-value-4
-                                size_x size_y size_z object-id grasp-pose))))
+                                size-x size-y size-z object-id grasp-pose))))   
     ?list))
 
-(defun test-grasp()
-    (let* ((?point-x-object 1)
-        (?point-y-object 1)
-        (?point-z-object 0.3)
-        (?quaterion-value-1 0)
-        (?quaterion-value-2 0.7)
-        (?quaterion-value-3 0)
-        (?quaterion-value-4 0.7)
-        (?size-x 0.1)
-        (?size-y 0.1)
-        (?size-z 0.1)
-        (?object-id "box")
-        (?grasp-mode 1)
-        (grasp (desig:a motion
-                    (:type :grasping)
-                    (:point-x ?point-x-object)
-                    (:point-y ?point-y-object)
-                    (:point-z ?point-z-object)
-                    (:quaterion-value-1 ?quaterion-value-1)
-                    (:quaterion-value-2 ?quaterion-value-2)
-                    (:quaterion-value-3 ?quaterion-value-3)
-                    (:quaterion-value-4 ?quaterion-value-4)
-                    (:size-x ?size-x)
-                    (:size-y ?size-y)
-                    (:size-z ?size-z)
-                    (:object-id ?object-id)
-                    (:grasp-mode ?grasp-mode))))
-    (with-hsr-process-modules (exe:perform
-                                     grasp)))
-  )
-
-(defun test-place()
-     (let* ((?point-x-object 1)
-        (?point-y-object 1)
-        (?point-z-object 0.3)
-        (?quaterion-value-1 0)
-        (?quaterion-value-2 0.7)
-        (?quaterion-value-3 0)
-        (?quaterion-value-4 0.7)
-        (?size-x 0.1)
-        (?size-y 0.1)
-        (?size-z 0.1)
-        (?object-id "box")
-        (?grasp-mode 1)
-        (place (desig:a motion
-                    (:type :placing)
-                    (:point-x ?point-x-object)
-                    (:point-y ?point-y-object)
-                    (:point-z ?point-z-object)
-                    (:quaterion-value-1 ?quaterion-value-1)
-                    (:quaterion-value-2 ?quaterion-value-2)
-                    (:quaterion-value-3 ?quaterion-value-3)
-                    (:quaterion-value-4 ?quaterion-value-4)
-                    (:size-x ?size-x)
-                    (:size-y ?size-y)
-                    (:size-z ?size-z)
-                    (:object-id ?object-id)
-                    (:grasp-mode ?grasp-mode))))
-    (comf::with-hsr-process-modules (exe:perform
-                                     place)))
-  )
