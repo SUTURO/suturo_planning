@@ -46,8 +46,36 @@
                     (:grasp-mode ?grasp-mode))))
     (comf::with-hsr-process-modules (exe:perform
                                      place))))
-  ;;say: done placeing object
-  
+
+(defun place-object-test (place-list)
+  (let* ((?point-x-object (nth 0 place-list))
+        (?point-y-object (nth 1 place-list))
+        (?point-z-object (nth 2 place-list))
+        (?quaterion-value-1 (nth 0 place-list))
+        (?quaterion-value-2 (nth 1 place-list))
+        (?quaterion-value-3 (nth 2 place-list))
+        (?quaterion-value-4 (nth 3 place-list))
+        (?size-x (nth 0 place-list))
+        (?size-y (nth 1 place-list))
+        (?size-z (nth 2 place-list))
+        (?object-id object-id)
+        (?grasp-mode grasp-pose)
+   (place (desig:a motion
+                    (:type :placing)
+                    (:point-x ?point-x-object)
+                    (:point-y ?point-y-object)
+                    (:point-z ?point-z-object)
+                    (:quaterion-value-1 ?quaterion-value-1)
+                    (:quaterion-value-2 ?quaterion-value-2)
+                    (:quaterion-value-3 ?quaterion-value-3)
+                    (:quaterion-value-4 ?quaterion-value-4)
+                    (:size-x ?size-x)
+                    (:size-y ?size-y)
+                    (:size-z ?size-z)
+                    (:object-id ?object-id)
+                    (:grasp-mode ?grasp-mode))))
+    (comf::with-hsr-process-modules (exe:perform
+                                     place))))  
 
 ;;@author Jan Schimpf
 ;;todo add checks for nil;
@@ -124,6 +152,6 @@
                         (list point-x-object (- point-y-object 0.05) point-z-object
                                 quaterion-value-1 quaterion-value-2
                                 quaterion-value-3 quaterion-value-4
-                                size-x size-y size-z object-id grasp-pose))))
+                                size-x size-y size-z object-id grasp-pose))))   
     ?list))
 

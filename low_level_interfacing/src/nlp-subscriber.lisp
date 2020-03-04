@@ -4,11 +4,11 @@
 
 ;; @author Tom-Eric Lehmkuhl
 (defun static-command-listener ()
-    (subscribe "/suturo_speech_recognition/hard_commands"  "nlp_msgs/StaticCommand" #'set-state-fluent)))
+    (subscribe "/suturo_speech_recognition/hard_commands"  "nlp_msgs/StaticCommand" #'set-state-fluent))
 
 ;; @author Tom-Eric Lehmkuhl
 (defun dynamic-command-listener ()
-    (subscribe "/suturo_speech_recognition/dynamic_commands"  "nlp_msgs/DynamicCommand" #'print)))
+    (subscribe "/suturo_speech_recognition/dynamic_commands"  "nlp_msgs/DynamicCommand" #'print))
 
 ;; @author Tom-Eric Lehmkuhl
 (defun set-state-fluent (msg)
