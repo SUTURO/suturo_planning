@@ -2,14 +2,15 @@
 
 (defvar *state-fluent* (cram-language:make-fluent :name :state-fluent) nil)
 
+;; @author Tom-Eric Lehmkuhl
 (defun static-command-listener ()
-    (with-ros-node ("command_listener" :spin t)
     (subscribe "/suturo_speech_recognition/hard_commands"  "nlp_msgs/StaticCommand" #'set-state-fluent)))
 
+;; @author Tom-Eric Lehmkuhl
 (defun dynamic-command-listener ()
-    (with-ros-node ("command_listener" :spin t)
     (subscribe "/suturo_speech_recognition/dynamic_commands"  "nlp_msgs/DynamicCommand" #'print)))
 
+;; @author Tom-Eric Lehmkuhl
 (defun set-state-fluent (msg)
     "Callback for static-commands, called by static-command-listener."
     (if (eq msg 1)

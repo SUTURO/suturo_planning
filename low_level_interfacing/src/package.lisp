@@ -74,4 +74,8 @@
    #:prolog-table-pose
    #:prolog-next-object
 
+   ;;nlp-subscriber
+   #:static-command-listener
+   #:dynmaic-command-listener
+
 ))

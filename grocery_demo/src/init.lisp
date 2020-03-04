@@ -20,6 +20,8 @@
   (init-perception)
 
   (init-knowledge)
+
+  (init-nlp)
 )
 
 (defun init-navigation()
@@ -61,6 +63,9 @@
   ;;init action client
   (llif::init-text-to-speech-action-client)
 )
+
+(defun init-nlp()
+  (llif::static-command-listener))
 
 (defun init-perception()
  "Initialize only local nodes for working without the real robot."
