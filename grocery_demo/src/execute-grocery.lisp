@@ -12,7 +12,7 @@
   ;;    (cram-language:wait-for *state-fluent*)
   ;;    (loop do
   ;;      (cram-language:sleep 0.1)))
-  (llif::call-text-to-speech-action "Fuck off mate i am working now.")
+  (llif::call-text-to-speech-action "Fuck off mate i am working now.                       ")
 
   ;;move to shelf
   (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way, you fucker.")
@@ -20,21 +20,21 @@
   ;;perceive shelf put objects into knowledge and bulletworld
   (llif::call-text-to-speech-action "I am perceiving the first shelf now.")
   (llif::call-take-pose-action 2)
-  (setf *perception-objects* (llif::call-robosherlock-pipeline "robocup_shelf_0"))
+  (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_shelf_0") t))
   (print *perception-objects*)
   (llif::insert-knowledge-objects *perception-objects*)
   (grocery::spawn-btr-objects *perception-objects*)
 
   (llif::call-text-to-speech-action "I am perceiving the second shelf now.")
   (llif::call-take-pose-action 2)
-  (setf *perception-objects* (llif::call-robosherlock-pipeline "robocup_shelf_1"))
+  (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_shelf_1") t))
   (print *perception-objects*)
   (llif::insert-knowledge-objects *perception-objects*)
   (grocery::spawn-btr-objects *perception-objects*)
 
   (llif::call-text-to-speech-action "I am perceiving the third shelf now.")
   (llif::call-take-pose-action 3)
-  (setf *perception-objects* (llif::call-robosherlock-pipeline "robocup_shelf_2"))
+  (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_shelf_2") t))
   (print *perception-objects*)
   (llif::insert-knowledge-objects *perception-objects*)
   (grocery::spawn-btr-objects *perception-objects*)
@@ -50,7 +50,7 @@
   ;;perceiving the table
   (llif::call-text-to-speech-action "I am perceiving the table now.")
   (llif::call-take-pose-action 2)
-  (setf *perception-objects* (llif::call-robosherlock-pipeline "robocup_table"))
+  (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_table") t))
   (llif::insert-knowledge-objects *perception-objects*)
   (grocery::spawn-btr-objects *perception-objects*)
   (llif::call-text-to-speech-action "I am done perceiving the table now.")

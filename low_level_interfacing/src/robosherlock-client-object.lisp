@@ -22,25 +22,28 @@
 (defun get-robosherlock-client ()
   "returns a RoboSherlock client if one already exists. Creates one otherwise."
   (unless *robosherlock-action-client*
-    (init-robosherlock-action-client))
+    (init-robosherlock-object-action-client))
   *robosherlock-action-client*)
 
-(defun call-robosherlock-pipeline (&optional
-                                     (regions-value (string "robocup_table"))
-                                     (visualisation-value 'False))
+(defun make-action-goal (in-regions in-visualize)
+  (actionlib::make-action-goal (get-robosherlock-client)
+    :regions in-regions
+    :visualize in-visualize))
+
+(defun call-robosherlock-pipeline (regions-value  viz-value)
   "Calls the RoboSherlock pipeline. Aka, triggers perception to perceive.
   Expects a region to be given as a vector. E.g.
   `regions-value' (vector (string 'robocup_table))"
   
-  (roslisp:ros-info (robosherlock-client) "Calling pipeline for regions ~a." regions-value)
+  (roslisp:ros-info (robosherlock-object-client) "Calling pipeline for regions ~a." regions-value)
   ;; actual call
   (format t "vector: ~a" regions-value)
-  (actionlib:call-goal (llif::get-robosherlock-client)
-                       (roslisp:make-message
-                        "suturo_perception_msgs/ObjectDetectionData"
-                        region regions-value)
-                       :timeout *robosherlock-action-timeout*
-                       :result-timeout *robosherlock-action-timeout*))
+  
+  (multiple-value-bind (result status)
+      (actionlib:call-goal (get-robosherlock-client)
+                       (make-action-goal regions-value viz-value))
+     (roslisp:ros-info (robosherlock-object-action) "robosherlock action finished")
+     (values result status)))
 
 
 ;;Currently unused:
