@@ -14,20 +14,22 @@
 ;;todo add checks for nil;
 ;;add the text to speech: what class the object we place has,
 ;; the name of the goal and if the action is done;
-(defun place-object (place-list)
- (setf ?place-list place-list)
- (let* ((?point-x-object (nth 0 place-list))
-        (?point-y-object (nth 1 place-list))
-        (?point-z-object (nth 2 place-list))
-        (?quaterion-value-1 (nth 3 place-list))
-        (?quaterion-value-2 (nth 4 place-list))
-        (?quaterion-value-3 (nth 5 place-list))
-        (?quaterion-value-4 (nth 6 place-list))
-        (?size-x (nth 7 place-list))
-        (?size-y (nth 8 place-list))
-        (?size-z (nth 9 place-list))
-        (?object-id (nth 10 place-list))
-        (?grasp-mode (nth 11 place-list))
+(defun place-object (object-id grasp-pose)
+  ;;(setf ?place-list place-list)
+  (setf *dimensions* (llif:prolog-object-dimensions object-id))
+  (setf *goal* (llif:prolog-object-goal-pose object-id))
+  (let* ((?point-x-object (nth 0 (nth 0 *goal*)))
+        (?point-y-object (nth 1 (nth 0 *goal*)))
+        (?point-z-object (nth 2 (nth 0 *goal*)))
+        (?quaterion-value-1 (nth 0 (nth 1 *goal*)))
+        (?quaterion-value-2 (nth 1 (nth 1 *goal*)))
+        (?quaterion-value-3 (nth 2 (nth 1 *goal*)))
+        (?quaterion-value-4 (nth 3 (nth 1 *goal*)))
+        (?size-x (nth 0 *dimensions*))
+        (?size-y (nth 1 *dimensions*))
+        (?size-z (nth 2 *dimensions*))
+        (?object-id object-id)
+        (?grasp-mode grasp-pose)
    (place (desig:a motion
                     (:type :placing)
                     (:point-x ?point-x-object)
@@ -91,19 +93,19 @@
 ;;@author Jan Schimpf
 (defun create-place-list (object-id grasp-pose)
   (setf *dimensions* (llif:prolog-object-dimensions object-id))
-  (setf *pose* (llif:prolog-object-pose object-id))
+  (setf *goal* (llif:prolog-object-goal-pose object-id))
 
-  (let ((point-x-object (nth 0 (nth 2 *pose*)))
-        (point-y-object (nth 1 (nth 2 *pose*)))
-        (point-z-object (nth 2 (nth 2 *pose*)))
-        (quaterion-value-1 (nth 0 (nth 3 *pose*)))
-        (quaterion-value-2 (nth 1 (nth 3 *pose*)))
-        (quaterion-value-3 (nth 2 (nth 3 *pose*)))
-        (quaterion-value-4 (nth 3 (nth 3 *pose*)))
+  (let* ((point-x-object (nth 0 (nth 0 *goal*)))
+        (point-y-object (nth 1 (nth 0 *goal*)))
+        (point-z-object (nth 2 (nth 0 *goal*)))
+        (quaterion-value-1 (nth 0 (nth 1 *goal*)))
+        (quaterion-value-2 (nth 1 (nth 1 *goal*)))
+        (quaterion-value-3 (nth 2 (nth 1 *goal*)))
+        (quaterion-value-4 (nth 3 (nth 1 *goal*)))
         (size_x (nth 0 *dimensions*))
         (size_y (nth 1 *dimensions*))
-        (size_z (nth 2 *dimensions*)))
-     (setf *list* (list (list point-x-object point-y-object point-z-object
+        (size_z (nth 2 *dimensions*))
+        (?list (list (list point-x-object point-y-object point-z-object
                                 quaterion-value-1 quaterion-value-2
                                 quaterion-value-3 quaterion-value-4
                                 size_x size_y size_z object-id grasp-pose)
@@ -122,8 +124,8 @@
                         (list point-x-object (- point-y-object 0.05) point-z-object
                                 quaterion-value-1 quaterion-value-2
                                 quaterion-value-3 quaterion-value-4
-                                size_x size_y size_z object-id grasp-pose)
-                        ))))
+                                size_x size_y size_z object-id grasp-pose))))
+    ?list))
 
 (defun test-grasp()
     (let* ((?point-x-object 1)
