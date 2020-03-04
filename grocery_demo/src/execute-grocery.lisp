@@ -3,14 +3,15 @@
 ;;(defparameter *running* NIL)
 (defparameter *no-objects* (cram-language:make-fluent :name :objects) NIL)
 (defparameter *next-object* NIL)
+(defparameter *object-goal-pose* NIL)
 
 ;;@author Torge Olliges, Tom-Eric Lehmkuhl
 (defun execute-grocery()
   ;;waiting for start signal loop
-  (cram-language:pursue
-      (cram-language:wait-for *state-fluent*)
-      (loop do
-        (cram-language:sleep 0.1)))
+  ;;(cram-language:pursue
+  ;;    (cram-language:wait-for *state-fluent*)
+  ;;    (loop do
+  ;;      (cram-language:sleep 0.1)))
 
   ;;move to shelf
   (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
@@ -61,7 +62,7 @@
         (setf *next-object* (llif::prolog-next-object))
         ;;grasp object
         (llif::call-text-to-speech-action "I'm going to grasp the object now.")
-        (comf::grasp-object *next-object* 1)
+        (comf::grasp-hsr *next-object* 1)
         (llif::call-text-to-speech-action "I have grapsed the object")
 
         ;;move to shelf
@@ -69,11 +70,11 @@
         (comf::move-to-shelf)
 
         ;;check for correct position depending on other objects in shelf
-        (stf *object-goal-pose* (llif::prolog-object-goal-pose *next-object*))
+        (setf *object-goal-pose* (llif::prolog-object-goal-pose *next-object*))
 
         ;;place object in shelf
         (llif::call-text-to-speech-action "I'm going to place the object in the shelf now.")
-        (comf::place-object *object-goal-pose*)
+        (comf::place-object *object-goal-pose* 1)
         (llif::call-text-to-speech-action "I have placed the object now.")
 
         ;;back to base position

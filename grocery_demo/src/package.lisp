@@ -4,4 +4,7 @@
   (:export
   ;;execute-grocery.lisp
   #:execute-grocery
+
+  ;;grocery_bw.lisp
+  #:spawn-btr-objects
 ))
