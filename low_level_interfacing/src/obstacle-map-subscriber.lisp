@@ -5,13 +5,14 @@
 
 
 (defun obstacle-map-listener ()
-  (subscribe "map" "nav_msgs/OccupancyGrid" #'saveObstacleMap)
+  ;;(subscribe "map" "nav_msgs/OccupancyGrid" #'saveObstacleMap)
+  (subscribe "dynamic_obstacle_map_ref" "nav_msgs/OccupancyGrid" #'saveObstacleMap)
   ;;(with-ros-node ("listener" :spin t)
   (roslisp:ros-info (obstacle-map-subscriber) "Map Subscribed")
 )
 
 (defun saveObstacleMap (mapMsg) 
-  (defparameter *currentObstacleMap* mapMsg)
+  (defparameter *currentObstacleMap* (roslisp:modify-message-copy mapMsg))
 )
 
 (defun getMapPoint (vect3) 
@@ -23,12 +24,11 @@
                         (y (y position origin info)))
       *currentObstacleMap*
 
-    (setf *indexs* (floor
+    (setf *indexs* 
                 (+
-                 (*
-                  (/
-                  (- (cl-tf::y vect3) y)resolution) width)
-                 (/ (- (cl-tf::x vect3) x)resolution))))
+                  (* (floor(/ (- (cl-tf::y vect3) y) resolution)) width)
+                  (floor(/ (- (cl-tf::x vect3) x)resolution))))
+    (roslisp:ros-info (obstacle-filter) "index: ~a" *indexs*)
     (if (> (length data) *indexs*) (aref data *indexs*) 111 )
 ))
 

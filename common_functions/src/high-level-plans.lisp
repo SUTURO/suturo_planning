@@ -69,6 +69,7 @@
                      (target (desig:a location (pose ?actual-nav-pose)))))
             ?actual-nav-pose))))))
 
+
 (defun try-movement-with-points-around-robot-list (listStamped)   )
 ;;Für jede Position werden positionen davon im umkreis von der breite vom roboter berechnet wenn alle ereichbar sind, wird die position zurück gebeben
 
@@ -164,7 +165,7 @@
         ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
 	;;please indent region...
 	(roslisp:ros-info (move-poi) "Move to POI started")
-        (setf *listOfPoi* (mapcar (lambda (listelem) (comf::pose-with-distance-to-point *poiDistance* listelem 10)) 
+        (setf *listOfPoi* (mapcar (lambda (listelem) (comf::pose-with-distance-to-point *poiDistance* listelem 6)) 
                                  (llif::sortedPoiByDistance
 					(cl-tf::transform-stamped->pose-stamped
 					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")))))
@@ -172,13 +173,24 @@
 	;;(roslisp:ros-info (move-poi) "Move to POIs: ~a"  *listOfPoi*)
 
 
+	(setf *rangetest* (loop for x from -2 to 3 by 0.1
+	      collect (loop for y from -2 to 3 by 0.1
+                      collect (
+                               cl-tf::make-pose
+                               (cl-tf::make-3d-vector x y 0.1)
+                               (cl-tf::make-quaternion 0 0.7 0 0.7 ))) ))
 
+        ;;(setf *li* (remove-if-not #'llif::robot-in-obstacle-stamped (flatten (copy-list *rangetest*))))
+	;;(publish-msg (advertise "range" "geometry_msgs/PoseArray")
+        ;;       :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
+        ;;       :poses (make-array (length *li*)
+        ;;                          :initial-contents (mapcar #'cl-tf::to-msg *li*)))
 
-	(publish-msg (advertise "removed" "geometry_msgs/PoseArray")
-               :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
-               :poses (make-array (length (flatten (mapcar (lambda (listelem) (remove-if #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* )))
-                                  :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
-                                                            (flatten (mapcar (lambda (listelem) (remove-if #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* ))))) )
+        ;;(setf *li1* (flatten (mapcar (lambda (listelem) (remove-if #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* )))
+	;;(publish-msg (advertise "removed" "geometry_msgs/PoseArray")
+        ;;       :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
+        ;;       :poses (make-array (length *li1*)
+        ;;                          :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose *li1*))) )
 
 
         ;;filter points that dont work, because of the obstacle map
@@ -186,16 +198,14 @@
 
 	(mapcar (lambda (listelem) ( roslisp:ros-info (move-poi) "Poi with all Alternative Points: ~a"  listelem)) *listOfPoi*)
 
+        (setf *li2* (llif::sortedPoiByDistance
+					(cl-tf::transform-stamped->pose-stamped
+					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
 
 	(publish-msg (advertise "origins" "geometry_msgs/PoseArray")
                :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map")
-               :poses (make-array (length (llif::sortedPoiByDistance
-					(cl-tf::transform-stamped->pose-stamped
-					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
-                                  :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
-                                                            (llif::sortedPoiByDistance
-					(cl-tf::transform-stamped->pose-stamped
-					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")))))) )
+               :poses (make-array (length *li2*)
+                                  :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose *li2*))) )
 
 
         (publish-msg (advertise "poi_debug" "geometry_msgs/PoseArray")
