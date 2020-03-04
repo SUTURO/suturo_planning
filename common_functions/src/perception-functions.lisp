@@ -24,13 +24,15 @@
   (delete-if 
    (lambda (object) 
     (roslisp::with-fields (confidence_class confidence_shape confidence_color) object 
+     ;;(roslisp:ros-info (confident) "~%class: = ~F~% shape = ~F~% color: ~F" confidence_class confidence_shape confidence_color) 
      (if (>= confidence_class 0.5) 
-         detectiondata
+         NIL
          (if (>= confidence_shape 0.5) 
-           detectiondata
+           NIL
            (if (>= confidence_color 0.5) 
-               detectiondata
-               (print "neither class shape or color confidence is high enough"))))
+               NIL
+               ;;(print "neither class shape or color confidence is high enough"
+               T)))
       )
     )
    detectiondata
