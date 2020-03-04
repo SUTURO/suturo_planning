@@ -93,7 +93,7 @@
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
                          (json-prolog:prolog-simple-1 
-                          (concatenate 'string "object_goal_pose('" knowrob-name "', POSE, CONTEXT)")
+                          (concatenate 'string "object_goal_pose_offset('" knowrob-name "', POSE, CONTEXT)")
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution.")
