@@ -4,12 +4,26 @@
 
 (defvar *nav-client* nil)
 
+;; (defun init-nav-client ()
+;;   "Initialize the navigation client"
+;;   (unless (eq roslisp::*node-status* :running)
+;;     (roslisp:start-ros-node "nav-action-client"))
+;;   (setf *nav-client* (actionlib:make-action-client
+;;                       "/move_base/move"
+;;                       "move_base_msgs/MoveBaseAction"))
+  
+;;   (roslisp:ros-info (nav-action-client) "waiting for Navigation Action server...")
+
+;;   (loop until
+;;         (actionlib:wait-for-server *nav-client*))
+;;   (roslisp:ros-info (nav-action-client) "Navigation action client created."))
+
 (defun init-nav-client ()
   "Initialize the navigation client"
   (unless (eq roslisp::*node-status* :running)
     (roslisp:start-ros-node "nav-action-client"))
   (setf *nav-client* (actionlib:make-action-client
-                      "/move_base/move"
+                      "/nav_fix"
                       "move_base_msgs/MoveBaseAction"))
   
   (roslisp:ros-info (nav-action-client) "waiting for Navigation Action server...")

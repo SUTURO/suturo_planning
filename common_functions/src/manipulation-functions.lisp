@@ -85,7 +85,7 @@
 (defun grasp-object (object-id grasp-pose)
   (setq *dimensions* (llif:prolog-object-dimensions object-id))
   (setq *pose* (llif:prolog-object-pose object-id))
-       
+  
   ;;say:grasping object of class *class*
   (let* ((?point-x-object (nth 0 (nth 2 *pose*)))
         (?point-y-object (nth 1 (nth 2 *pose*)))
