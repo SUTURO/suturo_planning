@@ -84,7 +84,7 @@
                      		      (cl-tf::make-pose-stamped "map" 0 
                                    	(cl-tf:make-3d-vector 2 3 0) 
                                         (cl-tf::make-quaternion 0 0 0 1))
-		      		      nav-goal-pose))
+		      		      nav-goal-pose-stamped))) ;;@Jan fixed? das war nav-goal-pose zuvor, also ein paar klammer probleme behoben
         (?desig (desig:a motion
                         (type going) 
                         (target (desig:a location

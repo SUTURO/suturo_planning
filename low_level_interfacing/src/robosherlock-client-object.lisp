@@ -30,7 +30,7 @@
     :regions in-regions
     :visualize in-visualize))
 
-(defun call-robosherlock-pipeline (regions-value  viz-value)
+(defun call-robosherlock-object-pipeline (regions-value  viz-value)
   "Calls the RoboSherlock pipeline. Aka, triggers perception to perceive.
   Expects a region to be given as a vector. E.g.
   `regions-value' (vector (string 'robocup_table))"

@@ -46,7 +46,7 @@
   ;;move to table
   (llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way, you fucker.")
   (comf::move-to-table t)
-
+  
   ;;perceiving the table
   (llif::call-text-to-speech-action "I am perceiving the table now.")
   (llif::call-take-pose-action 2)
