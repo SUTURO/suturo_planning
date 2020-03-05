@@ -40,8 +40,38 @@
             ?actual-nav-pose))))))
 
 
+
 ;;;;;;;;;;;;;;;;;;;;Try Movement with List ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun try-movement-stampedlist (listStamped)
+(defun try-movement-stamped (stamped)
+  (let ((?nav-pose stamped))
+
+    (urdf-proj:with-simulated-robot
+      (cpl:with-retry-counters ((going-retry 3))
+        ;;(cpl:with-failure-handling
+          ;;  (((or common-fail:low-level-failure 
+          ;;        cl::simple-error
+          ;;        cl::simple-type-error)
+          ;;       (e)
+          ;;   
+          ;;     (roslisp:ros-warn (going-demo movement-fail)
+          ;;                       "~%No more retries~%")
+          ;;     (cpl::abort)
+               ;;(return Nil)
+               
+               ;;(return-from try-movement-stamped Nil)
+          ;;     ))
+        
+          (let ((?actual-nav-pose ?nav-pose)) 
+          (cram-executive:perform
+           (desig:an action
+                     (type going)
+                     (target (desig:a location (pose ?actual-nav-pose)))))
+                      ?actual-nav-pose))))) ;; )
+
+
+;;;;;;;;;;;;;;;;;;;;Try Movement with List ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;@author Torge Olliges, Phillip Klein
+(defun try-movement-stampedList (listStamped)
   (let ((?nav-pose listStamped))
 
     (urdf-proj:with-simulated-robot
@@ -70,7 +100,10 @@
             ?actual-nav-pose))))))
 
 
-(defun try-movement-with-points-around-robot-list (listStamped)   )
+(defun try-move-list (listStamped)
+    (remove-if #'null (mapcar (lambda (listelem) (try-movement-stamped listelem)) listStamped))
+)
+
 ;;Für jede Position werden positionen davon im umkreis von der breite vom roboter berechnet wenn alle ereichbar sind, wird die position zurück gebeben
 
 
@@ -169,7 +202,7 @@
         ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
 	;;please indent region...
 	(roslisp:ros-info (move-poi) "Move to POI started")
-        (setf *listOfPoi* (mapcar (lambda (listelem) (comf::pose-with-distance-to-point *poiDistance* listelem 6)) 
+        (setf *listOfPoi* (mapcar (lambda (listelem) (comf::pose-with-distance-to-point *poiDistance* listelem 10)) 
                                  (llif::sortedPoiByDistance
 					(cl-tf::transform-stamped->pose-stamped
 					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")))))
@@ -177,12 +210,12 @@
 	;;(roslisp:ros-info (move-poi) "Move to POIs: ~a"  *listOfPoi*)
 
 
-	(setf *rangetest* (loop for x from -2 to 3 by 0.1
-	      collect (loop for y from -2 to 3 by 0.1
-                      collect (
-                               cl-tf::make-pose
-                               (cl-tf::make-3d-vector x y 0.1)
-                               (cl-tf::make-quaternion 0 0.7 0 0.7 ))) ))
+	;;(setf *rangetest* (loop for x from -2 to 3 by 0.1
+	;;      collect (loop for y from -2 to 3 by 0.1
+        ;;              collect (
+        ;;                       cl-tf::make-pose
+        ;;                       (cl-tf::make-3d-vector x y 0.1)
+        ;;                      (cl-tf::make-quaternion 0 0.7 0 0.7 ))) ))
 
         ;;(setf *li* (remove-if-not #'llif::robot-in-obstacle-stamped (flatten (copy-list *rangetest*))))
 	;;(publish-msg (advertise "range" "geometry_msgs/PoseArray")
@@ -204,16 +237,28 @@
 	;;remove empty lists
 	(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if #'null listelem)) *listOfPoi* ))
 
-	;;filter each point that isnt reachable in the simulator
-	(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if-not #'reachable-in-simulator listelem)) *listOfPoi* ))
-
-        ;;Limit Point per Poi to 2
-        (setf *listOfPoi* (mapcar (lambda (listelem) (
-		if (> (length listelem) 2) (subseq listelem 0 2) listelem
-                     )) *listOfPoi* ))
-
 
         (publish-msg (advertise "poi_debug" "geometry_msgs/PoseArray")
+               :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
+               :poses (make-array (length (flatten *listOfPoi*))
+                                  :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
+                                                            (flatten *listOfPoi*)))) )
+
+	;;liste druchgehen, zuerst im simulator testen und dann im echten, wenn beides erfolgreich => beenden sonst weiter
+
+	;;filter each point that isnt reachable in the simulator
+	;;(setf *listOfPoi* (mapcar (lambda (listelem) (try-move-list listelem)) *listOfPoi* ))
+
+	;;remove empty lists
+	;;(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if #'null listelem)) *listOfPoi* ))
+
+        ;;Limit Point per Poi to 2
+        ;;(setf *listOfPoi* (mapcar (lambda (listelem) (
+	;;	if (> (length listelem) 2) (subseq listelem 0 2) listelem
+        ;;             )) *listOfPoi* ))
+
+
+        (publish-msg (advertise "poi_debug_sim" "geometry_msgs/PoseArray")
                :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
                :poses (make-array (length (flatten *listOfPoi*))
                                   :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
