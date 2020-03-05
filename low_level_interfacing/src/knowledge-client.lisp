@@ -1,6 +1,4 @@
 ;;; Json-Prolog client for communication with KnowRob (Knowledge)
-
-
 (in-package :llif)
 
 (alexandria:define-constant +knowrob-prefix+
@@ -92,7 +90,7 @@
   (roslisp:ros-info (json-prolog-client) "Getting goal floor for object ~a." object-name)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple-1 
+                         (json-prolog:prolog-simple 
                           (concatenate 'string "object_goal_pose_offset('" knowrob-name "', POSE, CONTEXT)")
                           :package :llif))))
     (if (eq raw-response 1)

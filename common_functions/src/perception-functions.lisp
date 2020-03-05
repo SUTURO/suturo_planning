@@ -79,3 +79,25 @@
           (urdf-proj::detect (desig:an object (type :mug)))))) 
   ;; ToDo look into if detect can use something else then type (object-id would be best)
   )
+
+;;@author Torge Olliges
+;;TODO: currently unused
+(defun scan-shelf(shelf-name)
+  (case str 
+    ("robocup_shelf_0" 
+      (progn 
+        (llif::call-text-to-speech-action "I am perceiving shelf zero now.")
+        (llif::call-take-pose-action 2)))
+    ("robocup_shelf_1" 
+      (progn 
+        (llif::call-text-to-speech-action "I am perceiving shelf one now.")
+        (llif::call-take-pose-action 2)))
+    ("robocup_shelf_0" )
+      (progn 
+        (llif::call-text-to-speech-action "I am perceiving shelf two now.")
+        (llif::call-take-pose-action 3)))
+  (let (perception-objects (llif::call-robosherlock-object-pipeline (vector shelf-name) t)))
+  (print perception-objects)
+  (llif::insert-knowledge-objects perception-objects)
+  ;;(grocery::spawn-btr-objects perception-objects)
+)
