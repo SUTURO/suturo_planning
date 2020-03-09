@@ -83,7 +83,7 @@
                                                             *Positions*))) )
 
 
-
+        (print "Started Designator")
   	(let* ((?successfull-pose (try-movement-stampedList *Positions*))
 		(?desig (desig:a motion
 		                (type going) 
@@ -96,6 +96,7 @@
        (e)
        (setf ?successfull-pose (try-movement-stampedList *Positions*))
        (cpl:do-retry going-retry
+         (print "Failed Going Designator")
          (roslisp:ros-warn (move-fail)
                                  "~%Failed to go to Point~%")
          (cpl:retry))))
@@ -103,6 +104,7 @@
 	    
 	    (with-hsr-process-modules
 	      (exe:perform ?desig))))
+        (print "Going Designator Done")
         (if turn (llif::call-take-pose-action 2)))
 
 

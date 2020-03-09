@@ -18,6 +18,7 @@
 
   (init-knowledge)
   (init-tts)
+  (init-poi)
 )
 
 (defun init-navigation()
@@ -69,6 +70,11 @@
 (defun init-tts()
   ;;init action client
   (llif::init-text-to-speech-action-client)
+)
+(defun init-poi()
+  ;;init action client
+  (llif::point-listener)
+  (llif::obstacle-map-listener)
 )
 (defun init-planning()
   "Initialize only local nodes for working without the real robot."  

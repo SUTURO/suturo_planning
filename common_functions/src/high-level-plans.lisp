@@ -6,6 +6,7 @@
 ;;;; Navigation ;;;;
 ;;@author Torge Olliges 
 (defun try-movement () 
+(print "Try Movement startet")
 (let ((?nav-pose (list (cl-tf::make-pose-stamped "map" 0 
                                                (cl-tf:make-3d-vector 2 3 0) 
                                                (cl-tf::make-quaternion 0 0 0 1)) 
@@ -22,7 +23,7 @@
                 cl::simple-error
                 cl::simple-type-error)
                (e)
-             
+             (print "Try movement Failed")
              (setf ?nav-pose (cdr ?nav-pose))
              
              (cpl:do-retry going-retry
