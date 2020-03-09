@@ -184,8 +184,7 @@
 	(roslisp:ros-info (move-poi) "Move to POI started")
         (setf *listOfPoi* 
                           (llif::sortedPoiByDistance
-					(cl-tf::transform-stamped->pose-stamped
-					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
+					(roslisp::with-fields (translation) (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint") translation)))
 
         (pose-with-distance-to-points *poiDistance* *listOfPoi* 10 t) 
 

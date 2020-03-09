@@ -41,9 +41,9 @@
    (sort (copy-list (remove-if #'null list))
          (lambda (ers zwei) 
                  (< 
-	           (cl-tf::v-dist (cl-tf::origin point)
+	           (cl-tf::v-dist point
 			 (cl-tf::origin ers)) 
-                   (cl-tf::v-dist (cl-tf::origin point) 
+                   (cl-tf::v-dist point
                          (cl-tf::origin zwei))) )))
 
 

@@ -58,8 +58,7 @@
 
        ;;(append (list *newgoalstamped* point) *alternatePositions*))
 
-       (setf *alternatePositions* (llif::sortedStampedByDistance (cl-tf::transform-stamped->pose-stamped ;;new line ..
-				(cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))
+       (setf *alternatePositions* (llif::sortedStampedByDistance (roslisp::with-fields (translation) (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint") translation)
                                 *alternatePositions*))
 )
 
