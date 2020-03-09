@@ -160,7 +160,7 @@
   (roslisp:ros-info (json-prolog-client) "Getting pose from table")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
-                          (concatenate 'string "rdf_urdf_name(TABLE, table_2_center),"
+                          (concatenate 'string "get_surface_id_by_name(table_2_center, TABLE),"
                                                "surface_pose_in_map(TABLE, [TRANSLATION, ROTATION])")
                           :package :llif))))
     (if (eq raw-response 1)
@@ -173,7 +173,7 @@
   (roslisp:ros-info (json-prolog-client) "Getting pose from shelf")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
-                          (concatenate 'string "rdf_urdf_name(SHELF, shelf_floor_0_piece),"
+                          (concatenate 'string "get_surface_id_by_name(shelf_floor_0_piece, SHELF),"
                                                "surface_pose_in_map(SHELF, [TRANSLATION, ROTATION])")
                           :package :llif))))
     (if (eq raw-response 1)
@@ -192,6 +192,15 @@
     (if instance
         (knowrob-symbol->string instance)
         (roslisp:ros-warn (json-prolog-client) "Query didn't reach any solution."))))
+
+(defun prolog-forget-table-objects ()
+    "forget objects on table"
+  (roslisp:ros-info (json-prolog-client) "forget objects on table")
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple 
+                          (concatenate 'string "get_surface_id_by_name(table_2_center, TABLE),"
+                                               "forget_objects_on_table(TABLE).")
+                          :package :llif))))))  
 
 ;;; former planning_communication/json-prolog.lisp
 #+deprecated
