@@ -26,8 +26,8 @@
 
     (setf *indexs* 
                 (+
-                  (* (floor(/ (- (cl-tf::y vect3) y) resolution)) width)
-                  (floor(/ (- (cl-tf::x vect3) x)resolution))))
+                  (* (round(/ (- (cl-tf::y vect3) y) resolution)) width)
+                  (round(/ (- (cl-tf::x vect3) x)resolution))))
     (roslisp:ros-info (obstacle-filter) "index: ~a" *indexs*)
     (if (> (length data) *indexs*) (aref data *indexs*) 111 )
 ))

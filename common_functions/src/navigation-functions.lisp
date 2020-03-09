@@ -15,9 +15,8 @@
 ;;moved to high level
 
 
-(defun pose-with-distance-to-point (distance point amountAlternatePositions)
-
-        (setf *currentOrigin* (cl-tf::origin (cl-tf::transform-stamped->pose-stamped ;;new line ..
+(defun points-around-point (distance point amountAlternatePositions turn)
+(setf *currentOrigin* (cl-tf::origin (cl-tf::transform-stamped->pose-stamped ;;new line ..
 					      (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))))
         (setf *goalOrigin* (cl-tf::origin point))
 	(setf *newgoalOrigin* (cl-tf::v+ *goalOrigin* 
@@ -49,7 +48,7 @@
                                            (atanValue (atan (/ y x)))
                                           )
                                          
-                                       (if (< x 0) (- atanValue 1.57) (+ atanValue 1.57) ) 
+                                       (if turn (if (< x 0) (- atanValue 1.57) (+ atanValue 1.57) ) atanValue) 
                                      ))
 		        )) 
 	*radians*))
@@ -59,9 +58,54 @@
 
        ;;(append (list *newgoalstamped* point) *alternatePositions*))
 
-       (llif::sortedStampedByDistance (cl-tf::transform-stamped->pose-stamped ;;new line ..
+       (setf *alternatePositions* (llif::sortedStampedByDistance (cl-tf::transform-stamped->pose-stamped ;;new line ..
 				(cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))
                                 *alternatePositions*))
+)
+
+
+(defun pose-with-distance-to-points (distance points amountAlternatePositions &optional
+                                     (turn (Boolean Nil)))
+
+        (setf *Positions* (mapcar (lambda (listelem) (points-around-point distance listelem amountAlternatePositions turn)) points ))
+
+        ;;filter points that dont work, because of the obstacle map
+	(setf *Positions* (mapcar (lambda (listelem) (remove-if-not #'llif::robot-in-obstacle-stamped listelem)) *Positions* ))
+
+	;;remove empty lists
+	(setf *Positions* (mapcar (lambda (listelem) (remove-if #'null listelem)) *Positions* ))
+
+        (setf *Positions* (flatten *Positions* ))
+
+        (publish-msg (advertise "poi_debug" "geometry_msgs/PoseArray")
+               :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
+               :poses (make-array (length *Positions*)
+                                  :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
+                                                            *Positions*))) )
+
+
+
+  	(let* ((?successfull-pose (try-movement-stampedList *Positions*))
+		(?desig (desig:a motion
+		                (type going) 
+		                (target (desig:a location
+		                                 (pose ?successfull-pose))))))
+        (cpl:with-failure-handling
+     	 (((or common-fail:low-level-failure 
+                cl::simple-error
+         cl::simple-type-error)
+       (e)
+       (setf ?successfull-pose (try-movement-stampedList *Positions*))
+       (cpl:do-retry going-retry
+         (roslisp:ros-warn (move-fail)
+                                 "~%Failed to go to Point~%")
+         (cpl:retry)))))
+
+	    
+	    (with-hsr-process-modules
+	      (exe:perform ?desig)))
+        (if turn (llif::call-take-pose-action 2)))
+
 
 
 (cpl:def-cram-function scan-object ()
