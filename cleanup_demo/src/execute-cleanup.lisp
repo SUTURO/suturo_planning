@@ -20,8 +20,6 @@
   (llif::call-text-to-speech-action "I have found a point of interest to search.")
   ;;drive to poi
   (comf::move-to-poi)
-  ;;get into position to percieve
-  (llif::call-take-pose-action 2)
 
   (llif::call-text-to-speech-action "I am perceiving the position now.")
   (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
@@ -36,7 +34,7 @@
   
    ;; get next-object
   (setf *next-object* (llif::prolog-next-object))
-  (setf *object-goal-pose* (llif::prolog-object-goal-pose *next-object*))
+  (setf *object-goal-pose* (llif::prolog-object-pose *next-object*))
   (let ((stamp-pose  (cl-tf::make-pose-stamped "map" 0 
                                                (cl-tf:make-3d-vector
                                                (nth 0 (nth 2 *object-goal-pose*))
@@ -44,7 +42,7 @@
                                                0) 
                                                (cl-tf::make-quaternion 0 0 0 1))))
 
-  (comf::points-around-point 0.5 stamp-pose 8 NIL))
+  (comf::points-around-point 0.75 stamp-pose 8 NIL))
   (llif::call-text-to-speech-action *next-object*)
   ;; get into position to grasp
 
