@@ -19,7 +19,7 @@
   ;;      (cram-language:sleep 0.1)))
 
   ;;move to shelf
-  (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way, you fucker.")
+  (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
   (comf::move-to-shelf t)
   ;;perceive shelf put objects into knowledge and bulletworld
   (llif::call-text-to-speech-action "I am perceiving the first shelf now.")
@@ -63,7 +63,7 @@
   (llif::call-take-pose-action 1)
 
   ;;move to table
-  (llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way, you fucker.")
+  (llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way.")
   (comf::move-to-table t)
   
   ;;perceiving the table
@@ -118,11 +118,11 @@
         
 
         ;;move to shelf
-        (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way, you fucker.")
+        (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
         (comf::move-to-shelf NIL)
 
         ;;get and check goal position
-        (setf *object-goal-pose* (llif::prolog-object-goal-pose *next-object*))
+        ;;(setf *object-goal-pose* (llif::prolog-object-goal-pose *next-object*))
 
         ;;(if (= *object-goal-pose* 1) 
         ;;   (progn (llif::call-text-to-speech-action "No object goal pose received.")
@@ -132,7 +132,7 @@
 
         ;;place object in shelf
         (llif::call-text-to-speech-action "I'm going to place the object in the shelf now.")
-        (comf::place-object *object-goal-pose* 1)
+        (comf::place-object *next-object* 1)
         (llif::call-text-to-speech-action "I have placed the object now.")
 
         ;;back to base position

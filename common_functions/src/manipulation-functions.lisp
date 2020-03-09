@@ -20,7 +20,7 @@
   (setf *goal* (llif:prolog-object-goal-pose object-id))
   (let* ((?point-x-object (nth 0 (nth 0 *goal*)))
         (?point-y-object (nth 1 (nth 0 *goal*)))
-        (?point-z-object (nth 2 (nth 0 *goal*)))
+        (?point-z-object (- (nth 2 (nth 0 *goal*)) 0.07))
         (?quaterion-value-1 (nth 0 (nth 1 *goal*)))
         (?quaterion-value-2 (nth 1 (nth 1 *goal*)))
         (?quaterion-value-3 (nth 2 (nth 1 *goal*)))
@@ -44,6 +44,7 @@
                     (:size-z ?size-z)
                     (:object-id ?object-id)
                     (:grasp-mode ?grasp-mode))))
+    (print "Was here")
     (comf::with-hsr-process-modules (exe:perform
                                      place))))
 
@@ -114,6 +115,7 @@
                     (:object-id ?object-id)
                     (:grasp-mode ?grasp-mode))))
     (format t "desig: ~a" grasp)
+    (print "war HIER")
     (comf::with-hsr-process-modules (exe:perform
                                      grasp))))
                                           

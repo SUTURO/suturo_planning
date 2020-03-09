@@ -90,7 +90,7 @@
   (roslisp:ros-info (json-prolog-client) "Getting goal floor for object ~a." object-name)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple 
+                         (json-prolog:prolog-simple
                           (concatenate 'string "object_goal_pose_offset('" knowrob-name "', POSE, CONTEXT)")
                           :package :llif))))
     (if (eq raw-response 1)
@@ -185,7 +185,7 @@
   "returns the dimensions of an object as list with '(depth width height)"
   (roslisp:ros-info (json-prolog-client) "Getting object in gripper.")
   (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple-1 
+                         (json-prolog:prolog-simple
                                        "gripper(Gripper)"
                           :package :llif)))
          (instance (if (eq raw-response 1) NIL (cdr (assoc '?instance (cut:lazy-car raw-response))))))
