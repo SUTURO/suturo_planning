@@ -78,4 +78,10 @@
    #:static-command-listener
    #:dynmaic-command-listener
 
+   ;;poi-client
+   #:sortedStampedByDistance
+   
+  ;;process-module
+
+
 ))

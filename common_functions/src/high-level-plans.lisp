@@ -1,7 +1,7 @@
 (in-package :comf)
 (defvar *place-list* nil)
 (defparameter *listOfPoi* Nil)
-(defparameter *perception-objects* NIL)
+(defparameter *poiDistance* 0.75)
 
 ;;;; Navigation ;;;;
 ;;@author Torge Olliges 
@@ -55,6 +55,7 @@
                  (e)
                
                (setf ?nav-pose (cdr ?nav-pose))
+               (setf listStamped (cdr ?nav-pose))
              
                (cpl:do-retry going-retry
                  (roslisp:ros-warn (going-demo movement-fail)
@@ -69,9 +70,14 @@
            (desig:an action
                      (type going)
                      (target (desig:a location (pose ?actual-nav-pose)))))
+            (setf listStamped (cdr ?nav-pose))
             ?actual-nav-pose))))))
 
-(defun try-movement-with-points-around-robot-list (listStamped)   )
+
+(defun try-move-list (listStamped)
+    (remove-if #'null (mapcar (lambda (listelem) (try-movement-stamped listelem)) listStamped))
+)
+
 ;;Für jede Position werden positionen davon im umkreis von der breite vom roboter berechnet wenn alle ereichbar sind, wird die position zurück gebeben
 
 
@@ -172,26 +178,95 @@
            (comf::grasp-hsr object-id grasp-mode)
          )))))))
 
+(defun reachable-in-simulator (stamp) 
+    (null (try-movement-stampedlist (list stamp)))
+)
+
 ;;@author Philipp Klein
 (defun move-to-poi ()
         ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
 	;;please indent region...
 	(roslisp:ros-info (move-poi) "Move to POI started")
-        (setf *listOfPoi* (mapcar (lambda (listelem) (comf::pose-with-distance-to-point *poiDistance* listelem)) 
-                                 (llif::sortedPoiByDistance
-					(cl-tf::transform-stamped->pose-stamped
-					   (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")))))
-        ;;(roslisp:ros-info (poi-subscriber) "Gefundene POI sortiert nach entfernung: ~a" *listOfPoi*)
-	(roslisp:ros-info (move-poi) "Move to POIs: ~a"  *listOfPoi*)
-	(let* ((?successfull-pose (try-movement-stampedList *listOfPoi*))
-		(?desig (desig:a motion
-		                (type going) 
-		                (target (desig:a location
-		                                 (pose ?successfull-pose))))))
+        (setf *listOfPoi* 
+                          (llif::sortedPoiByDistance
+					(roslisp::with-fields (translation) (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint") translation)))
+
+        (pose-with-distance-to-points *poiDistance* *listOfPoi* 10 t) 
+
+	;;(roslisp:ros-info (move-poi) "Move to POIs: ~a"  *listOfPoi*)
+
+
+	;;(setf *rangetest* (loop for x from -2 to 3 by 0.1
+	;;      collect (loop for y from -2 to 3 by 0.1
+        ;;              collect (
+        ;;                       cl-tf::make-pose
+        ;;                       (cl-tf::make-3d-vector x y 0.1)
+        ;;                      (cl-tf::make-quaternion 0 0.7 0 0.7 ))) ))
+
+        ;;(setf *li* (remove-if-not #'llif::robot-in-obstacle-stamped (flatten (copy-list *rangetest*))))
+	;;(publish-msg (advertise "range" "geometry_msgs/PoseArray")
+        ;;       :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
+        ;;       :poses (make-array (length *li*)
+        ;;                          :initial-contents (mapcar #'cl-tf::to-msg *li*)))
+
+        ;;(setf *li1* (flatten (mapcar (lambda (listelem) (remove-if #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* )))
+	;;(publish-msg (advertise "removed" "geometry_msgs/PoseArray")
+        ;;       :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
+        ;;       :poses (make-array (length *li1*)
+        ;;                          :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose *li1*))) )
+
+
+        ;;filter points that dont work, because of the obstacle map
+	;;(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if-not #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* ))
+
+
+	;;remove empty lists
+	;;(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if #'null listelem)) *listOfPoi* ))
+
+
+        ;;(publish-msg (advertise "poi_debug" "geometry_msgs/PoseArray")
+        ;;       :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
+        ;;       :poses (make-array (length (flatten *listOfPoi*))
+        ;;                          :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
+        ;;                                                    (flatten *listOfPoi*)))) )
+
+	;;liste druchgehen, zuerst im simulator testen und dann im echten, wenn beides erfolgreich => beenden sonst weiter
+
+	;;filter each point that isnt reachable in the simulator
+	;;(setf *listOfPoi* (mapcar (lambda (listelem) (try-move-list listelem)) *listOfPoi* ))
+
+	;;remove empty lists
+	;;(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if #'null listelem)) *listOfPoi* ))
+
+        ;;Limit Point per Poi to 2
+        ;;(setf *listOfPoi* (mapcar (lambda (listelem) (
+	;;	if (> (length listelem) 2) (subseq listelem 0 2) listelem
+        ;;             )) *listOfPoi* ))
+
+        ;;(setf *listOfPoi* (flatten *listOfPoi* ))
+
+
+
+  	;;(let* ((?successfull-pose (try-movement-stampedList *listOfPoi*))
+	;;	(?desig (desig:a motion
+	;;	                (type going) 
+	;;	                (target (desig:a location
+	;;	                                 (pose ?successfull-pose))))))
+        ;;(cpl:with-failure-handling
+     	;; (((or common-fail:low-level-failure 
+        ;;        cl::simple-error
+        ;; cl::simple-type-error)
+        ;;(e)
+        ;;(setf ?successfull-pose (try-movement-stampedList *listOfPoi*))
+        ;;(cpl:do-retry going-retry
+        ;; (roslisp:ros-warn (move-fail)
+        ;;                         "~%Failed to go to Point~%")
+        ;; (cpl:retry)))))
+
 	    
-	    (with-hsr-process-modules
-	      (exe:perform ?desig)))
-        (llif::call-take-pose-action 2)
+	;;    (with-hsr-process-modules
+	;;      (exe:perform ?desig)))
+        ;;(llif::call-take-pose-action 2)
 )
 
 
@@ -237,4 +312,5 @@
 	       (with-hsr-process-modules
 	        (exe:perform ?desig))))
  
+
 

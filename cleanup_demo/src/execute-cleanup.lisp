@@ -1,23 +1,70 @@
 (in-package :clean)
 
-(defvar *goallist*)
-(defvar *POI-list* NIL)
-(defvar *next-object-list* NIL)
-(defvar *next-object*)
 (defparameter *perception-objects* NIL)
 (defparameter *object-goal-pose* NIL)
-
-
+(defparameter *object-id* NIL)
+(defparameter *next-object* NIL)
+(defparameter *stamp-pose* NIL)
 ;;@Author Jan Schimpf
 (defun execute-cleanup()
   (llif::call-text-to-speech-action "I am working now.")
-  (shelf-scan)
-  (table-scan)
-  (transport)
+;;  (shelf-scan)
+;;  (table-scan)
+;;  (transport)
+  (point-of-interest-search)
+  (point-of-interest-transport)
   )
 
 
+(defun point-of-interest-search()
+  (llif::call-text-to-speech-action "I have found a point of interest to search.")
+  ;;drive to poi
+  (comf::move-to-poi)
+  ;;get into position to percieve
+  (llif::call-take-pose-action 2)
 
+  (llif::call-text-to-speech-action "I am perceiving the position now.")
+  (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
+  (llif::insert-knowledge-objects *perception-objects*)
+  (clean::spawn-btr-objects *perception-objects*)
+  ;;percieve -> filter -> insert into knowledge
+  (llif::call-take-pose-action 1)
+
+  )
+
+(defun point-of-interest-transport()
+  
+   ;; get next-object
+  (setf *next-object* (llif::prolog-next-object))
+  (setf *object-goal-pose* (llif::prolog-object-goal-pose *next-object*))
+  (let ((stamp-pose  (cl-tf::make-pose-stamped "map" 0 
+                                               (cl-tf:make-3d-vector
+                                               (nth 0 (nth 2 *object-goal-pose*))
+                                               (nth 1 (nth 2 *object-goal-pose*))
+                                               0) 
+                                               (cl-tf::make-quaternion 0 0 0 1))))
+
+  (comf::points-around-point 0.5 stamp-pose 8 NIL))
+  (llif::call-text-to-speech-action *next-object*)
+  ;; get into position to grasp
+
+  ;; grasp the object
+  (llif::call-text-to-speech-action "I'm going to grasp the object now.")
+  (comf::grasp-object *next-object* 1)
+  (llif::call-text-to-speech-action "I have grapsed the object")
+
+  (comf::move-to-shelf NIL)
+  ;;place object in shelf
+  (llif::call-text-to-speech-action "I'm going to place the object in the shelf now.")
+  (comf::place-object *object-goal-pose* 1)
+  (llif::call-text-to-speech-action "I have placed the object now.")
+
+  ;;back to base position
+  (llif::call-take-pose-action 1)
+  ;; move into position to place object
+  ;; place object
+   )
+  
  
   ;;(cram-language:pursue
       ;;(cram-language:wait-for *objects*)
