@@ -199,7 +199,7 @@
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
                           (concatenate 'string "get_surface_id_by_name(table_2_center, TABLE),"
-                                               "forget_objects_on_table(TABLE).")
+                                               "forget_objects_on_surface(TABLE).")
                           :package :llif))))))  
 
 ;;; former planning_communication/json-prolog.lisp

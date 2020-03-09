@@ -7,13 +7,15 @@
 (defparameter *grasp-object-result* NIL)
 (defparameter *place-object-result* NIL)
 
-(def-top-level-plan execute-grocery-1()
+(defun execute-grocery-1()
+    (comf::move-to-shelf t)
+    (llif::call-take-pose-action 2)
+    (cram-language:top-level
     (cram-language:par 
-      (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
-      (cram-language:unwind-protect
-        (comf::move-to-shelf t)
-      )
-      )
+      (llif::call-text-to-speech-action "Don't panic! This is a test. I am not going to move. This is a long text. I am talking as long as need to take the percieve pose. Lalalalala la la laa la la")
+      (perceive-shelf "robocup_shelf_0")
+      (perceive-shelf "robocup_shelf_1")
+      ))
 )
 
 ;;@author Torge Olliges, Tom-Eric Lehmkuhl
