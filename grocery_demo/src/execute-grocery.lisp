@@ -7,9 +7,19 @@
 (defparameter *grasp-object-result* NIL)
 (defparameter *place-object-result* NIL)
 
+(def-top-level-plan execute-grocery-1()
+    (cram-language:par 
+      (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
+      (cram-language:unwind-protect
+        (comf::move-to-shelf t)
+      )
+      )
+)
+
 ;;@author Torge Olliges, Tom-Eric Lehmkuhl
 (defun execute-grocery()
-  ;;get in park position
+
+        ;;get in park position
   (llif::call-take-pose-action 1)
 
   ;;TODO: uncomment when NLP works
@@ -37,14 +47,18 @@
   (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
   (grasp-handling)
 
-  ;;move to shelf
-  (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
-  (comf::move-to-shelf t)
 
-  ;;perceive shelfs
-  (perceive-shelf "robocup_shelf_0")
-  (perceive-shelf "robocup_shelf_1")
-  (perceive-shelf "robocup_shelf_2")
+  ;;move to shelf
+  
+      (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
+      (comf::move-to-shelf t)
+  
+
+  ;;perceive shelf
+    (perceive-shelf "robocup_shelf_0")
+    (perceive-shelf "robocup_shelf_1")
+
+    (perceive-shelf "robocup_shelf_2")
   (llif::call-take-pose-action 1)
   (llif::call-text-to-speech-action "I am done perceiving the shelf now.")
   
@@ -83,6 +97,7 @@
         ;;query for knowledge if objects left
         ;;(if (= (length (llif::prolog-table-objects)) 0) (set *no-objects* true)
         )
+  
 )
 
 
