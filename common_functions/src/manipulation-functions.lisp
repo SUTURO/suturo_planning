@@ -115,7 +115,6 @@
                     (:object-id ?object-id)
                     (:grasp-mode ?grasp-mode))))
     (format t "desig: ~a" grasp)
-    (print "war HIER")
     (comf::with-hsr-process-modules (exe:perform
                                      grasp))))
                                           
