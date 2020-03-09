@@ -53,19 +53,21 @@
   (llif::call-take-pose-action 1)
 
   )
-(defun table-scan()
-   ;;move to table
-  (llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way.")
-  (comf::move-to-table t)
 
+(defun table-scan()
+  ;;move to table
+  (llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way, you fucker.")
+  (comf::move-to-table t)
+  
   ;;perceiving the table
   (llif::call-text-to-speech-action "I am perceiving the table now.")
   (llif::call-take-pose-action 2)
-  (setf *perception-objects* (llif::call-robosherlock-pipeline "robocup_table"))
+  (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_table") t))
   (llif::insert-knowledge-objects *perception-objects*)
   (clean::spawn-btr-objects *perception-objects*)
   (llif::call-text-to-speech-action "I am done perceiving the table now.")
-  (llif::call-take-pose-action 1))
+  (llif::call-take-pose-action 1)
+  )
 
 (defun transport()
         (loop do
@@ -82,7 +84,7 @@
         (llif::call-text-to-speech-action "I have grapsed the object")
 
         ;;move to shelf
-        (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
+        (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way, you fucker.")
         (comf::move-to-shelf)
 
         ;;check for correct position depending on other objects in shelf
@@ -95,5 +97,6 @@
 
         ;;back to base position
         (llif::call-take-pose-action 1));;)
+
   )
   

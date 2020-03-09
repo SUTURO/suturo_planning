@@ -1,6 +1,7 @@
 (in-package :comf)
 (defvar *place-list* nil)
 (defparameter *listOfPoi* Nil)
+(defparameter *perception-objects* NIL)
 
 ;;;; Navigation ;;;;
 ;;@author Torge Olliges 
@@ -103,10 +104,7 @@
                 cl::simple-error
          cl::simple-type-error)
        (e)
-         (comf::scan-object
-          ;;closet function i currently know of that allows me
-          ;;to trigger perception for this
-          )
+         (failure-grasp)
        (cpl:do-retry grasping-retry
          (roslisp:ros-warn (grasp-fail)
                                  "~%Failed to grasp the object~%")
@@ -114,7 +112,15 @@
 
          (roslisp:ros-warn (going-demo movement-fail)
                            "~%No more retries~%")))
-     (comf::grasp-object object-id grasp-pose))))
+    (comf::grasp-object object-id grasp-pose))))
+
+(defun failure-grasp ()
+            (comf::move-to-table t)
+            (llif::call-take-pose-action 2) 
+            (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_table") t))
+            (llif::insert-knowledge-objects *perception-objects*)
+            (llif::call-take-pose-action 1)
+  )
 
 ;;;; Place ;;;;
 ;;@author Jan Schimpf
@@ -202,6 +208,7 @@
         (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
                             (cl-tf::make-3d-vector (+ (first *tablePose*) 0.9) ;;0.7 was previously 0.95
                               (- (second *tablePose* ) 0.15) 0) (if turn (cl-tf::make-quaternion 0 0 -0.7 0.7) (cl-tf::make-quaternion 0 0 1 0))))
+         (?goal-pose (try-movement-stampedList (list ?goal-pose)))
          (?desig (desig:a motion
 		                  (type going) 
 		                  (target (desig:a location
@@ -221,6 +228,7 @@
         (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
                             (cl-tf::make-3d-vector (+ (first *shelfPose*) 0.1) ;;was previously 0.225
                               (+ (second *shelfPose*) 0.77) 0) (if turn (cl-tf::make-quaternion 0 0 0 1) (cl-tf::make-quaternion 0 0 -0.7 0.7))))
+         (?goal-pose (try-movement-stampedList (list ?goal-pose)))
          (?desig (desig:a motion
 		                  (type going) 
 		                  (target (desig:a location
