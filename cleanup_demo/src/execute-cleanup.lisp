@@ -60,6 +60,11 @@
   (llif::call-text-to-speech-action "I have grapsed the object")
 
   (comf::move-to-shelf NIL)
+
+  ;;Scan shelf 
+  (shelf-scan)
+
+  (comf::move-to-shelf NIL)
   ;;place object in shelf
   (llif::call-text-to-speech-action "I'm going to place the object in the shelf now.")
   (comf::place-object *next-object* 1)
