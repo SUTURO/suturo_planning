@@ -102,8 +102,7 @@
          (cpl:retry))))
 
 	    
-	    (with-hsr-process-modules
-	      (exe:perform ?desig))))
+	      (exe:perform ?desig)))
         (print "Going Designator Done")
         (if turn (llif::call-take-pose-action 2)))
 

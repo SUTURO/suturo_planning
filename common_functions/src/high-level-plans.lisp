@@ -48,7 +48,7 @@
 (defun try-movement-stampedList (listStamped)
   (let ((?nav-pose listStamped))
 
-    (urdf-proj:with-simulated-robot
+    (urdf-proj:without-top-level-simulated-robot
       (cpl:with-retry-counters ((going-retry 3))
         (cpl:with-failure-handling
             (((or common-fail:low-level-failure 
@@ -95,8 +95,7 @@
                         (target (desig:a location
                                          (pose ?successfull-pose))))))
     
-    (with-hsr-process-modules
-      (exe:perform ?desig))
+      (exe:perform ?desig)
 ))
 
 ;;;; Grasp ;;;;;
@@ -169,10 +168,10 @@
            
            (comf::looking *obj-pos*)
            (comf::detecting)
-           (llif::with-hsr-process-modules (exe:perform
+           (exe:perform
                                             (desig:a motion (type going)
                                                      (target (desig:a location
-                                                                      (pose ?successfull-pose))))))
+                                                                      (pose ?successfull-pose)))))
            (comf::grasp-hsr object-id grasp-mode)
          )))))))
 
