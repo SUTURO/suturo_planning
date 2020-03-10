@@ -104,7 +104,7 @@
 	    
 	      (exe:perform ?desig)))
         (print "Going Designator Done")
-        (if turn (llif::call-take-pose-action 2)))
+        (if turn (llif::call-take-pose-action 4)))
 
 
 

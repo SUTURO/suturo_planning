@@ -7,16 +7,16 @@
 (defparameter *stamp-pose* NIL)
 ;;@Author Jan Schimpf
 (defun execute-cleanup()
-   (comf::with-hsr-process-modules
+  (comf::with-hsr-process-modules
 
-  (llif::call-text-to-speech-action "I am working now.")
-;;  (shelf-scan)
-;;  (table-scan)
-;;  (transport)
-  (point-of-interest-search)
-  (point-of-interest-transport)
+    (llif::call-text-to-speech-action "I am working now.")
+    ;;  (shelf-scan)
+    ;;  (table-scan)
+    ;;  (transport)
+    (point-of-interest-search)
+    (point-of-interest-transport)
+    )
   )
-)
 
 (defun point-of-interest-search()
   (llif::call-text-to-speech-action "I have found a point of interest to search.")
@@ -37,14 +37,20 @@
    ;; get next-object
   (setf *next-object* (llif::prolog-next-object))
   (setf *object-goal-pose* (llif::prolog-object-pose *next-object*))
-  (let ((stamp-pose  (cl-tf::make-pose-stamped "map" 0 
-                                               (cl-tf:make-3d-vector
-                                               (nth 0 (nth 2 *object-goal-pose*))
-                                               (nth 1 (nth 2 *object-goal-pose*))
-                                               0) 
-                                               (cl-tf::make-quaternion 0 0 0 1))))
+  ;;(let ((stamp-pose  (cl-tf::make-pose-stamped "map" 0 
+  ;;                                             (cl-tf:make-3d-vector
+  ;;                                             (nth 0 (nth 2 *object-goal-pose*))
+  ;;                                             (nth 1 (nth 2 *object-goal-pose*))
+  ;;                                             0) 
+  ;;                                             (cl-tf::make-quaternion 0 0 0 1))))
 
-  (comf::points-around-point 0.75 stamp-pose 8 NIL))
+  ;;  (comf::points-around-point 0.75 stamp-pose 8 NIL))
+
+  (llif::call-text-to-speech-action "I'm turning towards the object, to grasp it.")
+  (llif::call-take-pose-action 1)
+  (roslisp::with-fields (translation rotation) (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")
+    (llif::call-nav-action-ps (cl-tf::make-pose-stamped "map" 0 translation (cl-tf::q* rotation (cl-tf::euler->quaternion :ax 0 :ay 0 :az -1.57) )))
+    )
   (llif::call-text-to-speech-action *next-object*)
   ;; get into position to grasp
 
