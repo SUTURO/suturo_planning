@@ -18,7 +18,7 @@
                                                (cl-tf:make-3d-vector 1.097 0.556 0)
                                                (cl-tf::make-quaternion 0 0 0 1)))))
 
-(urdf-proj:with-simulated-robot (cpl:with-retry-counters ((going-retry 3))
+(urdf-proj:without-top-level-simulated-robot (cpl:with-retry-counters ((going-retry 3))
       (cpl:with-failure-handling
           (((or common-fail:low-level-failure 
                 cl::simple-error
@@ -48,7 +48,7 @@
 (defun try-movement-stampedList (listStamped)
   (let ((?nav-pose listStamped))
 
-    (urdf-proj:with-simulated-robot
+    (urdf-proj:without-top-level-simulated-robot
       (cpl:with-retry-counters ((going-retry 3))
         (cpl:with-failure-handling
             (((or common-fail:low-level-failure 
@@ -284,7 +284,7 @@
         (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
                             (cl-tf::make-3d-vector (+ (first *tablePose*) 0.9) ;;0.7 was previously 0.95
                               (- (second *tablePose* ) 0.15) 0) (if turn (cl-tf::make-quaternion 0 0 -0.7 0.7) (cl-tf::make-quaternion 0 0 1 0))))
-         ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
+         (?goal-pose (try-movement-stampedList (list ?goal-pose)))
          (?desig (desig:a motion
 		                  (type going) 
 		                  (target (desig:a location
@@ -301,7 +301,7 @@
         (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
                             (cl-tf::make-3d-vector (+ (first *shelfPose*) 0.1) ;;was previously 0.225
                               (+ (second *shelfPose*) 0.77) 0) (if turn (cl-tf::make-quaternion 0 0 0 1) (cl-tf::make-quaternion 0 0 -0.7 0.7))))
-         ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
+         (?goal-pose (try-movement-stampedList (list ?goal-pose)))
          (?desig (desig:a motion
 		                  (type going) 
 		                  (target (desig:a location

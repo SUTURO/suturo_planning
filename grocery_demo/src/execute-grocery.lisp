@@ -8,15 +8,6 @@
 (defparameter *place-object-result* NIL)
 (defparameter *grasping-retries* 0)
 
-(def-top-level-plan execute-grocery-1()
-    (cram-language:par 
-      (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
-      (cram-language:unwind-protect
-        (comf::move-to-shelf t)
-      )
-      )
-)
-
 ;;@author Torge Olliges, Tom-Eric Lehmkuhl
 (defun execute-grocery()
   (comf::with-hsr-process-modules
@@ -113,6 +104,8 @@
           (progn (llif::call-text-to-speech-action "I have not grasped the object, looking for new object to grasp") 
                  ;;try to perceive again to get a better position
                  (comf::move-to-table t)
+                 (llif::prolog-forget-table-objects)
+                 (btr-utils:kill-all-objects)
                  (perceive-table)
                  (llif::call-take-pose-action 1)
                  ;;Grasp again
@@ -151,7 +144,7 @@
        (progn 
          (llif::call-text-to-speech-action "I am perceiving shelf two now.")
          (llif::call-take-pose-action 3))))
-   (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector shelf-region) t))
+   (setf *perception-objects* (comf::get-confident-objects (llif::call-robosherlock-object-pipeline (vector shelf-region) t)))
    (print *perception-objects*)
    (llif::insert-knowledge-objects *perception-objects*)
    (grocery::spawn-btr-objects *perception-objects*)
@@ -160,7 +153,7 @@
 (defun perceive-table()
   (llif::call-text-to-speech-action "I am perceiving the table now.")
   (llif::call-take-pose-action 2)
-  (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_table") t))
+  (setf *perception-objects* (comf::get-confident-objects (llif::call-robosherlock-object-pipeline (vector "robocup_table") t)))
   (llif::insert-knowledge-objects *perception-objects*)
   (grocery::spawn-btr-objects *perception-objects*)
   (llif::call-text-to-speech-action "I am done perceiving the table now.")
