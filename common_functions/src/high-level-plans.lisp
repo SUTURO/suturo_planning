@@ -18,7 +18,7 @@
                                                (cl-tf:make-3d-vector 1.097 0.556 0)
                                                (cl-tf::make-quaternion 0 0 0 1)))))
 
-(urdf-proj:with-simulated-robot (cpl:with-retry-counters ((going-retry 3))
+(urdf-proj::without-top-level-simulated-robot (cpl:with-retry-counters ((going-retry 3))
       (cpl:with-failure-handling
           (((or common-fail:low-level-failure 
                 cl::simple-error
@@ -48,7 +48,7 @@
 (defun try-movement-stampedList (listStamped)
   (let ((?nav-pose listStamped))
 
-    (urdf-proj:without-top-level-simulated-robot
+    (urdf-proj::without-top-level-simulated-robot
       (cpl:with-retry-counters ((going-retry 3))
         (cpl:with-failure-handling
             (((or common-fail:low-level-failure 
