@@ -19,6 +19,8 @@
     )
    detectiondata
    )
+   (roslisp:make-msg "SUTURO_PERCEPTION_MSGS/EXTRACTOBJECTINFORESULT"
+                     (detectionData) detectionData)
  )
   ;;(roslisp::make-msg )
 )

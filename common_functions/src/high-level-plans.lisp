@@ -7,39 +7,40 @@
 ;;;; Navigation ;;;;
 ;;@author Torge Olliges 
 (defun try-movement () 
-(print "Try Movement startet")
-(let ((?nav-pose (list (cl-tf::make-pose-stamped "map" 0 
-                                               (cl-tf:make-3d-vector 2 3 0) 
-                                               (cl-tf::make-quaternion 0 0 0 1)) 
-                     (cl-tf::make-pose-stamped "map" 0 
-                                                (cl-tf:make-3d-vector 2 3 0) 
-                                                (cl-tf::make-quaternion 0 0 0 1))
-                     (cl-tf::make-pose-stamped "map" 0 
-                                               (cl-tf:make-3d-vector 1.097 0.556 0)
-                                               (cl-tf::make-quaternion 0 0 0 1)))))
+  (print "Try Movement startet")
+  (let ((?nav-pose (list (cl-tf::make-pose-stamped "map" 0 
+                                                   (cl-tf:make-3d-vector 2 3 0) 
+                                                   (cl-tf::make-quaternion 0 0 0 1)) 
+                         (cl-tf::make-pose-stamped "map" 0 
+                                                   (cl-tf:make-3d-vector 2 3 0) 
+                                                   (cl-tf::make-quaternion 0 0 0 1))
+                         (cl-tf::make-pose-stamped "map" 0 
+                                                   (cl-tf:make-3d-vector 1.097 0.556 0)
+                                                   (cl-tf::make-quaternion 0 0 0 1)))))
 
-(urdf-proj:without-top-level-simulated-robot (cpl:with-retry-counters ((going-retry 3))
-      (cpl:with-failure-handling
-          (((or common-fail:low-level-failure 
-                cl::simple-error
-                cl::simple-type-error)
-               (e)
-             (print "Try movement Failed")
-             (setf ?nav-pose (cdr ?nav-pose))
-             
-             (cpl:do-retry going-retry
+    (urdf-proj::without-top-level-simulated-robot
+      (cpl:with-retry-counters ((going-retry 3))
+        (cpl:with-failure-handling
+            (((or common-fail:low-level-failure 
+                  cl::simple-error
+                  cl::simple-type-error)
+                 (e)
+               (print "Try movement Failed")
+               (setf ?nav-pose (cdr ?nav-pose))
+               
+               (cpl:do-retry going-retry
+                 (roslisp:ros-warn (going-demo movement-fail)
+                                   "~%Failed to move to given position~%")
+                 (cpl:retry))
+               
                (roslisp:ros-warn (going-demo movement-fail)
-                                 "~%Failed to move to given position~%")
-               (cpl:retry))
-             
-             (roslisp:ros-warn (going-demo movement-fail)
-                               "~%No more retries~%")))
-        
+                                 "~%No more retries~%")))
+          
           (let ((?actual-nav-pose (car ?nav-pose))) 
-          (cram-executive:perform
-           (desig:an action
-                     (type going)
-                     (target (desig:a location (pose ?actual-nav-pose)))))
+            (cram-executive:perform
+             (desig:an action
+                       (type going)
+                       (target (desig:a location (pose ?actual-nav-pose)))))
             ?actual-nav-pose))))))
 
 
@@ -48,7 +49,7 @@
 (defun try-movement-stampedList (listStamped)
   (let ((?nav-pose listStamped))
 
-    (urdf-proj:without-top-level-simulated-robot
+    (urdf-proj::without-top-level-simulated-robot
       (cpl:with-retry-counters ((going-retry 3))
         (cpl:with-failure-handling
             (((or common-fail:low-level-failure 
@@ -68,6 +69,7 @@
                                  "~%No more retries~%")))
         
           (let ((?actual-nav-pose (car ?nav-pose))) 
+          (print "test")
           (cram-executive:perform
            (desig:an action
                      (type going)
@@ -76,32 +78,32 @@
             ?actual-nav-pose))))))
 
 
-(defun try-move-list (listStamped)
-    (remove-if #'null (mapcar (lambda (listelem) (try-movement-stamped listelem)) listStamped))
-)
+;; (defun try-move-list (listStamped)
+;;     (remove-if #'null (mapcar (lambda (listelem) (try-movement-stamped listelem)) listStamped))
+;; )
 
 ;;Für jede Position werden positionen davon im umkreis von der breite vom roboter berechnet wenn alle ereichbar sind, wird die position zurück gebeben
 
 
 
 ;;@author Torge Olliges      
-(defun move-hsr (nav-goal-pose-stamped)
-  (let* ((?successfull-pose (try-movement-stampedList 
-				(list (cl-tf::make-pose-stamped "map" 0 
-                                      	(cl-tf:make-3d-vector 2 3 0) 
-                                      	(cl-tf::make-quaternion 0 0 0 1)) 
-                     		      (cl-tf::make-pose-stamped "map" 0 
-                                   	(cl-tf:make-3d-vector 2 3 0) 
-                                        (cl-tf::make-quaternion 0 0 0 1))
-		      		      nav-goal-pose-stamped))) ;;@Jan fixed? das war nav-goal-pose zuvor, also ein paar klammer probleme behoben
-        (?desig (desig:a motion
-                        (type going) 
-                        (target (desig:a location
-                                         (pose ?successfull-pose))))))
+;; (defun move-hsr (nav-goal-pose-stamped)
+;;   (let* ((?successfull-pose (try-movement-stampedList 
+;; 				(list (cl-tf::make-pose-stamped "map" 0 
+;;                                       	(cl-tf:make-3d-vector 2 3 0) 
+;;                                       	(cl-tf::make-quaternion 0 0 0 1)) 
+;;                      		      (cl-tf::make-pose-stamped "map" 0 
+;;                                    	(cl-tf:make-3d-vector 2 3 0) 
+;;                                         (cl-tf::make-quaternion 0 0 0 1))
+;; 		      		      nav-goal-pose-stamped))) ;;@Jan fixed? das war nav-goal-pose zuvor, also ein paar klammer probleme behoben
+;;         (?desig (desig:a motion
+;;                         (type going) 
+;;                         (target (desig:a location
+;;                                          (pose ?successfull-poslane))))))
     
-    (with-hsr-process-modules
-      (exe:perform ?desig))
-))
+;;     (with-hsr-process-modules
+;;       (exe:perform ?desig))
+;; ))
 
 ;;;; Grasp ;;;;;
 ;;@author Jan Schimpf
@@ -156,29 +158,29 @@
 ;;@author Jan Schimpf
 (defvar *obj-pos*)
 
-(defun move-to-grasp (object-id grasp-mode)
-  (let ((?move-positions (create-move-position-list object-id)))
-   (cpl:with-retry-counters ((grasping-retry 4))
-   (cpl:with-failure-handling
-      (((or common-fail:low-level-failure 
-                cl::simple-error
-         cl::simple-type-error)
-       (e)
-       (setf ?move-positions (cdr ?move-positions))
-       (cpl:do-retry grasping-retry
-         (roslisp:ros-warn (grasp-fail)
-                                 "~%Failed to grasp the object~%")
-         (cpl:retry))
-         (let ((?successfull-pose (try-movement-stampedList ?move-positions)))
+;; (defun move-to-grasp (object-id grasp-mode)
+;;   (let ((?move-positions (create-move-position-list object-id)))
+;;    (cpl:with-retry-counters ((grasping-retry 4))
+;;    (cpl:with-failure-handling
+;;       (((or common-fail:low-level-failure 
+;;                 cl::simple-error
+;;          cl::simple-type-error)
+;;        (e)
+;;        (setf ?move-positions (cdr ?move-positions))
+;;        (cpl:do-retry grasping-retry
+;;          (roslisp:ros-warn (grasp-fail)
+;;                                  "~%Failed to grasp the object~%")
+;;          (cpl:retry))
+;;          (let ((?successfull-pose (try-movement-stampedList ?move-positions)))
            
-           (comf::looking *obj-pos*)
-           (comf::detecting)
-           (llif::with-hsr-process-modules (exe:perform
-                                            (desig:a motion (type going)
-                                                     (target (desig:a location
-                                                                      (pose ?successfull-pose))))))
-           (comf::grasp-hsr object-id grasp-mode)
-         )))))))
+;;            (comf::looking *obj-pos*)
+;;            (comf::detecting)
+;;            (llif::with-hsr-process-modules (exe:perform
+;;                                             (desig:a motion (type going)
+;;                                                      (target (desig:a location
+;;                                                                       (pose ?successfull-pose))))))
+;;            (comf::grasp-hsr object-id grasp-mode)
+;;          )))))))
 
 (defun reachable-in-simulator (stamp) 
     (null (try-movement-stampedlist (list stamp)))
@@ -284,30 +286,35 @@
         (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
                             (cl-tf::make-3d-vector (+ (first *tablePose*) 0.9) ;;0.7 was previously 0.95
                               (- (second *tablePose* ) 0.15) 0) (if turn (cl-tf::make-quaternion 0 0 -0.7 0.7) (cl-tf::make-quaternion 0 0 1 0))))
-         (?goal-pose (try-movement-stampedList (list ?goal-pose)))
-         (?desig (desig:a motion
-		                  (type going) 
-		                  (target (desig:a location
-		                                   (pose ?goal-pose))))))
-	    	        (exe:perform ?desig)))
+               (?goal-pose (try-movement-stampedList (list ?goal-pose)))
+               (?desig (desig:a motion
+                                (type going) 
+                                (target (desig:a location
+                                                 (pose ?goal-pose))))))
+          (exe:perform ?desig)))
 
 ;;@author Tom-Eric Lehmkuhl
 (defun move-to-shelf (turn)
-        (roslisp:ros-info (move-poi) "Move to shelf started")  
-        (defparameter *postion* nil)                                            
-        (defparameter *shelfPose* (llif::prolog-shelf-pose)) ;; insert knowledge function for getting shelf pose
-        
-        ;; add shelf-depth to goal to insert distance (+y)
-        (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
-                            (cl-tf::make-3d-vector (+ (first *shelfPose*) 0.1) ;;was previously 0.225
-                              (+ (second *shelfPose*) 0.77) 0) (if turn (cl-tf::make-quaternion 0 0 0 1) (cl-tf::make-quaternion 0 0 -0.7 0.7))))
-         (?goal-pose (try-movement-stampedList (list ?goal-pose)))
-         (?desig (desig:a motion
-		                  (type going) 
-		                  (target (desig:a location
-		                                   (pose ?goal-pose))))))
-	    
-	        (exe:perform ?desig)))
+  (roslisp:ros-info (move-poi) "Move to shelf started")  
+  (defparameter *postion* nil)                                            
+  (let* ((*shelfPose* (llif::prolog-shelf-pose))) ;; insert knowledge function for getting shelf pose
+    ;(format t "shelf pose: ~a" *shelfPose*)
+    ;; add shelf-depth to goal to insert distance (+y)
+    (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
+                                                 (cl-tf::make-3d-vector
+                                                  (+ (first *shelfPose*) 0.1) ;;was previously 0.225
+                                                  (+ (second *shelfPose*) 0.77)
+                                                  0)
+                                                 (if turn
+                                                     (cl-tf::make-quaternion 0 0 0 1)
+                                                     (cl-tf::make-quaternion 0 0 -0.7 0.7))))
+           (?goal-pose (try-movement-stampedList (list ?goal-pose)))
+           (?desig (desig:a motion
+                            (type going) 
+                            (target (desig:a location
+                                             (pose ?goal-pose))))))
+    
+      (exe:perform ?desig))))
  
 
 
