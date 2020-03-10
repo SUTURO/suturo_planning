@@ -76,10 +76,6 @@
             ?actual-nav-pose))))))
 
 
-(defun try-move-list (listStamped)
-    (remove-if #'null (mapcar (lambda (listelem) (try-movement-stamped listelem)) listStamped))
-)
-
 ;;Für jede Position werden positionen davon im umkreis von der breite vom roboter berechnet wenn alle ereichbar sind, wird die position zurück gebeben
 
 
@@ -180,9 +176,6 @@
            (comf::grasp-hsr object-id grasp-mode)
          )))))))
 
-(defun reachable-in-simulator (stamp) 
-    (null (try-movement-stampedlist (list stamp)))
-)
 
 ;;@author Philipp Klein
 (defun move-to-poi ()
