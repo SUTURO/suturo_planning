@@ -273,7 +273,7 @@
 
 
 ;;@author Tom-Eric Lehmkuhl
-(cpl:def-cram-function move-to-table (turn)
+(defun move-to-table (turn)
      
         (roslisp:ros-info (move-poi) "Move to table started")
         ;;(defparameter *goalPose* nil)  
@@ -292,7 +292,7 @@
 	    	        (exe:perform ?desig)))
 
 ;;@author Tom-Eric Lehmkuhl
-(cpl:def-cram-function move-to-shelf (turn)
+(defun move-to-shelf (turn)
         (roslisp:ros-info (move-poi) "Move to shelf started")  
         (defparameter *postion* nil)                                            
         (defparameter *shelfPose* (llif::prolog-shelf-pose)) ;; insert knowledge function for getting shelf pose

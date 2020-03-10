@@ -31,7 +31,7 @@
       :language 1
       :sentence text)))
 
-(cpl:def-cram-function call-text-to-speech-action (text)
+(defun call-text-to-speech-action (text)
   "Calls the text to speech action to perform the given `text'"
   (when *enable-speech*
     (multiple-value-bind (result status)
