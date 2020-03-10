@@ -45,8 +45,7 @@
                     (:object-id ?object-id)
                     (:grasp-mode ?grasp-mode))))
     (print "Was here")
-    (comf::with-hsr-process-modules (exe:perform
-                                     place))))
+    (exe:perform place)))
 
 (defun place-object-test (place-list)
   (let* ((?point-x-object (nth 0 place-list))
@@ -115,8 +114,7 @@
                     (:object-id ?object-id)
                     (:grasp-mode ?grasp-mode))))
     (format t "desig: ~a" grasp)
-    (comf::with-hsr-process-modules (exe:perform
-                                     grasp))))
+    (exe:perform grasp)))
                                           
 
 ;;@author Jan Schimpf

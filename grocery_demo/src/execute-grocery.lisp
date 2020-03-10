@@ -6,100 +6,103 @@
 (defparameter *object-goal-pose* NIL)
 (defparameter *grasp-object-result* NIL)
 (defparameter *place-object-result* NIL)
+(defparameter *grasping-retries* 0)
 
-(defun execute-grocery-1()
-    (comf::move-to-shelf t)
-    (llif::call-take-pose-action 2)
-    (cram-language:top-level
+(def-top-level-plan execute-grocery-1()
     (cram-language:par 
-      (llif::call-text-to-speech-action "Don't panic! This is a test. I am not going to move. This is a long text. I am talking as long as need to take the percieve pose. Lalalalala la la laa la la")
-      (perceive-shelf "robocup_shelf_0")
-      (perceive-shelf "robocup_shelf_1")
-      ))
+      (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
+      (cram-language:unwind-protect
+        (comf::move-to-shelf t)
+      )
+      )
 )
 
 ;;@author Torge Olliges, Tom-Eric Lehmkuhl
 (defun execute-grocery()
+  (comf::with-hsr-process-modules
+    ;;get in park position
+    (llif::call-take-pose-action 1)
 
-        ;;get in park position
-  (llif::call-take-pose-action 1)
+    ;;TODO: uncomment when NLP works
+    ;;waiting for start signal loop
+    ;;(cram-language:pursue
+    ;;    (cram-language:wait-for *state-fluent*)
+    ;;    (loop do
+    ;;      (cram-language:sleep 0.1)))
 
-  ;;TODO: uncomment when NLP works
-  ;;waiting for start signal loop
-  ;;(cram-language:pursue
-  ;;    (cram-language:wait-for *state-fluent*)
-  ;;    (loop do
-  ;;      (cram-language:sleep 0.1)))
+    ;;move to table
+    (cram-language:par 
+      (llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way.")
+      (cram-language:unwind-protect
+           (comf::move-to-table t)
+      )
+    )
 
-;;move to table
-  (llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way.")
-  (comf::move-to-table t)
+    ;;perceiving the table
+    (perceive-table)
 
-;;perceiving the table
-  (perceive-table)
+    ;;move to table
+    (llif::call-text-to-speech-action "I am getting into a position to grasp from.")
+    (comf::move-to-table NIL)
 
-;;move to table
-  (llif::call-text-to-speech-action "I am getting into a position to grasp from.")
-  (comf::move-to-table NIL)
+    ;;query for next object, grasp object, faiure handling for grasp
+    (setf *next-object* (llif::prolog-next-object))
+    (llif::call-text-to-speech-action "I am grasping the Object: ")
+    (llif::call-text-to-speech-action (first (split-sequence:split-sequence #\_ *next-object*)))
+    (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
+    (grasp-handling)
 
-;;query for next object, grasp object, faiure handling for grasp
-  (setf *next-object* (llif::prolog-next-object))
-  (llif::call-text-to-speech-action "I am grasping the Object: ")
-  (llif::call-text-to-speech-action (first (split-sequence:split-sequence #\_ *next-object*)))
-  (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
-  (grasp-handling)
-
-
-  ;;move to shelf
-  
+    ;;move to shelf
+    (cram-language:par
       (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
-      (comf::move-to-shelf t)
-  
+      (cram-language:unwind-protect
+        (comf::move-to-shelf t)
+      )
+    )  
 
-  ;;perceive shelf
+    ;;perceive shelf
     (perceive-shelf "robocup_shelf_0")
     (perceive-shelf "robocup_shelf_1")
-
     (perceive-shelf "robocup_shelf_2")
-  (llif::call-take-pose-action 1)
-  (llif::call-text-to-speech-action "I am done perceiving the shelf now.")
+    (llif::call-take-pose-action 1)
+    (llif::call-text-to-speech-action "I am done perceiving the shelf now.")
   
 
-  ;;TODO: uncomment when NLP works
-  ;;(cram-language:pursue
-      ;;(cram-language:wait-for *objects*)
-      (loop do
-        ;;place position
-        (llif::call-text-to-speech-action "I am getting into a position to place from.")
-        (comf::move-to-shelf NIL)
-        ;;place object in shelf
-        (llif::call-text-to-speech-action "I'm going to place the object in the shelf now.")
-        (setf *place-object-result* (comf::place-object *next-object* 1))
-        ;;TODO: to place-handling with this speech action
-        (llif::call-text-to-speech-action "I have placed the object now.")
+    ;;TODO: uncomment when NLP works
+    ;;(cram-language:pursue
+    ;;(cram-language:wait-for *objects*)
+    (loop do
+      ;;place position
+      (llif::call-text-to-speech-action "I am getting into a position to place from.")
+      (comf::move-to-shelf NIL)
+      ;;place object in shelf
+      (llif::call-text-to-speech-action "I'm going to place the object in the shelf now.")
+      (setf *place-object-result* (comf::place-object *next-object* 1))
+      ;;TODO: to place-handling with this speech action
+      (llif::call-text-to-speech-action "I have placed the object now.")
 
-        ;;back to base position
-        (llif::call-take-pose-action 1)
+      ;;back to base position
+      (llif::call-take-pose-action 1)
 
-        ;;move to table
-        (llif::call-text-to-speech-action "I am getting into a position to grasp from.")
-        (comf::move-to-table NIL)
+      ;;move to table
+      (llif::call-text-to-speech-action "I am getting into a position to grasp from.")
+      (comf::move-to-table NIL)
 
-        ;;query for next object
-        (setf *next-object* (llif::prolog-next-object))
+      ;;query for next object
+      (setf *next-object* (llif::prolog-next-object))
 
-        ;;grasp object
-        (llif::call-text-to-speech-action "I am grasping the Object: ")
-        (llif::call-text-to-speech-action (first (split-sequence:split-sequence #\_ *next-object*)))
-        (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
+      ;;grasp object
+      (llif::call-text-to-speech-action "I am grasping the Object: ")
+      (llif::call-text-to-speech-action (first (split-sequence:split-sequence #\_ *next-object*)))
+      (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
 
-        ;;faiure handling for grasp
-        (grasp-handling)
+      ;;faiure handling for grasp
+      (grasp-handling)
 
-        ;;query for knowledge if objects left
-        ;;(if (= (length (llif::prolog-table-objects)) 0) (set *no-objects* true)
-        )
-  
+      ;;query for knowledge if objects left
+      ;;(if (= (length (llif::prolog-table-objects)) 0) (set *no-objects* true)
+     )
+    )
 )
 
 
@@ -122,8 +125,16 @@
                  ;;If it doesn't work again just stop trying
                  (if (roslisp::with-fields (error_code) *grasp-object-result* (= error_code 0)) 
                      (llif::call-text-to-speech-action "I have grapsed the object") 
-                     (progn (llif::call-text-to-speech-action "I can't grasp anything I will stop now.") NIL))))
-
+                     (if (< *grasping-retries* 3)
+                        (grasp-handling)
+                        (progn 
+                          (llif::call-text-to-speech-action "I am not able to grasp any object could you please put the object into my hand?")
+                          ;;(llif::call-move-gripper-action )
+                        )
+                     )
+                 )
+          )
+        )
 )
 
 (defun perceive-shelf(shelf-region)

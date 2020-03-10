@@ -109,11 +109,11 @@
 
 
 
-(cpl:def-cram-function scan-object ()
+(defun scan-object ()
 	(llif::insert-knowledge-objects(get-confident-objects))
 	)
 
-(cpl:def-cram-function move-to-poi-and-scan ()
+(defun move-to-poi-and-scan ()
 	(move-to-poi)
 	(scan-object)
 )
