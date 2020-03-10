@@ -7,6 +7,8 @@
 (defparameter *stamp-pose* NIL)
 ;;@Author Jan Schimpf
 (defun execute-cleanup()
+   (comf::with-hsr-process-modules
+
   (llif::call-text-to-speech-action "I am working now.")
 ;;  (shelf-scan)
 ;;  (table-scan)
@@ -14,7 +16,7 @@
   (point-of-interest-search)
   (point-of-interest-transport)
   )
-
+)
 
 (defun point-of-interest-search()
   (llif::call-text-to-speech-action "I have found a point of interest to search.")
