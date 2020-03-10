@@ -62,7 +62,7 @@
   (comf::move-to-shelf NIL)
   ;;place object in shelf
   (llif::call-text-to-speech-action "I'm going to place the object in the shelf now.")
-  (comf::place-object *object-goal-pose* 1)
+  (comf::place-object *next-object* 1)
   (llif::call-text-to-speech-action "I have placed the object now.")
 
   ;;back to base position
