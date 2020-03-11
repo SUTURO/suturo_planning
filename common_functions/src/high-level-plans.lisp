@@ -285,10 +285,10 @@
 
         (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
                             (cl-tf::make-3d-vector 
-                              (- (first *tablePose*) 0.5) ;;0.7 was previously 0.95
-                              (+ (second *tablePose* ) 0.5) 0) 
+                              (+ (first *tablePose*) 0.5) ;;0.7 was previously 0.95
+                              (- (second *tablePose* ) 0.67) 0) 
                (if turn (cl-tf::make-quaternion 0 0 0.3 0.95) (cl-tf::make-quaternion 0 0 0.9 0))))
-               (?goal-pose (try-movement-stampedList (list ?goal-pose)))
+               ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
                (?desig (desig:a motion
                                 (type going) 
                                 (target (desig:a location
@@ -310,7 +310,7 @@
                                                  (if turn
                                                      (cl-tf::make-quaternion 0 0 0.7 0.72)
                                                      (cl-tf::make-quaternion 0 0 0 1))))
-           (?goal-pose (try-movement-stampedList (list ?goal-pose)))
+           ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
            (?desig (desig:a motion
                             (type going) 
                             (target (desig:a location
