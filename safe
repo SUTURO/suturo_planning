@@ -1,0 +1,6 @@
+    -1.5 4
+
+(defun safe ()
+  (llif::call-text-to-speech-action "Knock Knock please open the door")
+  (llif::call-nav-action-ps (cl-tf::make-pose-stamped "map" 0.0 (cl-tf::make-3d-vector -1.5 4 0)    (cl-tf::make-quaternion 0 0.7 0 0.7)))
+)
