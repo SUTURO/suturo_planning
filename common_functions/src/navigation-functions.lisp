@@ -108,16 +108,6 @@
 
 
 
-(defun scan-object ()
-	(llif::insert-knowledge-objects(get-confident-objects))
-	)
-
-(defun move-to-poi-and-scan ()
-	(move-to-poi)
-	(scan-object)
-)
-
-
 (defun flatten (l)
   (cond ((null l) nil)
         ((atom l) (list l))

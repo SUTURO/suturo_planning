@@ -189,80 +189,23 @@
 
         (pose-with-distance-to-points *poiDistance* *listOfPoi* 10 t) 
 
-	;;(roslisp:ros-info (move-poi) "Move to POIs: ~a"  *listOfPoi*)
+	)
+
+;;@author Philipp Klein
+(defun scan-object ()
+	(llif::insert-knowledge-objects(get-confident-objects))
+)
 
 
-	;;(setf *rangetest* (loop for x from -2 to 3 by 0.1
-	;;      collect (loop for y from -2 to 3 by 0.1
-        ;;              collect (
-        ;;                       cl-tf::make-pose
-        ;;                       (cl-tf::make-3d-vector x y 0.1)
-        ;;                      (cl-tf::make-quaternion 0 0.7 0 0.7 ))) ))
+;;@author Philipp Klein
+(defun move-to-poi-and-scan ()
+	(move-to-poi)
+	(scan-object)
+	(llif::call-take-pose-action 1)
+	(roslisp::with-fields (translation rotation) (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")
+	    (llif::call-nav-action-ps (cl-tf::make-pose-stamped "map" 0 translation (cl-tf::q* rotation (cl-tf::euler->quaternion :ax 0 :ay 0 :az 1.57) )))
+	    )
 
-        ;;(setf *li* (remove-if-not #'llif::robot-in-obstacle-stamped (flatten (copy-list *rangetest*))))
-	;;(publish-msg (advertise "range" "geometry_msgs/PoseArray")
-        ;;       :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
-        ;;       :poses (make-array (length *li*)
-        ;;                          :initial-contents (mapcar #'cl-tf::to-msg *li*)))
-
-        ;;(setf *li1* (flatten (mapcar (lambda (listelem) (remove-if #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* )))
-	;;(publish-msg (advertise "removed" "geometry_msgs/PoseArray")
-        ;;       :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
-        ;;       :poses (make-array (length *li1*)
-        ;;                          :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose *li1*))) )
-
-
-        ;;filter points that dont work, because of the obstacle map
-	;;(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if-not #'llif::robot-in-obstacle-stamped listelem)) *listOfPoi* ))
-
-
-	;;remove empty lists
-	;;(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if #'null listelem)) *listOfPoi* ))
-
-
-        ;;(publish-msg (advertise "poi_debug" "geometry_msgs/PoseArray")
-        ;;       :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
-        ;;       :poses (make-array (length (flatten *listOfPoi*))
-        ;;                          :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
-        ;;                                                    (flatten *listOfPoi*)))) )
-
-	;;liste druchgehen, zuerst im simulator testen und dann im echten, wenn beides erfolgreich => beenden sonst weiter
-
-	;;filter each point that isnt reachable in the simulator
-	;;(setf *listOfPoi* (mapcar (lambda (listelem) (try-move-list listelem)) *listOfPoi* ))
-
-	;;remove empty lists
-	;;(setf *listOfPoi* (mapcar (lambda (listelem) (remove-if #'null listelem)) *listOfPoi* ))
-
-        ;;Limit Point per Poi to 2
-        ;;(setf *listOfPoi* (mapcar (lambda (listelem) (
-	;;	if (> (length listelem) 2) (subseq listelem 0 2) listelem
-        ;;             )) *listOfPoi* ))
-
-        ;;(setf *listOfPoi* (flatten *listOfPoi* ))
-
-
-
-  	;;(let* ((?successfull-pose (try-movement-stampedList *listOfPoi*))
-	;;	(?desig (desig:a motion
-	;;	                (type going) 
-	;;	                (target (desig:a location
-	;;	                                 (pose ?successfull-pose))))))
-        ;;(cpl:with-failure-handling
-     	;; (((or common-fail:low-level-failure 
-        ;;        cl::simple-error
-        ;; cl::simple-type-error)
-        ;;(e)
-        ;;(setf ?successfull-pose (try-movement-stampedList *listOfPoi*))
-        ;;(cpl:do-retry going-retry
-        ;; (roslisp:ros-warn (move-fail)
-        ;;                         "~%Failed to go to Point~%")
-        ;; (cpl:retry)))))
-
-	    
-	;;    (with-hsr-process-modules
-	;;      (exe:perform ?desig)))
-        ;;(llif::call-take-pose-action 2)
 )
 
 
