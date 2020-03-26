@@ -1,35 +1,37 @@
 ;;; Perception/RoboSherlock client
 (in-package :llif)
 
-(defvar *robosherlock-action-client* NIL)
+(defparameter *robosherlock-object-action-client* NIL)
 (defparameter *robosherlock-action-timeout* 30.0 "in seconds")
-(defvar *robosherlock-door-client* NIL)
+(defparameter *robosherlock-door-client* NIL)
 
 
 (defun init-robosherlock-object-action-client ()
   "initializes the RoboSherlock client"
   (roslisp:ros-info (robosherlock-client)
                     "Creating robosherlock action client for server 'perception_server'.")
-  (setf *robosherlock-action-client*
+  (setf *robosherlock-object-action-client*
         (actionlib:make-action-client "/perception_actionserver"
                                       "suturo_perception_msgs/ExtractObjectInfoAction"))
   (roslisp:ros-info (robosherlock-client) "'Actionlib made action client.")
-  (loop until (actionlib:wait-for-server *robosherlock-action-client*
+  (loop until (actionlib:wait-for-server *robosherlock-object-action-client*
                                          *robosherlock-action-timeout*))
   (roslisp:ros-info (robosherlock-client)
                     "Robosherlock action client for ~a created." "'extract_object_infos'"))
 
 (defun get-robosherlock-client ()
   "returns a RoboSherlock client if one already exists. Creates one otherwise."
-  (unless *robosherlock-action-client*
+  (unless *robosherlock-object-action-client*
     (init-robosherlock-object-action-client))
-  *robosherlock-action-client*)
+  *robosherlock-object-action-client*)
 
+;;@Torge Olliges
 (defun make-action-goal (in-regions in-visualize)
   (actionlib::make-action-goal (get-robosherlock-client)
     :regions in-regions
     :visualize in-visualize))
 
+;;@Torge Olliges
 (defun call-robosherlock-object-pipeline (regions-value  viz-value)
   "Calls the RoboSherlock pipeline. Aka, triggers perception to perceive.
   Expects a region to be given as a vector. E.g.
@@ -44,56 +46,3 @@
                        (make-action-goal regions-value viz-value))
      (roslisp:ros-info (robosherlock-object-action) "robosherlock action finished")
      (values result status)))
-
-
-;;Currently unused:
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;here the pipeline for door shut/closed starts;;;;;;;;
-
-
-
-;(defun init-robosherlock-door-action-client ()
-;  "Initializes the RoboSherlock client for door perception."
-;  (roslisp:ros-info (robosherlock-client)
-;                    "Creating robosherlock action client for server 'analye_shelf_status'.")
-;  (setf *robosherlock-door-client*
-;        (actionlib:make-action-client "/analyze_shelf_status"
-;                                      "suturo_perception_msgs/AnalyzeShelfStatusAction"))
-;  (loop until (actionlib:wait-for-server *robosherlock-door-client*
-;                                         *robosherlock-action-timeout*))
-;  (roslisp:ros-info (robosherlock-client)
-;                    "Robosherlock door action client for ~a created." "'analye_shelf_status'"))
-
-;(defun destroy-door-action-client ()
-;  "Kills the RoboSherlock door action client"
-;  (setf *robosherlock-door-client* nil))
-;
-;(defun get-robosherlock-door-client ()
-;  (unless *robosherlock-door-client*
-;    (init-robosherlock-door-action-client))
-;  *robosherlock-door-client*)
-
-;(roslisp-utilities:register-ros-cleanup-function destroy-door-action-client)
-
-
-
-;(defun call-robosherlock-door-pipeline ()
-;  "loops till door is open"
- ;; (lli:publish-operator-text "Toya is the door open?")
-;  (roslisp:ros-info (robosherlock-client) "Calling pipeline for door.")
-  ;; actual call
-;  (roslisp:with-fields (door_open)
-;      (actionlib:call-goal (get-robosherlock-door-client)
-;                           (actionlib:make-action-goal
-;                               (get-robosherlock-door-client))
-;                             :timeout *robosherlock-action-timeout*)
-;    (if door_open
-;        ;;(lli:publish-robot-text "The door is open Operator we can continute.")
-;        (progn
-;          (sleep 1)
-;          (call-robosherlock-door-pipeline)))
-;    door_open))
-
-
-

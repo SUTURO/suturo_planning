@@ -13,14 +13,7 @@
            NIL
            (if (>= confidence_color 0.5) 
                NIL
-               ;;(print "neither class shape or color confidence is high enough"
-               T)))
-      )
-    )
-   detectiondata
-   )
+               T)))))
+   detectiondata)
    (roslisp:make-msg "SUTURO_PERCEPTION_MSGS/EXTRACTOBJECTINFORESULT"
-                     (detectionData) detectionData)
- )
-  ;;(roslisp::make-msg )
-)
+                     (detectionData) detectionData)))

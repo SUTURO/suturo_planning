@@ -23,23 +23,20 @@
           (((or common-fail:low-level-failure 
                 cl::simple-error
                 cl::simple-type-error)
-               (e)
-             (print "Try movement Failed")
-             (setf ?nav-pose (cdr ?nav-pose))
-             
+                (e)
+                (print "Try movement Failed")
+                (setf ?nav-pose (cdr ?nav-pose))
              (cpl:do-retry going-retry
                (roslisp:ros-warn (going-demo movement-fail)
                                  "~%Failed to move to given position~%")
                (cpl:retry))
-             
              (roslisp:ros-warn (going-demo movement-fail)
                                "~%No more retries~%")))
-        
           (let ((?actual-nav-pose (car ?nav-pose))) 
-          (cram-executive:perform
-           (desig:an action
-                     (type going)
-                     (target (desig:a location (pose ?actual-nav-pose)))))
+            (cram-executive:perform
+            (desig:an action
+                (type going)
+                (target (desig:a location (pose ?actual-nav-pose)))))
             ?actual-nav-pose))))))
 
 

@@ -121,14 +121,12 @@
                      (if (< *grasping-retries* 3)
                         (grasp-handling)
                         (progn 
-                          (llif::call-text-to-speech-action "I am not able to grasp any object could you please put the object into my hand?")
-                          ;;(llif::call-move-gripper-action )
-                        )
-                     )
-                 )
-          )
+                          (llif::call-text-to-speech-action "I am not able to grasp any object could you please put the object into my hand?")))))))
+
+(defun grasp-with-failure-handling()
+;;TODO: replicate logic of function above with cpl:with-failure-handling    
+;;(cpl::with-failure-handling)
         )
-)
 
 (defun perceive-shelf(shelf-region)
   (case shelf-region 
