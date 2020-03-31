@@ -26,4 +26,7 @@
    ;;navigation-functions.lisp
    #:scan-object 
    #:move-to-poi-and-scan
+
+   ;;safety-check.lisp
+   #:execute-safety-check
    ))

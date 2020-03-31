@@ -26,5 +26,6 @@
             (:file "select-process-modules" :depends-on("package"))
 	          (:file "process-modules" :depends-on("package"))
              ;;high level plans depends on every other file in here
-             (:file "high-level-plans" :depends-on("package")) 
+             (:file "high-level-plans" :depends-on("package"))
+	     (:file "safety-check" :depends-on("package")) 
 ))))
