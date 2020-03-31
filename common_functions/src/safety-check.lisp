@@ -3,6 +3,7 @@
 (defvar *point-behind-exit-door* NIL)     ;;TO-DO: set point
 (defvar *reached-goal* (cram-language:make-fluent :name :reached-goal) NIL)
 
+;;@author Tom-Eric Lehmkuhl
 (defun execute-safety-check ()
  "safety-check-plan: moving through the entrance door to the exit-door."
     (roslisp:ros-info (safety-check) "Safety-check-plan started")
@@ -21,6 +22,7 @@
         (cram-language:unwind-protect
             (comf::move-hsr *point-behind-exit-door*))))
 
+;;@author Tom-Eric Lehmkuhl
 (defun check-goal-reached (nav-goal-pose-stamped)
  "checks if the goal is reached."
     (loop do
