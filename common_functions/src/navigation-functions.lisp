@@ -7,6 +7,8 @@
 (defparameter *newgoalstamped* Nil)
 (defparameter *radians* Nil)
 (defparameter *alternatePositions* Nil)
+(defparameter *polyCorner1* Nil)
+(defparameter *isPoly* Nil)
 ;;difference between defvar and defparemeter do you really need defvar?
 (defvar *pose*)
 
@@ -63,8 +65,7 @@
 )
 
 
-(defun pose-with-distance-to-points (distance points amountAlternatePositions &optional
-                                     (turn (Boolean Nil)))
+(defun pose-with-distance-to-points (distance points amountAlternatePositions turn)
 
         (setf *Positions* (mapcar (lambda (listelem) (points-around-point distance listelem amountAlternatePositions turn)) points ))
 
@@ -106,13 +107,50 @@
         (print "Going Designator Done")
         (if turn (llif::call-take-pose-action 4)))
 
-
+(defun pointInPolygon (listOfEdges point)
+  (setf *polyCorner1*  (- (length listOfEdges) 1))
+  (loop
+    for i from 0 to (- (length listOfEdges) 1)
+    do
+       (if
+        (or
+         (and
+          (< (cl-tf::y (nth i listOfEdges)) (cl-tf::y point))
+          (> (cl-tf::y (nth *polyCorner1* listOfEdges)) (cl-tf::y point)))
+         (and
+          (< (cl-tf::y (nth *polyCorner1* listOfEdges)) (cl-tf::y point))
+          (> (cl-tf::y (nth i listOfEdges)) (cl-tf::y point))))
+        (handler-case (progn ( if
+         (<
+          (+
+           (cl-tf::x (nth i listOfEdges))
+           (/
+            (-
+             (cl-tf::y point)
+             (cl-tf::y (nth i listOfEdges)))
+            (*
+             (-
+              (cl-tf::x (nth *polyCorner1* listOfEdges))
+              (cl-tf::x (nth i listOfEdges)))
+             (-
+              (cl-tf::y (nth *polyCorner1* listOfEdges))
+              (cl-tf::y (nth i listOfEdges)))))
+          (cl-tf::x point)))
+         (setf *isPoly* (not *isPoly*))))
+          (division-by-zero (err) (if
+           (<
+            (-
+             (cl-tf::y point)
+             (cl-tf::y (nth i listOfEdges)))
+            0)
+           (setf *isPoly* (not *isPoly*)))))) 
+       (setf *polyCorner1* i))
+  *isPoly*)
 
 (defun flatten (l)
   (cond ((null l) nil)
         ((atom l) (list l))
-        (t (loop for a in l appending (flatten a))))
-)
+        (t (loop for a in l appending (flatten a)))))
 
 
 (defun create-move-position-list(object-id)
