@@ -124,9 +124,37 @@
                           (llif::call-text-to-speech-action "I am not able to grasp any object could you please put the object into my hand?")))))))
 
 (defun grasp-with-failure-handling()
-;;TODO: replicate logic of function above with cpl:with-failure-handling    
-;;(cpl::with-failure-handling)
-        )
+    (if (roslisp::with-fields (error_code) *grasp-object-result* (= error_code 0))
+        (cpl:with-retry-counters ((grasping-retry 3))
+            (cpl:with-failure-handling
+                ;;TODO: find out which failure...
+                (((or common-fail:low-level-failure 
+                      cl::simple-error
+                      cl::simple-type-error)
+                  (e)
+                  (progn 
+                      (llif::call-text-to-speech-action "I have not grasped the object, looking for new object to grasp") 
+                      ;;try to perceive again to get a better position
+                      (comf::move-to-table t)
+                      (llif::prolog-forget-table-objects)
+                      (btr-utils:kill-all-objects)
+                      (perceive-table)
+                      (llif::call-take-pose-action 1)
+                      ;;Grasp again
+                      (llif::call-text-to-speech-action "I am getting into a position to grasp from.")
+                      (comf::move-to-table NIL)
+                      (setf *next-object* (llif::prolog-next-object))
+                      (llif::call-text-to-speech-action "I am grasping the Object: ")
+                      (llif::call-text-to-speech-action (first (split-sequence:split-sequence #\_ *next-object*)))
+                      (setf *grasp-object-result* (comf::grasp-object *next-object* 1)))
+                  (cpl:do-retry grasping-retry
+                      (roslisp:ros-warn (execute-grocery grasp-with-failure-handling)
+                                 "~%Failed to grasp the object~%")
+                      (cpl:retry))
+                  (progn 
+                      (roslisp:ros-warn (execute-grocery grasp-with-failure-handling) "~%No more retries~%")
+                      (llif::call-text-to-speech-action "I am not able to grasp any object could you please put the object into my hand?"))))
+            (roslisp:ros-log (execute-grocery grasp-with-failure-handling) "Grasp failure handling successfull.")))))
 
 (defun perceive-shelf(shelf-region)
   (case shelf-region 
