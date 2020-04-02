@@ -108,43 +108,40 @@
         (if turn (llif::call-take-pose-action 4)))
 
 (defun pointInPolygon (listOfEdges point)
-  (setf *polyCorner1*  (- (length listOfEdges) 1))
+  (setq *polyCorner1*  (- (length listOfEdges) 1))
+  (setq *isPoly* nil)
   (loop
     for i from 0 to (- (length listOfEdges) 1)
     do
-       (if
-        (or
-         (and
-          (< (cl-tf::y (nth i listOfEdges)) (cl-tf::y point))
-          (> (cl-tf::y (nth *polyCorner1* listOfEdges)) (cl-tf::y point)))
-         (and
-          (< (cl-tf::y (nth *polyCorner1* listOfEdges)) (cl-tf::y point))
-          (> (cl-tf::y (nth i listOfEdges)) (cl-tf::y point))))
-        (handler-case (progn ( if
-         (<
-          (+
+        (if
+          (not(and
+           (>
+            (cl-tf::y (nth i listOfEdges))
+            (cl-tf::y point))
+           (>
+            (cl-tf::y (nth *polyCorner1* listOfEdges))
+            (cl-tf::y point))))
+          (if
+          (<
            (cl-tf::x (nth i listOfEdges))
-           (/
-            (-
-             (cl-tf::y point)
-             (cl-tf::y (nth i listOfEdges)))
-            (*
-             (-
-              (cl-tf::x (nth *polyCorner1* listOfEdges))
-              (cl-tf::x (nth i listOfEdges)))
+           (+
+            (cl-tf::x (nth i listOfEdges))
+            (/
+             (*
+              (-
+               (cl-tf::x (nth *polyCorner1* listOfEdges))
+               (cl-tf::x (nth i listOfEdges)))
+              (-
+               (cl-tf::y point)
+               (cl-tf::y (nth i listOfEdges))))
              (-
               (cl-tf::y (nth *polyCorner1* listOfEdges))
-              (cl-tf::y (nth i listOfEdges)))))
-          (cl-tf::x point)))
-         (setf *isPoly* (not *isPoly*))))
-          (division-by-zero (err) (if
-           (<
-            (-
-             (cl-tf::y point)
-             (cl-tf::y (nth i listOfEdges)))
-            0)
-           (setf *isPoly* (not *isPoly*)))))) 
-       (setf *polyCorner1* i))
+              (cl-tf::y (nth i listOfEdges))))))
+          (setq *isPoly* (not *isPoly*))
+          (print "hit")))
+        (setf *polyCorner1* i)
+        (print "next edge")
+        (print *isPoly*))
   *isPoly*)
 
 (defun flatten (l)
