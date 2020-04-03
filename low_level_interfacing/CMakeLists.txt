@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   move_base_msgs
   control_msgs
   #suturo_perception_msgs
-  suturo_manipulation_msgs
+  #suturo_manipulation_msgs
   manipulation_action_msgs
   knowledge_msgs
 )
