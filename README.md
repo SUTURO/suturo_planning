@@ -31,7 +31,7 @@ Repository for planning code
 13. cd ..
 14. rosdep install --ignore-src --from-paths src/ -r
 15. cd src && rm -rf cram
-16. git clone https://github.com/Plexiglas/cram -branch hsrb
+16. git clone https://github.com/Plexiglas/cram -b hsrb
 17. git clone https://github.com/SUTURO/suturo_resources
 18. git clone https://github.com/Plexiglas/snap_map_icp
 19. git clone https://github.com/Plexiglas/hsr_navigation
