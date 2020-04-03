@@ -14,6 +14,7 @@
 (defparameter *grasping-retries* 0)
 
 ;;@Author Jan Schimpf
+;; execute the clean up plan
 (defun execute-cleanup()
   (comf::with-hsr-process-modules
 
@@ -27,6 +28,9 @@
     ))
   )
 
+;; @Author Jan Schimpf
+;; goes to detected point of interest to scan them for objects, filters the objects,
+;; then inserts them into the knowledge base and bulletworld and positions toya back into a neutral pose
 (defun point-of-interest-search()
   (llif::call-text-to-speech-action "I have found a point of interest to search.")
   ;;drive to poi
@@ -41,16 +45,19 @@
 
   )
 
+;;@Author Jan Schimpf; Philipp Klein
+;; Grasps the object and places it in the goal area (currently sill the shelf)
 (defun point-of-interest-transport()
   
-   ;; get next-object
+  ;; get the next-object
   (setf *next-object* (llif::prolog-next-object))
   (setf *object-goal-pose* (llif::prolog-object-pose *next-object*))
-
+  
+  ;; make sure we are in a neutral position
   (llif::call-text-to-speech-action "I'm turning towards the object, to grasp it.")
   (llif::call-take-pose-action 1)
+  
   ;; turn to face the object
-  ;;@author phillip
   (roslisp::with-fields (translation rotation) (cl-tf::lookup-transform cram-tf::*transformer* "map" "base_footprint")
     (llif::call-nav-action-ps (cl-tf::make-pose-stamped
                                "map" 0 translation
@@ -72,7 +79,8 @@
   ;;back to base position
   (llif::call-take-pose-action 1)
    )
-  
+
+;;Author Jan Schimpf
 (defun hsr-failure-handling-grasp()
    (cpl:with-retry-counters ((grasping-retry 1))
    (cpl:with-failure-handling
@@ -99,7 +107,7 @@ could you please put the object into my hand? could you please give me the objec
   
 
 
-
+;; copied from execute-grocery
 (defun shelf-scan()
   ;;move to shelf
   (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
@@ -131,7 +139,7 @@ could you please put the object into my hand? could you please give me the objec
    (setf *perception-objects* (comf::get-confident-objects (llif::call-robosherlock-object-pipeline (vector shelf-region) t)))
    (print *perception-objects*)
    (llif::insert-knowledge-objects *perception-objects*)
-   (grocery::spawn-btr-objects *perception-objects*)
+   (clean::spawn-btr-objects *perception-objects*)
 )
 
 (defun perceive-table()
@@ -143,7 +151,7 @@ could you please put the object into my hand? could you please give me the objec
   (llif::call-take-pose-action 2)
   (setf *perception-objects* (comf::get-confident-objects (llif::call-robosherlock-object-pipeline (vector "robocup_table") t)))
   (llif::insert-knowledge-objects *perception-objects*)
-  (grocery::spawn-btr-objects *perception-objects*)
+  (clean::spawn-btr-objects *perception-objects*)
   (llif::call-text-to-speech-action "I am done perceiving the table now.")
   (llif::call-take-pose-action 1)
 )
