@@ -97,6 +97,9 @@
 
 ;;;; Grasp ;;;;;
 ;;@author Jan Schimpf
+;; gets object id and the grasp-pose takes care of some of the failure-handling for grasp
+;; if grasp fails, toya will get into a position to trigger perception again to update
+;; the position of objects and then retries with the new information
 (defun grasp-hsr (object-id grasp-pose)    
   (cpl:with-retry-counters ((grasping-retry 3))
    (cpl:with-failure-handling
@@ -114,6 +117,8 @@
                            "~%No more retries~%")))
     (comf::grasp-object object-id grasp-pose))))
 
+;;@author Jan Schimpf
+;; the failure handling for the grasp-hsr function
 (defun failure-grasp ()
             (comf::move-to-table t)
             (llif::call-take-pose-action 2) 
@@ -124,11 +129,12 @@
 
 ;;;; Place ;;;;
 ;;@author Jan Schimpf
-
+;; gets object id and the grasp-pose takes care of some of the failure-handling for place
+;; currently retries with different position in case of a failure.
 (defun place-hsr (object-id grasp-pose)
  (let ((?place-position (comf:create-place-list object-id grasp-pose)))
                          
- (cpl:with-retry-counters ((grasping-retry 4))
+ (cpl:with-retry-counters ((place-retry 4))
    (cpl:with-failure-handling
       (((or common-fail:low-level-failure 
                 cl::simple-error
@@ -136,42 +142,13 @@
        (e)
        (setf ?place-position (cdr ?place-position))
        (cpl:do-retry grasping-retry
-         (roslisp:ros-warn (grasp-fail)
+         (roslisp:ros-warn (place-fail)
                                  "~%Failed to grasp the object~%")
          (cpl:retry))
          (let ((?actual-place-position (car ?place-position)))
          (comf::place-object-test ?actual-place-position)
                        )))))))
    
-
-;;;;Move-to-Grasp;;;;
-;;@author Jan Schimpf
-(defvar *obj-pos*)
-
-(defun move-to-grasp (object-id grasp-mode)
-  (let ((?move-positions (create-move-position-list object-id)))
-   (cpl:with-retry-counters ((grasping-retry 4))
-   (cpl:with-failure-handling
-      (((or common-fail:low-level-failure 
-                cl::simple-error
-         cl::simple-type-error)
-       (e)
-       (setf ?move-positions (cdr ?move-positions))
-       (cpl:do-retry grasping-retry
-         (roslisp:ros-warn (grasp-fail)
-                                 "~%Failed to grasp the object~%")
-         (cpl:retry))
-         (let ((?successfull-pose (try-movement-stampedList ?move-positions)))
-           
-           (comf::looking *obj-pos*)
-           (comf::detecting)
-           (exe:perform
-                                            (desig:a motion (type going)
-                                                     (target (desig:a location
-                                                                      (pose ?successfull-pose)))))
-           (comf::grasp-hsr object-id grasp-mode)
-         )))))))
-
 
 ;;@author Philipp Klein
 (defun move-to-poi ()
