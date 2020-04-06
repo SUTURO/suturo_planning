@@ -1,4 +1,5 @@
 (in-package :comf)
+;;TODO: fix indentation similar to high-level/grocery-execute
 
 (defparameter *currentOrigin* Nil)
 (defparameter *goalOrigin* Nil)

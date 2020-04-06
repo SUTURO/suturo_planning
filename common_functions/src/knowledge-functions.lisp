@@ -1,5 +1,6 @@
 (in-package :comf)
-
+;;TODO: fix indentation similar to high-level/grocery-execute
+;;TODO: or remove? is it unnecessary?
 (defvar *objects* NIL)
 (defvar *robot-pose-stamped* NIL)
 (defvar *robot-transform* NIL)
