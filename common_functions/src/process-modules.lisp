@@ -3,10 +3,10 @@
 (defmacro with-hsr-process-modules (&body body)
     `(cram-process-modules:with-process-modules-running
         (hsr-navigation
-        hsr-arm
-        hsr-text-to-speach
-        hsr-perceive)
-        (cpl-impl::named-top-level (:name :top-level), @body)))
+         hsr-arm
+         hsr-text-to-speach
+         hsr-perceive)
+        (cpl-impl::named-top-level (:name :top-level),@body)))
 
  ;;;;;;;;;;;;;;;;;;;; BASE ;;;;;;;;;;;;;;;;;;;;;;;;
  (cram-process-modules:def-process-module hsr-navigation (motion-designator)

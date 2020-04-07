@@ -192,7 +192,7 @@
                     (llif::call-text-to-speech-action "I am not able to grasp any object could you please put the object into my hand?")
                     ;;TODO: add the manipulation function for grasping where the gripper currently is here. if that fails shutdown?
                     )))
-            (roslisp:ros-log (execute-grocery grasp-with-failure-handling) "Grasp failure handling successfull.")))))
+            (roslisp:ros-info (execute-grocery grasp-with-failure-handling) "Grasp failure handling successfull.")))))
 
 ;;@author Torge Olliges
 (defun place-handling (object-name)

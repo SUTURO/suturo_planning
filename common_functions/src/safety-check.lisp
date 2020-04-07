@@ -2,7 +2,7 @@
 (defvar *point-behind-entrance-door* NIL) ;;TO-DO: set point
 (defvar *point-behind-exit-door* NIL)     ;;TO-DO: set point
 (defvar *reached-goal* (cram-language:make-fluent :name :reached-goal) NIL)
-
+;;TODO: fix indentation similar to high-level/grocery-execute
 ;;@author Tom-Eric Lehmkuhl
 (defun execute-safety-check ()
  "safety-check-plan: moving through the entrance door to the exit-door."
