@@ -156,12 +156,12 @@
                   cl::simple-type-error)
         (e)
         (setf ?place-position (cdr ?place-position))
-        (cpl:do-retry grasping-retry
+        (cpl:do-retry place-retry
             (roslisp:ros-warn (place-fail)
                                   "~%Failed to grasp the object~%")
             (cpl:retry))
         (let ((?actual-place-position (car ?place-position)))
-        (comf::place-object-test ?actual-place-position))))))))
+        (comf::place-object-list ?actual-place-position))))))))
    
 
 ;;@author Philipp Klein
