@@ -35,6 +35,7 @@
   (llif::init-knowledge-action-client)
   (llif::knowledge-set-tables-source)
   (llif::knowledge-set-ground-source)
+  (llif::knowledge-set-target-surfaces)
 )
 
 (defun init-manipulation()
