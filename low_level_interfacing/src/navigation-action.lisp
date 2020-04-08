@@ -22,9 +22,11 @@
   "Initialize the navigation client"
   (unless (eq roslisp::*node-status* :running)
     (roslisp:start-ros-node "nav-action-client"))
+  ;;(setf *nav-client* (actionlib:make-action-client
+  ;;                    "/nav_fix"
   (setf *nav-client* (actionlib:make-action-client
-                      "/nav_fix"
-                      "move_base_msgs/MoveBaseAction"))
+                      "/move_base/move"
+                      "move_base_msgs/MoveBaseAction"))                      "move_base_msgs/MoveBaseAction"))
   
   (roslisp:ros-info (nav-action-client) "waiting for Navigation Action server...")
 
