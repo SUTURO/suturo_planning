@@ -38,7 +38,12 @@
   "set the tables as source for storing objects"
   (roslisp:ros-info (json-prolog-client) "Set tables as source")
   (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple "make_all_tables_source."
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                             ;;don't know why, but solves problem with simulator
+                                 "tf_lookup_transform(map, 'base_footprint', Y),"
+                                 "tf_lookup_transform(map, 'base_footprint', Y),"
+                                                        "make_all_tables_source")
                                              :package :llif))))))
 
 (defun knowledge-set-ground-source ()
@@ -48,19 +53,30 @@
                          (json-prolog:prolog-simple "make_ground_source."
                                                     :package :llif))))))
 
+(defun knowledge-set-target-surfaces ()
+  "set the target surfaces"
+  (roslisp:ros-info (json-prolog-client) "Set target surfaces.")
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple "make_all_shelves_target."
+                                                    :package :llif))))))
+
 (defun prolog-add-test-objects ()
   "add some test objects to the knowledge base"
   (roslisp:ros-info (json-prolog-client) "Add objects to knowledge base")
   (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple "create_objects_on_table."
+                         (json-prolog:prolog-simple (concatenate 'string
+                                                      "table_surfaces(Tables),"
+                                                      "member(Table, Tables)," 
+                                         "create_object_on_surface(Table)")
                                              :package :llif))))))
 
 (defun prolog-table-objects ()
   "returns the list of all objects on the table"
   (roslisp:ros-info (json-prolog-client) "Getting objects on the table.")
   (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple "all_objects_on_tables
-                                                     (INSTANCES)"
+                         (json-prolog:prolog-simple (concatenate 'string
+                                       "all_objects_on_tables(INSTANCES),"
+                                       "member(INSTANCE, INSTANCES)")
                                              :package :llif)))
          (instances (if (eq raw-response 1)
                         NIL
@@ -79,15 +95,13 @@
          (raw-response (with-safe-prolog  
                          (json-prolog:prolog-simple 
                               (concatenate 'string 
-                                  "object_goal_surface
-                                   ('" knowrob-name "', SURFACE)," 
-                                  "object_frame_name(SURFACE, Name),"
-                                  "atom_concat
-                                   ('kitchen_description_', URDFNAME, Name)")
+                                           "object_goal_surface('"
+                                           knowrob-name "', SURFACE)," 
+                                           "surface_frame(SURFACE, FRAME)")
                                              :package :llif)))
          (surface (if (eq raw-response 1)
                       NIL
-                      (cdr (assoc '?urdfname (cut:lazy-car raw-response))))))
+                      (cdr (assoc '?frame (cut:lazy-car raw-response))))))
     (if surface
         (format nil "environment/~a" (string-trim "'" surface))
         (roslisp:ros-warn (json-prolog-client)
@@ -100,9 +114,8 @@
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
-                          (concatenate 'string "object_goal_pose_offset
-                                               ('"knowrob-name 
-                                               "', POSE, CONTEXT)")
+                          (concatenate 'string "object_goal_pose_offset('"
+                                                knowrob-name"', POSE, CONTEXT).")
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (json-prolog-client)
@@ -148,8 +161,8 @@
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
-                          (concatenate 'string "object_dimensions
-                                               ('" knowrob-name "', D, W, H)")
+                          (concatenate 'string "object_dimensions('"
+                                                     knowrob-name "', D, W, H)")
                           :package :llif)))
          (raw-dimensions (if (eq raw-response 1)
                           NIL
@@ -169,8 +182,8 @@
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
-                          (concatenate 'string "object_pose
-                                               ('" knowrob-name "', POSE)")
+                          (concatenate 'string "object_pose('"
+                                                        knowrob-name "', POSE)")
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (json-prolog-client)
