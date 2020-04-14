@@ -187,6 +187,9 @@ could you please put the object into my hand? could you please give me the objec
       (comf::move-to-shelf NIL)
       ;;place object in shelf
       (llif::call-text-to-speech-action "I'm going to place the object in the shelf now.")
+      (multiple-value-bind (a b) (llif::prolog-object-goal-pose
+                                  (llif::prolog-next-object))
+                                             (llif:call-text-to-speech-action b))
       (setf *place-object-result* (comf::place-object *next-object* 1))
 
       (llif::call-text-to-speech-action "I have placed the object now.")

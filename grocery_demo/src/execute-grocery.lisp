@@ -200,6 +200,8 @@
     (llif::call-text-to-speech-action "I am getting into a position to place from.")
     (comf::move-to-shelf NIL)
     (llif::call-text-to-speech-action "I'm going to place the object in the shelf now.")
+    (multiple-value-bind (a b) (llif::prolog-object-goal-pose object-name)
+                                            (llif::call-text-to-speech-action b))
     ;;place object in shelf
     (setf *place-object-result* (comf::place-object object-name 1))
     (llif::call-text-to-speech-action "I have placed the object now."))

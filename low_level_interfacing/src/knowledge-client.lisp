@@ -38,13 +38,8 @@
   "set the tables as source for storing objects"
   (roslisp:ros-info (json-prolog-client) "Set tables as source")
   (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple
-                          (concatenate 'string
-                             ;;don't know why, but solves problem with simulator
-                                 "tf_lookup_transform(map, 'base_footprint', Y),"
-                                 "tf_lookup_transform(map, 'base_footprint', Y),"
-                                                        "make_all_tables_source")
-                                             :package :llif))))))
+                         (json-prolog:prolog-simple "make_all_tables_source"
+                                                    :package :llif))))))
 
 (defun knowledge-set-ground-source ()
   "set the ground as source cleanup"
