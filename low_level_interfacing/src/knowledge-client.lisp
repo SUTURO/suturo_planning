@@ -192,10 +192,10 @@
   (roslisp:ros-info (json-prolog-client) "Getting pose from table")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
-                          (concatenate 'string "get_surface_id_by_name
-                                                (table_center, TABLE),"
-                                               "surface_pose_in_map
-                                               (TABLE, [TRANSLATION, ROTATION])")
+                          (concatenate 'string "get_surface_id_by_name"
+                                                "(table_center, TABLE),"
+                                               "surface_pose_in_map"
+                                               "(TABLE, [TRANSLATION, ROTATION])")
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (json-prolog-client)
@@ -208,16 +208,12 @@
   "returns the pose of the shelf"
   (roslisp:ros-info (json-prolog-client) "Getting pose from shelf")
   (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple 
-                          (concatenate 'string "get_surface_id_by_name
-                                                (shelf_floor_0_piece, SHELF),"
-                                               "surface_pose_in_map
-                                               (SHELF, [TRANSLATION, ROTATION])")
+                         (json-prolog:prolog-simple "pose_of_shelves(POSES)"
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (json-prolog-client)
                            "Query didn't reach any solution.")
-        (values-list `(,(cdr (assoc '?translation (cut:lazy-car raw-response)))
+        (values-list `(,(cdr (assoc '?Poses (cut:lazy-car raw-response)))
                        ,(string-trim "'" (cdr (assoc '?context
                                               (cut:lazy-car raw-response)))))))))                                                  
 

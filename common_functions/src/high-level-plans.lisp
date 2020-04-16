@@ -156,12 +156,12 @@
     ;;(roslisp::with-fields (x y z) *tablePose* (setf *postion* (cl-tf::make-3d-vector (x y z))))
     (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
                 (cl-tf::make-3d-vector
-                    (+ (first *tablePose*) 0.9) ;;0.7 was previously 0.95
-                    (- (second *tablePose* ) 0.15)
+                    (- (first *tablePose*) 1.8) ;;0.7 was previously 0.95
+                    (+ (second *tablePose* ) 0.4)
                     0)
                 (if turn
-                    (cl-tf::make-quaternion 0 0 -0.7 0.7)
-                    (cl-tf::make-quaternion 0 0 1 0))))
+                    (cl-tf::make-quaternion 0 0 0.45 0.89)
+                    (cl-tf::make-quaternion 0 0 -0.3 0.95))))
         ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
         (?desig (desig:a motion
                     (type going) 
@@ -173,15 +173,15 @@
 (defun move-to-shelf (turn)
     (roslisp:ros-info (move-poi) "Move to shelf started")  
     (defparameter *postion* nil)                                            
-    (let* ((*shelfPose* (llif::prolog-shelf-pose))) ;; insert knowledge function for getting shelf pose
+    (let* ((*shelfPose* (first (first (llif::prolog-shelf-pose))))) ;; insert knowledge function for getting shelf pose
     ;; add shelf-depth to goal to insert distance (+y)
     (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
         (cl-tf::make-3d-vector
-            (+ (first *shelfPose*) 0.1) ;;was previously 0.225
-            (+ (second *shelfPose*) 0.77) 0)
+            (- (first *shelfPose*) 0.03) ;;was previously 0.225
+            (- (second *shelfPose*) 0.7) 0)
         (if turn
-            (cl-tf::make-quaternion 0 0 0 1)
-            (cl-tf::make-quaternion 0 0 -0.7 0.7))))
+            (cl-tf::make-quaternion 0 0 1 1)
+            (cl-tf::make-quaternion 0 0 0.7 0.7))))
         ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
         (?desig (desig:a motion
                     (type going) 
