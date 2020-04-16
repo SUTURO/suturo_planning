@@ -192,10 +192,10 @@
   (roslisp:ros-info (json-prolog-client) "Getting pose from table")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
-                          (concatenate 'string "get_surface_id_by_name
-                                                (table_center, TABLE),"
-                                               "surface_pose_in_map
-                                               (TABLE, [TRANSLATION, ROTATION])")
+                          (concatenate 'string "get_surface_id_by_name"
+                                                "(table_center, TABLE),"
+                                               "surface_pose_in_map"
+                                               "(TABLE, [TRANSLATION, ROTATION])")
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (json-prolog-client)
@@ -209,10 +209,10 @@
   (roslisp:ros-info (json-prolog-client) "Getting pose from shelf")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
-                          (concatenate 'string "get_surface_id_by_name
-                                                (shelf_floor_0_piece, SHELF),"
-                                               "surface_pose_in_map
-                                               (SHELF, [TRANSLATION, ROTATION])")
+                          (concatenate 'string "get_surface_id_by_name"
+                                                "(shelf_floor_0_piece, SHELF),"
+                                       "surface_pose_in_map"
+                                       "(SHELF, [TRANSLATION, ROTATION])")
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (json-prolog-client)
