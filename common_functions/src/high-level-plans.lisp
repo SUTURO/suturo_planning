@@ -155,12 +155,12 @@
     ;;(roslisp::with-fields (x y z) *tablePose* (setf *postion* (cl-tf::make-3d-vector (x y z))))
     (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
                 (cl-tf::make-3d-vector
-                    (- (first *tablePose*) 1.8) ;;0.7 was previously 0.95
-                    (+ (second *tablePose* ) 0.4)
+                    (- (first *tablePose*) 1.2) ;;0.7 was previously 0.95
+                    (+ (second *tablePose* ) 0.1)
                     0)
                 (if turn
-                    (cl-tf::make-quaternion 0 0 0.45 0.89)
-                    (cl-tf::make-quaternion 0 0 -0.3 0.95))))
+                    (cl-tf::make-quaternion 0 0 0.39 0.91)
+                    (cl-tf::make-quaternion 0 0 -0.3 0.93))))
         ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
         (?desig (desig:a motion
                     (type going) 

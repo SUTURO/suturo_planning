@@ -10,7 +10,9 @@
 
 ;;@author Torge Olliges, Tom-Eric Lehmkuhl
 (defun execute-grocery()
-    (comf::with-hsr-process-modules
+  (comf::with-hsr-process-modules
+    (llif::knowledge-set-tables-source)
+    (llif::knowledge-set-target-surfaces)
     ;;get in park position
     (llif::call-take-pose-action 1)
 
@@ -107,10 +109,10 @@
               (llif::call-text-to-speech-action "I am perceiving shelf two now.")
               (llif::call-take-pose-action 3))))
    (setf *perception-objects* 
-      (comf::get-confident-objects 
+      ;;(comf::get-confident-objects 
           (llif::call-robosherlock-object-pipeline 
-              (vector shelf-region) 
-              T)))
+           (vector shelf-region) 
+              T))
    (print *perception-objects*)
    (llif::insert-knowledge-objects *perception-objects*)
    (grocery::spawn-btr-objects *perception-objects*))
@@ -120,10 +122,10 @@
     (llif::call-text-to-speech-action "I am perceiving the table now.")
     (llif::call-take-pose-action 2)
     (setf *perception-objects* 
-        (comf::get-confident-objects 
+      ;;  (comf::get-confident-objects 
             (llif::call-robosherlock-object-pipeline 
-                (vector "robocup_table") 
-                T)))
+                (vector "table") 
+                T))
     (llif::insert-knowledge-objects *perception-objects*)
     (grocery::spawn-btr-objects *perception-objects*)
     (llif::call-text-to-speech-action "I am done perceiving the table now.")
