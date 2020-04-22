@@ -38,10 +38,6 @@
                 (setf listStamped (cdr ?nav-pose))
                 ?actual-nav-pose))))))
 
-;;TODO: english pls
-;;Für jede Position werden positionen davon im umkreis von der breite vom roboter berechnet wenn alle ereichbar sind, wird die position zurück gebeben
-
-
 
 ;;@author Torge Olliges
 ;;Lets the robot move to the given position with a motion designator    
@@ -63,6 +59,7 @@
                     (desig:a location
                         (pose ?successfull-pose))))))
         (exe:perform ?desig)))
+
 
 ;;;; Grasp ;;;;;
 ;;@author Jan Schimpf
@@ -86,6 +83,7 @@
             "~%No more retries~%")))
     (comf::grasp-object object-id grasp-pose))))
 
+
 ;;@author Jan Schimpf
 ;; the failure handling for the grasp-hsr function
 (defun failure-grasp ()
@@ -94,6 +92,7 @@
         (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_table") t))
         (llif::insert-knowledge-objects *perception-objects*)
         (llif::call-take-pose-action 1))
+
 
 ;;;; Place ;;;;
 ;;@author Jan Schimpf
@@ -168,6 +167,7 @@
                     (target (desig:a location 
                     (pose ?goal-pose))))))
         (exe:perform ?desig))))
+
 
 ;;@author Tom-Eric Lehmkuhl
 (defun move-to-shelf (turn)
