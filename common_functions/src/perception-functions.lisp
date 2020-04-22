@@ -1,7 +1,7 @@
 (in-package :comf)
 
 ;;@author Torge Olliges
-(defun get-confident-objects(perception-msg, &optional (threshold 0.5))
+(defun get-confident-objects(perception-msg &optional (threshold 0.5))
     (roslisp::with-fields (detectiondata) perception-msg
         (delete-if 
             (lambda (object) 

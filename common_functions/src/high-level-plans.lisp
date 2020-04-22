@@ -180,7 +180,7 @@
             (- (first *shelfPose*) 0.03) ;;was previously 0.225
             (- (second *shelfPose*) 0.7) 0)
         (if turn
-            (cl-tf::make-quaternion 0 0 1 1)
+            (cl-tf::make-quaternion 0 0 -1 0)
             (cl-tf::make-quaternion 0 0 0.7 0.7))))
         ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
         (?desig (desig:a motion
