@@ -48,6 +48,13 @@
                          (json-prolog:prolog-simple "make_ground_source."
                                                     :package :llif))))))
 
+(defun knowledge-set-buckets-target ()
+  "set buckets as target surfaces"
+  (roslisp:ros-info (json-prolog-client) "Set buckets as target surfaces.")
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple "make_all_buckets_target."
+                                                    :package :llif))))))
+
 (defun knowledge-set-target-surfaces ()
   "set the target surfaces"
   (roslisp:ros-info (json-prolog-client) "Set target surfaces.")
@@ -215,7 +222,19 @@
                            "Query didn't reach any solution.")
         (values-list `(,(cdr (assoc '?Poses (cut:lazy-car raw-response)))
                        ,(string-trim "'" (cdr (assoc '?context
-                                              (cut:lazy-car raw-response)))))))))                                                  
+                                              (cut:lazy-car raw-response)))))))))
+(defun prolog-target-pose ()
+  "returns the poses of all targets surfaces"
+  (roslisp:ros-info (json-prolog-client) "Getting poses from targets")
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple "pose_of_target_surfaces(POSES)"
+                          :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (json-prolog-client)
+                           "Query didn't reach any solution.")
+        (values-list `(,(cdr (assoc '?Poses (cut:lazy-car raw-response)))
+                       ,(string-trim "'" (cdr (assoc '?context
+                                              (cut:lazy-car raw-response)))))))))
 
 (defun prolog-object-in-gripper ()
   "returns the object in the gripper"

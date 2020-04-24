@@ -8,6 +8,9 @@
    #:move-hsr
    #:hsr-grasp
    #:grasp-hsr
+   #:move-to-table
+   #:move-to-shelf
+   #:move-to-bucket
    
 
    ;;perception-functions.lisp

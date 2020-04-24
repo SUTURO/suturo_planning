@@ -72,6 +72,8 @@
    #:prolog-objects-around-pose
    #:object-name->class
    #:prolog-table-pose
+   #:prolog-shelf-pose
+   #:prolog-target-pose
    #:prolog-next-object
 
    ;;nlp-subscriber
