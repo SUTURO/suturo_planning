@@ -10,6 +10,8 @@
 (defparameter *alternatePositions* Nil)
 (defparameter *polyCorner1* Nil)
 (defparameter *isPoly* Nil)
+(defparameter *removed* Nil)
+(defparameter *Positions* Nil)
 ;;difference between defvar and defparemeter do you really need defvar?
 (defvar *pose*)
 
@@ -68,17 +70,24 @@
 
 (defun pose-with-distance-to-points (distance points amountAlternatePositions turn)
 
-        (setf *Positions* (mapcar (lambda (listelem) (points-around-point distance listelem amountAlternatePositions turn)) points ))
+  (setf *Positions* (mapcar (lambda (listelem) (points-around-point distance listelem amountAlternatePositions turn)) points ))
 
-        ;;filter points that dont work, because of the obstacle map
+  ;;filter points that dont work, because of the obstacle map
+  (setf *removed* (mapcar (lambda (listelem) (remove-if #'llif::robot-in-obstacle-stamped listelem)) *Positions* ))
 	(setf *Positions* (mapcar (lambda (listelem) (remove-if-not #'llif::robot-in-obstacle-stamped listelem)) *Positions* ))
+
+          (publish-msg (advertise "poi_filter" "geometry_msgs/PoseArray")
+               :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
+               :poses (make-array (length *removed*)
+                                  :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
+                                                            *removed*))))
 
 	;;remove empty lists
 	(setf *Positions* (mapcar (lambda (listelem) (remove-if #'null listelem)) *Positions* ))
 
         (setf *Positions* (flatten *Positions* ))
 
-        (publish-msg (advertise "poi_debug" "geometry_msgs/PoseArray")
+        (publish-msg (advertise "poi_positions" "geometry_msgs/PoseArray")
                :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
                :poses (make-array (length *Positions*)
                                   :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
