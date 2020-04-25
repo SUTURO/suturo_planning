@@ -73,14 +73,16 @@
   (setf *Positions* (mapcar (lambda (listelem) (points-around-point distance listelem amountAlternatePositions turn)) points ))
 
   ;;filter points that dont work, because of the obstacle map
-  (setf *removed* (mapcar (lambda (listelem) (remove-if #'llif::robot-in-obstacle-stamped listelem)) *Positions* ))
+  ;;(setf *removed* (mapcar (lambda (listelem) (remove-if #'llif::robot-in-obstacle-stamped listelem)) *Positions* ))
 	(setf *Positions* (mapcar (lambda (listelem) (remove-if-not #'llif::robot-in-obstacle-stamped listelem)) *Positions* ))
 
-          (publish-msg (advertise "poi_filter" "geometry_msgs/PoseArray")
-               :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
-               :poses (make-array (length *removed*)
-                                  :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
-                                                            *removed*))))
+  ;;	(setf *removed* (mapcar (lambda (listelem) (remove-if #'null listelem)) *removed* ))
+
+  ;;        (publish-msg (advertise "poi_filter" "geometry_msgs/PoseArray")
+  ;;             :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
+  ;;             :poses (make-array (length *removed*)
+  ;;                                :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
+  ;;                                                          *removed*))))
 
 	;;remove empty lists
 	(setf *Positions* (mapcar (lambda (listelem) (remove-if #'null listelem)) *Positions* ))

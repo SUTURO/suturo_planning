@@ -6,7 +6,7 @@
 
 (defun obstacle-map-listener ()
   ;;(subscribe "map" "nav_msgs/OccupancyGrid" #'saveObstacleMap)
-  (subscribe "dynamic_obstacle_map_ref" "nav_msgs/OccupancyGrid" #'saveObstacleMap)
+  (subscribe "dynamic_obstacle_map" "nav_msgs/OccupancyGrid" #'saveObstacleMap)
   ;;(with-ros-node ("listener" :spin t)
   (roslisp:ros-info (obstacle-map-subscriber) "Map Subscribed")
 )

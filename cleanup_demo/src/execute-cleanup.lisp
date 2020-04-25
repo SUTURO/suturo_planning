@@ -17,16 +17,30 @@
 ;; execute the clean up plan
 (defun execute-cleanup()
   (comf::with-hsr-process-modules
-
     (llif::call-text-to-speech-action "I am working now.")
-    (shelf-scan)
+      (llif::knowledge-set-tables-source)
+      (llif::knowledge-set-buckets-target)
+
     (perceive-table)
     (transport)
+    
+    (llif::knowledge-set-ground-source)
+  
+
+    (goto-poihotspot)
     (loop do
     (point-of-interest-search)
     (point-of-interest-transport)
     ))
   )
+
+(defun goto-poihotspot ()
+  (llif::call-nav-action-ps
+   (cl-tf::make-pose-stamped "map" 0.0
+                             (cl-tf::make-3d-vector 0.834 2.802 0)
+                             (cl-tf::euler->quaternion :ax 0 :ay 0 :az 0 )))
+  )
+
 
 ;; @Author Jan Schimpf
 ;; goes to detected point of interest to scan them for objects, filters the objects,
@@ -48,9 +62,12 @@
 ;;@Author Jan Schimpf; Philipp Klein
 ;; Grasps the object and places it in the goal area (currently sill the shelf)
 (defun point-of-interest-transport()
-  
+
+  (loop do
   ;; get the next-object
-  (setf *next-object* (llif::prolog-next-object))
+    (setf *next-object* (llif::prolog-next-object))
+          (when (eq *next-object* 1) (return) )
+
   (setf *object-goal-pose* (llif::prolog-object-pose *next-object*))
   
   ;; make sure we are in a neutral position
@@ -78,7 +95,7 @@
 
   ;;back to base position
   (llif::call-take-pose-action 1)
-   )
+   ))
 
 ;;Author Jan Schimpf
 (defun hsr-failure-handling-grasp()
@@ -107,40 +124,6 @@ could you please put the object into my hand? could you please give me the objec
   
 
 
-;; copied from execute-grocery
-(defun shelf-scan()
-  ;;move to shelf
-  (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
-  (comf::move-to-shelf t)
-  
-  ;;perceive shelf
-  (perceive-shelf "robocup_shelf_0")
-  (perceive-shelf "robocup_shelf_1")
-  (perceive-shelf "robocup_shelf_2")
-  (llif::call-take-pose-action 1)
-  (llif::call-text-to-speech-action "I am done perceiving the shelf now.")
-  )
-
-;;copied from execute grocery
-(defun perceive-shelf(shelf-region)
-  (case shelf-region 
-     ("robocup_shelf_0" 
-       (progn 
-         (llif::call-text-to-speech-action "I am perceiving shelf zero now.")
-         (llif::call-take-pose-action 2)))
-     ("robocup_shelf_1" 
-       (progn 
-         (llif::call-text-to-speech-action "I am perceiving shelf one now.")
-         (llif::call-take-pose-action 2)))
-     ("robocup_shelf_2" 
-       (progn 
-         (llif::call-text-to-speech-action "I am perceiving shelf two now.")
-         (llif::call-take-pose-action 3))))
-   (setf *perception-objects* (comf::get-confident-objects (llif::call-robosherlock-object-pipeline (vector shelf-region) t)))
-   (print *perception-objects*)
-   (llif::insert-knowledge-objects *perception-objects*)
-   (clean::spawn-btr-objects *perception-objects*)
-)
 
 (defun perceive-table()
   ;;move to table
@@ -149,7 +132,7 @@ could you please put the object into my hand? could you please give me the objec
   ;;perceive-table
   (llif::call-text-to-speech-action "I am perceiving the table now.")
   (llif::call-take-pose-action 2)
-  (setf *perception-objects* (comf::get-confident-objects (llif::call-robosherlock-object-pipeline (vector "robocup_table") t)))
+  (setf *perception-objects* (comf::get-confident-objects (llif::call-robosherlock-object-pipeline (vector "table") t)))
   (llif::insert-knowledge-objects *perception-objects*)
   (clean::spawn-btr-objects *perception-objects*)
   (llif::call-text-to-speech-action "I am done perceiving the table now.")
@@ -165,10 +148,13 @@ could you please put the object into my hand? could you please give me the objec
 
       ;;move to table
       (llif::call-text-to-speech-action "I am getting into a position to grasp from.")
-      (comf::move-to-table NIL)
 
       ;;query for next object
       (setf *next-object* (llif::prolog-next-object))
+      
+      (when (eq *next-object* 1) (return) )
+
+      (comf::move-to-table NIL)
 
       ;;grasp object
       (llif::call-text-to-speech-action "I am grasping the Object: ")
@@ -180,13 +166,13 @@ could you please put the object into my hand? could you please give me the objec
 
       ;;move to shelf
       (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
-      (comf::move-to-shelf Nil)
+      (comf::move-to-bucket)
 
       ;;place position
       (llif::call-text-to-speech-action "I am getting into a position to place from.")
-      (comf::move-to-shelf NIL)
+      (comf::move-to-bucket)
       ;;place object in shelf
-      (llif::call-text-to-speech-action "I'm going to place the object in the shelf now.")
+      (llif::call-text-to-speech-action "I'm going to place the object in the bucket now.")
       (multiple-value-bind (a b) (llif::prolog-object-goal-pose
                                   (llif::prolog-next-object))
                                              (llif:call-text-to-speech-action b))
@@ -196,7 +182,8 @@ could you please put the object into my hand? could you please give me the objec
 
       (llif::call-take-pose-action 1)
 
-            ))
+   )
+)
 
 ;;copied from execute-grocery
 (defun grasp-handling()

@@ -77,11 +77,11 @@
             )(coerce poses 'list)
         )
       )
-   (publish-msg (advertise "poi" "geometry_msgs/PoseArray")
-               :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
-               :poses (make-array (length *poi*)
-                                  :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
-                                                            *poi*))) )
+  ;; (publish-msg (advertise "poi" "geometry_msgs/PoseArray")
+  ;;             :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
+  ;;            :poses (make-array (length *poi*)
+  ;;                                :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
+  ;;                                                          *poi*))) )
   ;;(roslisp:ros-info (poi-subscriber) "closest point to zero? xD ~a" (closestPoi
   ;;(cl-tf::make-pose-stamped "map" 0.0 (cl-tf::make-3d-vector 0 0 0) (cl-tf::make-quaternion 0 0.7 0 0.7) )))
 )
