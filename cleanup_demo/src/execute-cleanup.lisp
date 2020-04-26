@@ -164,17 +164,13 @@ could you please put the object into my hand? could you please give me the objec
       ;;faiure handling for grasp
       (grasp-handling)
 
-      ;;move to shelf
-      (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
-      (comf::move-to-bucket)
-
       ;;place position
       (llif::call-text-to-speech-action "I am getting into a position to place from.")
       (comf::move-to-bucket)
       ;;place object in shelf
       (llif::call-text-to-speech-action "I'm going to place the object in the bucket now.")
       (multiple-value-bind (a b) (llif::prolog-object-goal-pose
-                                  (llif::prolog-next-object))
+                                  *next-object*)
                                              (llif:call-text-to-speech-action b))
       (setf *place-object-result* (comf::place-object *next-object* 1))
 

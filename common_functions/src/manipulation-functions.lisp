@@ -21,6 +21,7 @@
   ;;get the information from knowledge
   (setf *dimensions* (llif:prolog-object-dimensions object-id))
   (setf *goal* (llif:prolog-object-goal-pose object-id))
+  (print *goal*)
   
   ;;takes apart the messages for the needed information to consturct the place motion-designator 
   (let* ((?point-x-object (nth 0 (nth 0 *goal*)))
