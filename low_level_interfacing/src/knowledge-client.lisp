@@ -149,9 +149,11 @@
                          (json-prolog:prolog-simple 
                           "next_object(OBJECT)"
                           :package :llif)))
-    (object (if (eq raw-response 1) NIL 
-              (cdr (assoc '?object (cut:lazy-car raw-response))))))
-    (if object
+       ; (roslisp:ros-info (next-object) "test ~a" raw-response))))
+         (object (if (eq raw-response 1) NIL 
+                     (cdr (assoc '?object (cut:lazy-car raw-response))))))
+   ; (write object)
+    (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
         (knowrob-symbol->string object)
         (roslisp:ros-warn (json-prolog-client)
                            "Query didn't reach any solution."))))
