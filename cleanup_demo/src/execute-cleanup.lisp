@@ -18,15 +18,10 @@
 (defun execute-cleanup()
   (comf::with-hsr-process-modules
     (llif::call-text-to-speech-action "I am working now.")
-      (llif::knowledge-set-tables-source)
-      (llif::knowledge-set-buckets-target)
 
     (perceive-table)
     (transport)
-    
-    (llif::knowledge-set-ground-source)
   
-
     (goto-poihotspot)
     (loop do
     (point-of-interest-search)
@@ -86,7 +81,7 @@
   (hsr-failure-handling-grasp)
   
   ;;move to shelf
-  (comf::move-to-shelf NIL)
+  (comf::move-to-bucket)
   
   ;;place object in shelf
   (llif::call-text-to-speech-action "I'm going to place the object in the shelf now.")

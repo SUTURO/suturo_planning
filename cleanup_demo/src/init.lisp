@@ -30,9 +30,14 @@
   )
 
 (defun init-knowledge()
+
   ;;Init action clients
   (roslisp:ros-info (init-interface) "init knowledge client")
   (llif::init-knowledge-action-client)
+
+  (llif::knowledge-set-tables-source)
+  (llif::knowledge-set-ground-source)
+  (llif::knowledge-set-buckets-target)
 )
 
 (defun init-manipulation()

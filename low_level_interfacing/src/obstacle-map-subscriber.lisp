@@ -28,7 +28,7 @@
                 (+
                   (* (round(/ (- (cl-tf::y vect3) y) resolution)) width)
                   (round(/ (- (cl-tf::x vect3) x)resolution))))
-    (if (> (length data) *indexs*) (aref data *indexs*) 111 )
+    (if (and (> (length data) *indexs*) (> *indexs* 0) ) (aref data *indexs*) 111 )
 ))
 
 (defun robot-in-obstacle-stamped (point) 
