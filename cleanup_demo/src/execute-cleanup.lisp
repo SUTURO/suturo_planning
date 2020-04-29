@@ -21,9 +21,9 @@
 
     (perceive-table)
     (transport)
-  
-    (goto-poihotspot)
+
     (loop do
+    (goto-poihotspot)
     (point-of-interest-search)
     (point-of-interest-transport)
     ))
@@ -64,9 +64,10 @@
 
   (loop do
   ;; get the next-object
-    (setf *next-object* (llif::prolog-next-object))
+  (setf *next-object* (llif::prolog-next-object))
           (when (eq *next-object* 1) (return) )
 
+  (goto-poihotspot)
   (setf *object-goal-pose* (llif::prolog-object-pose *next-object*))
   
   ;; make sure we are in a neutral position

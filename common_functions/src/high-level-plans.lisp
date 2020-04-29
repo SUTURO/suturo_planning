@@ -196,7 +196,7 @@
     ;; add shelf-depth to goal to insert distance (+y)
     (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
         (cl-tf::make-3d-vector
-            (+ (first *bucketPose*) 1.0) ;;was previously 0.225
+            (+ (first *bucketPose*) 0.7) ;;was previously 0.225
             (- (second *bucketPose*) 0.05) 0)
             (cl-tf::make-quaternion 0 0 -1 0)))
         ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))

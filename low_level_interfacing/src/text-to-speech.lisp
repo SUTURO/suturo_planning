@@ -2,7 +2,7 @@
 (in-package :llif)
 
 (defvar *text-to-speech-publisher* nil)
-(defparameter *enable-speech* T)
+(defparameter *enable-speech* nil)
 
 (defvar *text-to-speech-action-client* nil)
 
@@ -41,5 +41,6 @@
            (make-text-action-goal text)))
       (roslisp:ros-info (text-to-speech-action-client) "Text to speech action finished.")
       (values result status)
-      result)))
-
+      result))
+  (unless *enable-speech*
+      (format t "text-to-speech: ~a" text)))
