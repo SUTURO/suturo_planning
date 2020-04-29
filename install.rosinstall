@@ -1,0 +1,48 @@
+- git:
+    local-name: cram
+    uri: https://github.com/Plexiglas/cram.git
+    version: hsrb
+- git:
+    local-name: iai_maps
+    uri: https://github.com/code-iai/iai_maps.git
+    version: master
+- git:
+    local-name: iai_common_msgs
+    uri: https://github.com/code-iai/iai_common_msgs.git
+    version: master
+- git:
+    local-name: giskard_msgs
+    uri: https://github.com/SemRoCo/giskard_msgs.git
+    version: master
+- git:
+    local-name: pr2_kinematics
+    uri: https://github.com/code-iai/pr2_kinematics.git
+    version: kinetic-devel
+- git:
+    local-name: hsr_description
+    uri: https://github.com/Vanessa-rin/hsr_description.git
+    version: master
+- git:
+    local-name: roslisp_common
+    uri: https://github.com/ros/roslisp_common.git
+    version: master
+- git:
+    local-name: hsr_meshes
+    uri: https://github.com/ToyotaResearchInstitute/hsr_meshes.git
+    version: master
+- git:
+    local-name: snap_map_icp
+    uri: https://github.com/Plexiglas/snap_map_icp.git
+    version: master
+- git:
+    local-name: hsr_navigation
+    uri: https://github.com/Plexiglas/hsr_navigation
+    version: master
+- git:
+    local-name: suturo_resources
+    uri: https://github.com/SUTURO/suturo_resources.git
+    version: master
+- git:
+    local-name: suturo_planning
+    uri: https://github.com/SUTURO/suturo_planning.git
+    version: milestone_03

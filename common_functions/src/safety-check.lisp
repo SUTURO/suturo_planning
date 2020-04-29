@@ -1,6 +1,6 @@
 (in-package :comf)
-(defvar *point-behind-entrance-door* NIL) ;;TO-DO: set point
-(defvar *point-behind-exit-door* NIL)     ;;TO-DO: set point
+(defvar *point-behind-entrance-door* NIL) ;;TODO: set point
+(defvar *point-behind-exit-door* NIL)     ;;TODO: set point
 (defvar *reached-goal* (cram-language:make-fluent :name :reached-goal) NIL)
 ;;TODO: fix indentation similar to high-level/grocery-execute
 ;;@author Tom-Eric Lehmkuhl
@@ -12,7 +12,7 @@
     (cram-language:par
         (check-goal-reached *point-behind-entrance-door*)
         (cram-language:pursue
-            (cram-language:wait-for *reached-goal*) ;;TO-DO: Recognizing that the door is open
+            (cram-language:wait-for *reached-goal*) ;;TODO: Recognizing that the door is open
             (loop do
                 (cram-language:unwind-protect
                     (comf::move-hsr *point-behind-entrance-door*)))))
@@ -24,12 +24,17 @@
 
 ;;@author Tom-Eric Lehmkuhl
 (defun check-goal-reached (nav-goal-pose-stamped)
- "checks if the goal is reached."
+  "checks if the goal is reached."
+    (defvar *distance* 0)
     (loop do
         (roslisp::with-fields (translation) 
             (cl-tf::lookup-transform cram-tf::*transformer* 
-                                                        "map" "base_footprint")
-            (if (cl-tf::eq translation (cl-tf::origin nav-goal-pose-stamped)) 
+                                     "map" "base_footprint")
+          (setf *distance* (+ (abs (cl-tf:x translation))
+                                (+ (abs (cl-tf:y translation))
+                                   (+ (abs (cl-tf:x nav-goal-pose-stamped))
+                                      (abs (cl-tf:y nav-goal-pose-stamped))))))
+            (if (> *distance* 0.2) 
                 (setf (cram-language:value *reached-goal*) T)))
         (cram-language:sleep 0.1)))
     
