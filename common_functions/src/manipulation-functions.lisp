@@ -95,9 +95,13 @@
 
 (defun grasp-object (object-id grasp-pose)
    ;;get the information from knowledge
-
+  (print "getting dimensions")
   (setq *dimensions* (llif:prolog-object-dimensions object-id))
+  (print "getting pose")
   (setq *pose* (llif:prolog-object-pose object-id))
+  (print "grasping now")
+  (print *dimensions*)
+  (print *pose*)
   
   ;;takes apart the messages for the needed information to consturct the grasp motion-designator 
   (let* ((?point-x-object (nth 0 (nth 2 *pose*)))

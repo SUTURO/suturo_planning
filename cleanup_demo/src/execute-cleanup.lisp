@@ -30,11 +30,15 @@
   )
 
 (defun goto-poihotspot ()
-  (llif::call-nav-action-ps
-   (cl-tf::make-pose-stamped "map" 0.0
+      (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0.0
                              (cl-tf::make-3d-vector 0.834 2.802 0)
                              (cl-tf::euler->quaternion :ax 0 :ay 0 :az 0 )))
-  )
+        (?desig (desig:a motion
+                    (type going) 
+                    (target (desig:a location 
+                    (pose ?goal-pose))))))
+        (exe:perform ?desig)))
+  
 
 
 ;; @Author Jan Schimpf
@@ -127,7 +131,7 @@ could you please put the object into my hand? could you please give me the objec
   ;;perceive-table
   (llif::call-text-to-speech-action "I am perceiving the table now.")
   (llif::call-take-pose-action 2)
-  (setf *perception-objects* (comf::get-confident-objects (llif::call-robosherlock-object-pipeline (vector "table") t)))
+  (setf *perception-objects*  (llif::call-robosherlock-object-pipeline (vector "table") t))
   (llif::insert-knowledge-objects *perception-objects*)
   (clean::spawn-btr-objects *perception-objects*)
   (llif::call-text-to-speech-action "I am done perceiving the table now.")
