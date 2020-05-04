@@ -4,9 +4,9 @@
 (alexandria:define-constant +knowrob-prefix+
   "http://knowrob.org/kb/knowrob.owl#" :test 'string=)
 (alexandria:define-constant +hsr-objects-prefix+
-  "http://www.semanticweb.org/suturo/ontologies/2018/10/objects#" :test 'string=)
+  "http://www.semanticweb.org/suturo/ontologies/2020/3/objects#" :test 'string=)
 (alexandria:define-constant +robocup-prefix+
-  "http://knowrob.org/kb/robocup.owl#" :test 'string=)
+  "http://www.semanticweb.org/suturo/ontologies/2020/2/Robocup#" :test 'string=)
 (alexandria:define-constant +srld-prefix+
   "http://knowrob.org/kb/srdl2-comp.owl#" :test 'string=)
 
