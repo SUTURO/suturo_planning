@@ -23,7 +23,6 @@
     (transport)
 
     (loop do
-    (goto-poihotspot)
     (point-of-interest-search)
     (point-of-interest-transport)
     ))
@@ -47,6 +46,8 @@
 (defun point-of-interest-search()
   (llif::call-text-to-speech-action "I have found a point of interest to search.")
   ;;drive to poi
+  (goto-poihotspot)
+
   (comf::move-to-poi)
 
   (llif::call-text-to-speech-action "I am perceiving the position now.")
@@ -62,12 +63,11 @@
 ;; Grasps the object and places it in the goal area (currently sill the shelf)
 (defun point-of-interest-transport()
 
-  (loop do
+  ;;(loop do
   ;; get the next-object
   (setf *next-object* (llif::prolog-next-object))
-          (when (eq *next-object* 1) (return) )
+  ;;(when (eq *next-object* 1) (return) )
 
-  (goto-poihotspot)
   (setf *object-goal-pose* (llif::prolog-object-pose *next-object*))
   
   ;; make sure we are in a neutral position
@@ -95,7 +95,9 @@
 
   ;;back to base position
   (llif::call-take-pose-action 1)
-   ))
+  ;;(goto-poihotspot)
+
+   ) ;;)
 
 ;;Author Jan Schimpf
 (defun hsr-failure-handling-grasp()
