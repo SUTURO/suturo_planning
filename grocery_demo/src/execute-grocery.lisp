@@ -34,8 +34,11 @@
     (perceive-table)
 
     ;;move to table
-    (llif::call-text-to-speech-action "I am getting into a position to grasp from.")
-    (comf::move-to-table NIL)
+    (cram-language:par 
+        (llif::call-text-to-speech-action 
+            "Hello, i am getting into a position to grasp from.")
+        (cram-language:unwind-protect
+            (comf::move-to-table NIL)))
 
     ;;query for next object, grasp object, faiure handling for grasp
     (setf *next-object* (llif::prolog-next-object))
@@ -44,7 +47,8 @@
     (llif::call-text-to-speech-action 
         (first (split-sequence:split-sequence #\_ *next-object*)))
     (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
-    (grasp-handling)
+    ;;todo if this doesnt work pls tell me and use grasp-handling for the time being
+    (grasp-with-failure-handling)
 
     ;;move to shelf
     (cram-language:par
@@ -54,9 +58,9 @@
             (comf::move-to-shelf t)))  
 
     ;;perceive shelf
-    (perceive-shelf "robocup_shelf_0")
-    (perceive-shelf "robocup_shelf_1")
-    (perceive-shelf "robocup_shelf_2")
+    (loop for shelf_nr from 0 to 2
+      do   (perceive-shelf 
+              (concatenate "robocup_shelf_" (write-to-string shelf_nr))))
     (llif::call-take-pose-action 1)
     (llif::call-text-to-speech-action "I am done perceiving the shelf now.")
   
@@ -85,12 +89,14 @@
             (first (split-sequence:split-sequence #\_ *next-object*)))
         (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
         ;;faiure handling for grasp
-        (grasp-handling)
+        ;;todo if this doesnt work pls tell me and use grasp-handling for the time being
+        (grasp-with-failure-handling)
 
         ;;query for knowledge if objects left
         (if (= (length 
             (llif::prolog-table-objects)) 0) 
             (set *no-objects* true)))))
+
 
 ;;@author Torge Olliges
 ;;Perceives a given shelf region (currently only shelf 0,1,2 due to robot capabilities)
@@ -122,10 +128,10 @@
     (llif::call-text-to-speech-action "I am perceiving the table now.")
     (llif::call-take-pose-action 2)
     (setf *perception-objects* 
-      ;;  (comf::get-confident-objects 
+        (comf::get-confident-objects 
             (llif::call-robosherlock-object-pipeline 
                 (vector "table") 
-                T))
+                T)))
     (llif::insert-knowledge-objects *perception-objects*)
     (grocery::spawn-btr-objects *perception-objects*)
     (llif::call-text-to-speech-action "I am done perceiving the table now.")

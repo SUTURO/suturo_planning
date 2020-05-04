@@ -13,7 +13,7 @@
 (defparameter *place-object-result* NIL)
 (defparameter *grasping-retries* 0)
 
-;;@Author Jan Schimpf
+;;@author Jan Schimpf
 ;; execute the clean up plan
 (defun execute-cleanup()
   (comf::with-hsr-process-modules
@@ -37,7 +37,7 @@
   )
 
 
-;; @Author Jan Schimpf
+;; @author Jan Schimpf
 ;; goes to detected point of interest to scan them for objects, filters the objects,
 ;; then inserts them into the knowledge base and bulletworld and positions toya back into a neutral pose
 (defun point-of-interest-search()
@@ -54,7 +54,7 @@
 
   )
 
-;;@Author Jan Schimpf; Philipp Klein
+;;@author Jan Schimpf; Philipp Klein
 ;; Grasps the object and places it in the goal area (currently sill the shelf)
 (defun point-of-interest-transport()
 
@@ -92,7 +92,7 @@
   (llif::call-take-pose-action 1)
    ))
 
-;;Author Jan Schimpf
+;;@author Jan Schimpf
 (defun hsr-failure-handling-grasp()
    (cpl:with-retry-counters ((grasping-retry 1))
    (cpl:with-failure-handling
