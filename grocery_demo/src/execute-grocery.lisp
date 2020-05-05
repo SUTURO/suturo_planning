@@ -8,9 +8,26 @@
 (defparameter *place-object-result* NIL)
 (defparameter *grasping-retries* 0)
 
+<<<<<<< Updated upstream
+=======
+;;@author Tom-Eric Lehmkuhl
+(defun execute-grocery-nlp()
+    ;;TODO: uncomment when NLP works
+  ;;waiting for start signal loop
+  (comf::with-hsr-process-modules
+    (cram-language:pursue
+      (cram-language:wait-for low-level-interfacing::*state-fluent*)
+        (loop do
+          (cram-language:sleep 0.1)))
+
+  (cram-language:pursue
+    (cram-language:wait-for (pulsed llif::*state-fluent*))
+    (grocery:execute-grocery))))
+
+>>>>>>> Stashed changes
 ;;@author Torge Olliges, Tom-Eric Lehmkuhl
 (defun execute-grocery()
-  (comf::with-hsr-process-modules
+  ;;(comf::with-hsr-process-modules
     (llif::knowledge-set-tables-source)
     (llif::knowledge-set-target-surfaces)
     ;;get in park position
@@ -90,7 +107,7 @@
         ;;query for knowledge if objects left
         (if (= (length 
             (llif::prolog-table-objects)) 0) 
-            (set *no-objects* true)))))
+            (set *no-objects* true))))
 
 ;;@author Torge Olliges
 ;;Perceives a given shelf region (currently only shelf 0,1,2 due to robot capabilities)

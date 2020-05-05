@@ -1,87 +1,62 @@
 (in-package :llif)
 
-(defun make-point (px py pz ox oy oz ow)
-		(cl-transforms-stamped:to-msg
-                (cl-tf::make-pose-stamped  
-                 "map"
-                 0.0 
-                 (cl-tf:make-3d-vector px py pz) 
-                 (cl-tf:make-quaternion ox oy oz ow))))
-;;defparemeter once on the top of the file 
 (defparameter *poi* (list ()))
 
+;;@author Philipp Klein
+(defun closest-poi (point)
+  "returns the closest poi in relation to the given point"
+  (closest-point-in-list point *poi*))
 
-(defun closestPoi (point)
-  (closestPointInList point *poi*))
+;;@author Philipp Klein
+(defun closest-point-in-list (point stampedList)
+	"returns the closest point in relation of the given point"
+  (cond
+    ((null stampedList) nil)
+    ((null (rest stampedList)) (first stampedList))
+    ((null (first stampedList)) (closestPointInList point (rest stampedList)))
+    ((< 
+      (cl-tf::v-dist (cl-tf::origin point)
+                     (cl-tf::origin (first stampedList))) 
+      (cl-tf::v-dist (cl-tf::origin point)
+                     (cl-tf::origin (second stampedList))))
+     (closestPointInList point (cons (first stampedList) 
+                                     (rest (rest stampedList)))))
+    (t (closestPointInList point (rest stampedList))))) 
 
-(defun closestPointInList (point stampedList)
-	"returns the closest Poi in relation of the given point"
-	
- (cond
-       ((null stampedList) nil)
-	;;indent region.. control + alt + \ i think 
-       ((null (rest stampedList)) (first stampedList))
-	;;leerzeilen nur bei gedankenspruengen..
-       ((null (first stampedList)) (closestPointInList point (rest stampedList)))
+;;@author Philipp Klein
+(defun sorted-poi-by-distance (point)
+  "sort the poi list by the distance to the given point"
+  (sorted-stamped-by-distance point *poi*))
 
-       ((< 
-          (cl-tf::v-dist (cl-tf::origin point) ;;next line
-			 (cl-tf::origin (first stampedList))) 
-          (cl-tf::v-dist (cl-tf::origin point) (cl-tf::origin (second stampedList)))
-        )
-        (closestPointInList point (cons (first stampedList) 
-                       (rest (rest stampedList)))))
-       (t (closestPointInList point (rest stampedList))))) 
+;;@author Philipp Klein
+(defun sorted-stamped-by-distance (point list)
+  "sort a list stamped poses by the distance to the given point"
+  (sort (copy-list (remove-if #'null list))
+        (lambda (ers zwei) 
+          (< 
+           (cl-tf::v-dist point
+                          (cl-tf::origin ers)) 
+           (cl-tf::v-dist point
+                          (cl-tf::origin zwei))) )))
 
-
-(defun sortedPoiByDistance (point)  
-   (sortedStampedByDistance point *poi*))
-
-(defun sortedStampedByDistance (point list)  
-   (sort (copy-list (remove-if #'null list))
-         (lambda (ers zwei) 
-                 (< 
-	           (cl-tf::v-dist point
-			 (cl-tf::origin ers)) 
-                   (cl-tf::v-dist point
-                         (cl-tf::origin zwei))) )))
-
-
-(defun add-poi (px py pz ox oy oz ow)
-	(defparameter *poi* (append *poi*  ;;next line
-				    (list(make-point px py pz ox oy oz ow))))
-        ;;(append *poi* (make-point px py pz ox oy oz ow))
-)
-
+;;@author Philipp Klein
 (defun add-stamped-poi (stamped)
-	(defparameter *poi* (append *poi* (list stamped)))
-)
+  "add a stamped pose to the list of pois"
+	(defparameter *poi* (append *poi* (list stamped))))
 
-
-
+;;@author Philipp Klein
 (defun point-listener ()
-  (subscribe "object_finder" "geometry_msgs/PoseArray" #'addPoiFromTopic)
-  ;;(with-ros-node ("listener" :spin t)
-  (roslisp:ros-info (poi-subscriber) "POI Subscriber started")
-)
+  "subscribe to bject_finder and call the callback function add-poi-from-topic"
+  (subscribe "object_finder" "geometry_msgs/PoseArray" #'add-poi-from-topic)
+  (roslisp:ros-info (poi-subscriber) "POI Subscriber started"))
 
-(defun addPoiFromTopic (poseArrayMsg) 
-  ;;(roslisp:ros-info (poi-subscriber) "added POIs to List")
+;;@author Philipp Klein
+(defun add-poi-from-topic (poseArrayMsg)
+  "save the given points to the parameter poi"
   (defparameter *poi* (list()))
-    (roslisp:with-fields (poses) poseArrayMsg
-        (mapcar 
-            (lambda (arg) 
-                         (add-stamped-poi(cl-tf::pose->pose-stamped "map" 0.0 (cl-tf::from-msg arg)))
-                         ;;(roslisp:ros-info (poi-subscriber) "added ~a"arg)
-                         ;;(roslisp:ros-info (poi-subscriber) "Die ganze Liste: ~a"*poi*)
-            )(coerce poses 'list)
-        )
-      )
-  ;; (publish-msg (advertise "poi" "geometry_msgs/PoseArray")
-  ;;             :header (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time) )
-  ;;            :poses (make-array (length *poi*)
-  ;;                                :initial-contents (mapcar #'cl-tf::to-msg (mapcar #'cl-tf::pose-stamped->pose
-  ;;                                                          *poi*))) )
-  ;;(roslisp:ros-info (poi-subscriber) "closest point to zero? xD ~a" (closestPoi
-  ;;(cl-tf::make-pose-stamped "map" 0.0 (cl-tf::make-3d-vector 0 0 0) (cl-tf::make-quaternion 0 0.7 0 0.7) )))
-)
+  (roslisp:with-fields (poses) poseArrayMsg
+    (mapcar 
+     (lambda (arg) 
+       (add-stamped-poi
+        (cl-tf::pose->pose-stamped "map" 0.0 (cl-tf::from-msg arg)))
+       )(coerce poses 'list))))

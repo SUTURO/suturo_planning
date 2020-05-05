@@ -118,33 +118,33 @@
 
 ;;@author Philipp Klein
 (defun move-to-poi ()
-    ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
-	  ;;please indent region...
-	  (roslisp:ros-info (move-poi) "Move to POI started")
-        (setf *listOfPoi* 
-            (llif::sortedPoiByDistance
-            (roslisp::with-fields (translation)
-                (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")
-                translation)))
-    (pose-with-distance-to-points *poiDistance* *listOfPoi* 10 t))
-
-;;@author Philipp Klein
-;;TODO: scan-objects as name? why do we need this as a function?
-(defun scan-object ()
-	  (llif::insert-knowledge-objects(get-confident-objects)))
-
+  "moves the robot to the closest poi point"
+  (roslisp:ros-info (move-poi) "Move to POI started")
+  (setf *listOfPoi* 
+        (llif::sorted-poi-by-distance
+         (roslisp::with-fields (translation)
+             (cl-tf::lookup-transform
+              cram-tf::*transformer*
+              "map"
+              "base_footprint")
+           translation)))
+  (pose-with-distance-to-points *poiDistance* *listOfPoi* 10 t))
 
 ;;@author Philipp Klein
 (defun move-to-poi-and-scan ()
-	  (move-to-poi)
-	  (scan-object)
-	  (llif::call-take-pose-action 1)
-	  (roslisp::with-fields (translation rotation) (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")
-	      (llif::call-nav-action-ps 
-            (cl-tf::make-pose-stamped "map" 0 translation 
-                (cl-tf::q* rotation 
-                    (cl-tf::euler->quaternion :ax 0 :ay 0 :az 1.57))))))
-
+  "moves the robot to a poi and perceive it"
+  (move-to-poi)
+  (llif::call-take-pose-action 1)
+  (roslisp::with-fields
+      (translation rotation)
+      (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")
+    (llif::call-nav-action-ps 
+     (cl-tf::make-pose-stamped
+      "map"
+      0
+      translation 
+      (cl-tf::q* rotation 
+                 (cl-tf::euler->quaternion :ax 0 :ay 0 :az 1.57))))))
 
 ;;@author Tom-Eric Lehmkuhl
 (defun move-to-table (turn)
