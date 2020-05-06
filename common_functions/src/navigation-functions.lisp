@@ -88,7 +88,7 @@
                    atanValue))))) 
          *radians*))
   (setf *alternatePositions*
-        (llif::sortedStampedByDistance
+        (llif::sorted-stamped-by-distance
          (roslisp::with-fields (translation)
              (cl-tf::lookup-transform
               cram-tf::*transformer*
