@@ -24,7 +24,18 @@ action server."
   (roslisp:ros-info (grasp-action) "grasp action client created"))
 
 ;; NOTE most of these params have to be (vector ...)s 
-(defun make-grasp-action-goal (px py pz ox oy oz ow size_x size_y size_z frameid graspmode)
+(defun make-grasp-action-goal (point-x-object
+                               point-y-object
+                               point-z-object
+                               quaterion-value-1
+                               quaterion-value-2
+                               quaterion-value-3
+                               quaterion-value-4
+                               size-x
+                               size-y
+                               size-z
+                               object-id
+                               grasp-mode)
   "Creates the grasp-action-goal. Does not send it to the action server though."
   (actionlib:make-action-goal
       (get-grasp-action-client)
@@ -33,33 +44,69 @@ action server."
                 (cl-tf::make-pose-stamped  
                  "map"
                  0.0 
-                 (cl-tf:make-3d-vector px py pz) 
-                 (cl-tf:make-quaternion ox oy oz ow)))
-    :grasp_mode graspmode
-    :object_frame_id frameid
+                 (cl-tf:make-3d-vector point-x-object point-y-object point-z-object) 
+                 (cl-tf:make-quaternion quaterion-value-1 quaterion-value-2
+                                        quaterion-value-3 quaterion-value-4)))
+    :grasp_mode grasp-mode
+    :object_frame_id object-id
     :object_size (roslisp:make-msg
                   "geometry_msgs/vector3"
-                  :x size_x
-                  :y size_y
-                  :z size_z)
+                  :x size-x
+                  :y size-y
+                  :z size-z)
     ))
                                                  
-(defun ensure-grasp-goal-reached (status px py pz ox oy oz ow size_x size_y size_z)
+(defun ensure-grasp-goal-reached (status
+                                  point-x-object
+                                  point-y-object
+                                  point-z-object
+                                  quaterion-value-1
+                                  quaterion-value-2
+                                  quaterion-value-3
+                                  quaterion-value-4
+                                  size-x
+                                  size-y
+                                  size-z)
   (roslisp:ros-warn (grasp-action) "Status ~a" status)
   status
-  px py pz ox oy oz ow size_x size_y size_z
+  point-x-object point-y-object point-z-object
+  quaterion-value-1 quaterion-value-2 quaterion-value-3 quaterion-value-4
+  size-x size-y size-z
   T)
 
 
-(defun call-grasp-action (px py pz ox oy oz ow size_x size_y size_z frameid graspmode)
+(defun call-grasp-action (point-x-object
+                          point-y-object
+                          point-z-object
+                          quaterion-value-1
+                          quaterion-value-2
+                          quaterion-value-3
+                          quaterion-value-4
+                          size-x
+                          size-y
+                          size-z
+                          object-id
+                          grasp-mode)
   "object-id' object-id of frame-id of object to grasp"
   ;;  (format t "grasp called with state: ~a" state)
    (multiple-value-bind (result status)
   (actionlib:call-goal (get-grasp-action-client)
-                       (make-grasp-action-goal px py pz ox oy oz ow size_x size_y size_z frameid graspmode
+                       (make-grasp-action-goal point-x-object
+                                               point-y-object
+                                               point-z-object
+                                               quaterion-value-1
+                                               quaterion-value-2
+                                               quaterion-value-3
+                                               quaterion-value-4
+                                               size-x size-y size-z
+                                               object-id grasp-mode
                         ))
      (roslisp:ros-info (grasp-action) "grasp action finished")
-    (ensure-grasp-goal-reached status px py pz ox oy oz ow size_x size_y size_z)
+     (ensure-grasp-goal-reached status
+                                point-x-object point-y-object point-z-object
+                                quaterion-value-1 quaterion-value-2
+                                quaterion-value-3 quaterion-value-4
+                                size-x size-y size-z)
      (values result status)))
 
 ;;NOTE 0 0 is the deafault lookig straight position.
