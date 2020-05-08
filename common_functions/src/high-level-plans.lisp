@@ -148,6 +148,8 @@
 
 ;;@author Tom-Eric Lehmkuhl
 (defun move-to-table (turn)
+  "moves the robot to the table. if turn is true,
+   then the robot will move sideways to the table"
     (roslisp:ros-info (move-poi) "Move to table started")
     ;;(defparameter *goalPose* nil)  
     (defparameter *postion* nil)                                            
@@ -170,6 +172,8 @@
 
 ;;@author Tom-Eric Lehmkuhl
 (defun move-to-shelf (turn)
+   "moves the robot to the shelf. if turn is true,
+   then the robot will move sideways to the shelf"
     (roslisp:ros-info (move-poi) "Move to shelf started")  
     (defparameter *postion* nil)                                            
     (let* ((*shelfPose* (first (first (llif::prolog-shelf-pose))))) 
@@ -190,6 +194,7 @@
 
 ;;@author Tom-Eric Lehmkuhl
 (defun move-to-bucket ()
+   "moves the robot to the bucket."
     (roslisp:ros-info (move-poi) "Move to bucket started")  
     (defparameter *postion* nil)                                            
   (let* ((*bucketPose* (first (first (llif::prolog-target-pose))))) 

@@ -39,8 +39,10 @@
           (actionlib:call-goal
            (get-text-to-speech-action-client)
            (make-text-action-goal text)))
-      (roslisp:ros-info (text-to-speech-action-client) "Text to speech action finished.")
+      (roslisp:ros-info (text-to-speech-action-client)
+                        "Text to speech action finished.")
       (values result status)
       result))
+  ;; print text on terminal, if speech is disabled (in simulator)
   (unless *enable-speech*
-      (format t "text-to-speech: ~a" text)))
+    (roslisp:ros-info (text-to-speech-action-client) "~A" text)))
