@@ -11,7 +11,7 @@
 
 ;;@author Torge Olliges, Tom-Eric Lehmkuhl
 (defun execute-grocery()
-  ;;(comf::with-hsr-process-modules
+  (comf::with-hsr-process-modules
     (llif::knowledge-set-tables-source)
     (llif::knowledge-set-target-surfaces)
     ;;get in park position
@@ -59,9 +59,16 @@
             (comf::move-to-shelf t)))  
 
     ;;perceive shelf
-    (loop for shelf_nr from 0 to 2
-      do   (perceive-shelf 
-              (concatenate "robocup_shelf_" (write-to-string shelf_nr))))
+    ;;(loop for shelf_nr from 0 to 2
+    ;;  do   (perceive-shelf 
+    ;;          (concatenate 'string "bookshelf_" (write-to-string shelf_nr))))
+    (llif::call-text-to-speech-action "I am perceiving shelf zero now.")
+    (llif::call-take-pose-action 2)
+    (perceive-shelf "bookshelf_0")
+    (perceive-shelf "bookshelf_1")
+    (llif::call-text-to-speech-action "I am perceiving shelf zero now.")
+    (llif::call-take-pose-action 3)
+    (perceive-shelf "bookshelf_2")
     (llif::call-take-pose-action 1)
     (llif::call-text-to-speech-action "I am done perceiving the shelf now.")
   
@@ -82,7 +89,7 @@
 
         ;;query for next object
         (setf *next-object* 
-            (llif::prolog-next-object))
+        (llif::prolog-next-object))
 
         ;;grasp object
         (llif::call-text-to-speech-action "I am grasping the Object: ")
@@ -94,27 +101,26 @@
         (grasp-with-failure-handling)
 
         ;;query for knowledge if objects left
-        (if (= (length 
-            (llif::prolog-table-objects)) 0) 
-            (set *no-objects* true))))
+        (if (eq (type-of (llif::prolog-table-objects)) 'BIT) 
+            (set *no-objects* T)))))
 
 
 ;;@author Torge Olliges
 ;;Perceives a given shelf region (currently only shelf 0,1,2 due to robot capabilities)
 (defun perceive-shelf(shelf-region)
-  (case shelf-region 
-      ("robocup_shelf_0" 
-          (progn 
+  (case (intern (string-upcase shelf-region)) 
+      (bookshelf_0 
+          ;;(progn 
               (llif::call-text-to-speech-action "I am perceiving shelf zero now.")
-              (llif::call-take-pose-action 2)))
-      ("robocup_shelf_1" 
-          (progn 
+              (llif::call-take-pose-action 2))
+      (bookshelf_1 
+          ;;(progn 
               (llif::call-text-to-speech-action "I am perceiving shelf one now.")
-              (llif::call-take-pose-action 2)))
-     ("robocup_shelf_2" 
-          (progn 
+              (llif::call-take-pose-action 2))
+     (bookshelf_2 
+         ;; (progn 
               (llif::call-text-to-speech-action "I am perceiving shelf two now.")
-              (llif::call-take-pose-action 3))))
+              (llif::call-take-pose-action 3)))
    (setf *perception-objects* 
       ;;(comf::get-confident-objects 
           (llif::call-robosherlock-object-pipeline 
