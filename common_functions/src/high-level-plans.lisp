@@ -66,6 +66,8 @@
 ;; gets object id and the grasp-pose takes care of some of the failure-handling for grasp
 ;; if grasp fails, toya will get into a position to trigger perception again to update
 ;; the position of objects and then retries with the new information
+;; needs to be refactored so it can take over the failurehandling for grasping
+;; from the table for both plans 
 (defun grasp-hsr (object-id grasp-pose)    
     (cpl:with-retry-counters ((grasping-retry 3))
     (cpl:with-failure-handling
@@ -73,7 +75,11 @@
               cl::simple-error
               cl::simple-type-error)
         (e)
-        (failure-grasp)
+        (comf::move-to-table t)
+        (llif::call-take-pose-action 2) 
+        (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_table") t))
+            (llif::insert-knowledge-objects *perception-objects*)
+            (llif::call-take-pose-action 1)
         (cpl:do-retry grasping-retry
             (roslisp:ros-warn (grasp-fail)
                                   "~%Failed to grasp the object~%")
@@ -81,26 +87,20 @@
         (roslisp:ros-warn 
             (going-demo movement-fail)
             "~%No more retries~%")))
-    (comf::grasp-object object-id grasp-pose))))
+        (comf::grasp-object object-id grasp-pose))))
 
-
-;;@author Jan Schimpf
-;; the failure handling for the grasp-hsr function
-(defun failure-grasp ()
-    (comf::move-to-table t)
-    (llif::call-take-pose-action 2) 
-        (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_table") t))
-        (llif::insert-knowledge-objects *perception-objects*)
-        (llif::call-take-pose-action 1))
 
 
 ;;;; Place ;;;;
 ;;@author Jan Schimpf
-;; gets object id and the grasp-pose takes care of some of the failure-handling for place
+;; Gets object id and the grasp-pose takes care of some of the failure-handling for place
 ;; currently retries with different position in case of a failure.
+;; Still untested and not in use in any of the plans.
 ;;TODO: more comments inline pls
 (defun place-hsr (object-id grasp-pose)
     (let ((?place-position (comf:create-place-list object-id grasp-pose)))
+      ;;create the the list with contatains a number of place we can place if
+      ;;the first one doesn't work
     (cpl:with-retry-counters ((place-retry 4))
         (cpl:with-failure-handling
             (((or common-fail:low-level-failure 
@@ -108,6 +108,7 @@
                   cl::simple-type-error)
         (e)
         (setf ?place-position (cdr ?place-position))
+        ;;starts iterating over the list if after a failed try        
         (cpl:do-retry place-retry
             (roslisp:ros-warn (place-fail)
                                   "~%Failed to grasp the object~%")

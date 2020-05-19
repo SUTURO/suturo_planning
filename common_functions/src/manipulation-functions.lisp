@@ -107,6 +107,7 @@
         (?size-z (nth 2 *dimensions*))
         (?object-id object-id)
         (?grasp-mode grasp-pose)
+        
         ;; construct the motion designator      
         (grasp (desig:a motion
                    (:type :grasping)
