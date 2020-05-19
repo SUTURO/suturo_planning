@@ -67,7 +67,8 @@
 ;; if grasp fails, toya will get into a position to trigger perception again to update
 ;; the position of objects and then retries with the new information
 ;; needs to be refactored so it can take over the failurehandling for grasping
-;; from the table for both plans 
+;; from the table for both plans needs to be updated with the failure handling for
+;; grasping from the table that is currently in the grocery plan
 (defun grasp-hsr (object-id grasp-pose)    
     (cpl:with-retry-counters ((grasping-retry 3))
     (cpl:with-failure-handling
@@ -87,7 +88,7 @@
         (roslisp:ros-warn 
             (going-demo movement-fail)
             "~%No more retries~%")))
-        (comf::grasp-object object-id grasp-pose))))
+    (comf::grasp-object object-id grasp-pose))))
 
 
 
@@ -96,11 +97,10 @@
 ;; Gets object id and the grasp-pose takes care of some of the failure-handling for place
 ;; currently retries with different position in case of a failure.
 ;; Still untested and not in use in any of the plans.
-;;TODO: more comments inline pls
 (defun place-hsr (object-id grasp-pose)
-    (let ((?place-position (comf:create-place-list object-id grasp-pose)))
-      ;;create the the list with contatains a number of place we can place if
-      ;;the first one doesn't work
+    ;;create the the list with contatains a number of place we can place if
+    ;;the first one doesn't work
+    (let ((?place-position (comf:create-place-list object-id grasp-pose)))     
     (cpl:with-retry-counters ((place-retry 4))
         (cpl:with-failure-handling
             (((or common-fail:low-level-failure 
@@ -113,6 +113,7 @@
             (roslisp:ros-warn (place-fail)
                                   "~%Failed to grasp the object~%")
             (cpl:retry))
+        ;;First element in the list is used to make a designator from it
         (let ((?actual-place-position (car ?place-position)))
         (comf::place-object-list ?actual-place-position))))))))
    

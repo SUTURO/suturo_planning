@@ -81,12 +81,11 @@
 
     (hsr-failure-handling-grasp)
   
-    ;;move to shelf
+    ;;move to bucket
     (comf::move-to-bucket)
   
-    ;;place object in shelf
-    (llif::call-text-to-speech-action
-    "I'm going to place the object in the shelf now.")
+    ;;place object in bucket
+    (llif::call-text-to-speech-action "I'm going to place the object in the bucket now.")
 
     (comf::place-object *next-object* 1)
     (llif::call-text-to-speech-action "I have placed the object now.")
@@ -95,6 +94,8 @@
     (llif::call-take-pose-action 1))
 
 ;;@author Jan Schimpf
+;;Failure handling for grasping from the floor much more basic then from the
+;;one from the table as we currently don't have a way to forget items on the floor.
 (defun hsr-failure-handling-grasp()
     (cpl:with-retry-counters ((grasping-retry 1))
     (cpl:with-failure-handling
