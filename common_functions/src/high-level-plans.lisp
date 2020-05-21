@@ -66,6 +66,9 @@
 ;; gets object id and the grasp-pose takes care of some of the failure-handling for grasp
 ;; if grasp fails, toya will get into a position to trigger perception again to update
 ;; the position of objects and then retries with the new information
+;; needs to be refactored so it can take over the failurehandling for grasping
+;; from the table for both plans needs to be updated with the failure handling for
+;; grasping from the table that is currently in the grocery plan
 (defun grasp-hsr (object-id grasp-pose)    
     (cpl:with-retry-counters ((grasping-retry 3))
     (cpl:with-failure-handling
@@ -73,7 +76,11 @@
               cl::simple-error
               cl::simple-type-error)
         (e)
-        (failure-grasp)
+        (comf::move-to-table t)
+        (llif::call-take-pose-action 2) 
+        (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_table") t))
+            (llif::insert-knowledge-objects *perception-objects*)
+            (llif::call-take-pose-action 1)
         (cpl:do-retry grasping-retry
             (roslisp:ros-warn (grasp-fail)
                                   "~%Failed to grasp the object~%")
@@ -84,23 +91,16 @@
     (comf::grasp-object object-id grasp-pose))))
 
 
-;;@author Jan Schimpf
-;; the failure handling for the grasp-hsr function
-(defun failure-grasp ()
-    (comf::move-to-table t)
-    (llif::call-take-pose-action 2) 
-        (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_table") t))
-        (llif::insert-knowledge-objects *perception-objects*)
-        (llif::call-take-pose-action 1))
-
 
 ;;;; Place ;;;;
 ;;@author Jan Schimpf
-;; gets object id and the grasp-pose takes care of some of the failure-handling for place
+;; Gets object id and the grasp-pose takes care of some of the failure-handling for place
 ;; currently retries with different position in case of a failure.
-;;TODO: more comments inline pls
+;; Still untested and not in use in any of the plans.
 (defun place-hsr (object-id grasp-pose)
-    (let ((?place-position (comf:create-place-list object-id grasp-pose)))
+    ;;create the the list with contatains a number of place we can place if
+    ;;the first one doesn't work
+    (let ((?place-position (comf:create-place-list object-id grasp-pose)))     
     (cpl:with-retry-counters ((place-retry 4))
         (cpl:with-failure-handling
             (((or common-fail:low-level-failure 
@@ -108,46 +108,50 @@
                   cl::simple-type-error)
         (e)
         (setf ?place-position (cdr ?place-position))
+        ;;starts iterating over the list if after a failed try        
         (cpl:do-retry place-retry
             (roslisp:ros-warn (place-fail)
                                   "~%Failed to grasp the object~%")
             (cpl:retry))
+        ;;First element in the list is used to make a designator from it
         (let ((?actual-place-position (car ?place-position)))
         (comf::place-object-list ?actual-place-position))))))))
    
 
 ;;@author Philipp Klein
 (defun move-to-poi ()
-    ;;Point to go is: goal + (poiDistance/distance)*(currentpose - goal)
-	  ;;please indent region...
-	  (roslisp:ros-info (move-poi) "Move to POI started")
-        (setf *listOfPoi* 
-            (llif::sortedPoiByDistance
-            (roslisp::with-fields (translation)
-                (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")
-                translation)))
-    (pose-with-distance-to-points *poiDistance* *listOfPoi* 10 t))
-
-;;@author Philipp Klein
-;;TODO: scan-objects as name? why do we need this as a function?
-(defun scan-object ()
-	  (llif::insert-knowledge-objects(get-confident-objects)))
-
+  "moves the robot to the closest poi point"
+  (roslisp:ros-info (move-poi) "Move to POI started")
+  (setf *listOfPoi* 
+        (llif::sorted-poi-by-distance
+         (roslisp::with-fields (translation)
+             (cl-tf::lookup-transform
+              cram-tf::*transformer*
+              "map"
+              "base_footprint")
+           translation)))
+  (pose-with-distance-to-points *poiDistance* *listOfPoi* 10 t))
 
 ;;@author Philipp Klein
 (defun move-to-poi-and-scan ()
-	  (move-to-poi)
-	  (scan-object)
-	  (llif::call-take-pose-action 1)
-	  (roslisp::with-fields (translation rotation) (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")
-	      (llif::call-nav-action-ps 
-            (cl-tf::make-pose-stamped "map" 0 translation 
-                (cl-tf::q* rotation 
-                    (cl-tf::euler->quaternion :ax 0 :ay 0 :az 1.57))))))
-
+  "moves the robot to a poi and perceive it"
+  (move-to-poi)
+  (llif::call-take-pose-action 1)
+  (roslisp::with-fields
+      (translation rotation)
+      (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint")
+    (llif::call-nav-action-ps 
+     (cl-tf::make-pose-stamped
+      "map"
+      0
+      translation 
+      (cl-tf::q* rotation 
+                 (cl-tf::euler->quaternion :ax 0 :ay 0 :az 1.57))))))
 
 ;;@author Tom-Eric Lehmkuhl
 (defun move-to-table (turn)
+  "moves the robot to the table. if turn is true,
+   then the robot will move sideways to the table"
     (roslisp:ros-info (move-poi) "Move to table started")
     ;;(defparameter *goalPose* nil)  
     (defparameter *postion* nil)                                            
@@ -170,6 +174,8 @@
 
 ;;@author Tom-Eric Lehmkuhl
 (defun move-to-shelf (turn)
+   "moves the robot to the shelf. if turn is true,
+   then the robot will move sideways to the shelf"
     (roslisp:ros-info (move-poi) "Move to shelf started")  
     (defparameter *postion* nil)                                            
     (let* ((*shelfPose* (first (first (llif::prolog-shelf-pose))))) 
@@ -177,7 +183,7 @@
     (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
         (cl-tf::make-3d-vector
             (- (first *shelfPose*) 0.03) ;;was previously 0.225
-            (- (second *shelfPose*) 0.7) 0)
+            (- (second *shelfPose*) 0.9) 0)
         (if turn
             (cl-tf::make-quaternion 0 0 -1 0)
             (cl-tf::make-quaternion 0 0 0.7 0.7))))
@@ -190,6 +196,7 @@
 
 ;;@author Tom-Eric Lehmkuhl
 (defun move-to-bucket ()
+   "moves the robot to the bucket."
     (roslisp:ros-info (move-poi) "Move to bucket started")  
     (defparameter *postion* nil)                                            
   (let* ((*bucketPose* (first (first (llif::prolog-target-pose))))) 
