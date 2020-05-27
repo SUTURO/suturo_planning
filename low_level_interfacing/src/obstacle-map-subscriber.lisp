@@ -11,12 +11,15 @@
 
 ;;@author Philipp Klein
 (defun save-obstacle-map (mapMsg)
-  "saves the given msg in the currentObstacleMap parameter"
+  "saves the given msg in the currentObstacleMap parameter
+  `mapMsg' the message to be saved"
   (defparameter *currentObstacleMap* (roslisp:modify-message-copy mapMsg)))
 
 ;;@author Philipp Klein
 (defun get-map-point (vect3)
-  "returns the obstacle value of the given point"
+  "returns the obstacle value of the given point
+  `vect3' the position on the map"
+
   (roslisp:with-fields (
                         data
                         (resolution(resolution info))
@@ -46,17 +49,20 @@
 
 ;;@author Philipp Klein
 (defun robot-in-obstacle-stamped (point)
-  "wrappen for the robot-in-obstacle function to use a stamped pose"
+  "wrappen for the robot-in-obstacle function to use a stamped pose
+  `point' the position on the map"
   (robot-in-obstacle (cl-tf::origin point)))
 
 ;;@author Philipp Klein
 (defun robot-in-obstacle (point)
-  "returns if the obstacle value for the given point is lower then 66"
+  "returns if the obstacle value for the given point is lower then 66
+  `point' the position on the map"
   (circle-is-in-obstacle point))
 
 ;;@author Philipp Klein
 (defun circle-is-in-obstacle (point)
-  "returns if the obstacle value for the given point is lower then 66"
+  "returns if the obstacle value for the given point is lower then 66
+  `point' the position on the map"
   (< (get-map-point point) 66 ))
 
 

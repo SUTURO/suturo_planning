@@ -4,12 +4,15 @@
 
 ;;@author Philipp Klein
 (defun closest-poi (point)
-  "returns the closest poi in relation to the given point"
+  "returns the closest poi in relation to the given point
+  `point' the point which is taken as source for the distance measurement"
   (closest-point-in-list point *poi*))
 
 ;;@author Philipp Klein
 (defun closest-point-in-list (point stampedList)
-	"returns the closest point in relation of the given point"
+	"returns the closest point in relation of the given point
+  `point' the point which is taken as source for the distance measurement
+  `stampedList' the list of points to be sorted"
   (cond
     ((null stampedList) nil)
     ((null (rest stampedList)) (first stampedList))
@@ -25,12 +28,15 @@
 
 ;;@author Philipp Klein
 (defun sorted-poi-by-distance (point)
-  "sort the poi list by the distance to the given point"
+  "sort the poi list by the distance to the given point
+  `point' the point which is taken as source for the distance measurement"
   (sorted-stamped-by-distance point *poi*))
 
 ;;@author Philipp Klein
 (defun sorted-stamped-by-distance (point list)
-  "sort a list stamped poses by the distance to the given point"
+  "sort a list stamped poses by the distance to the given point
+  `point' the point which is taken as source for the distance measurement
+  `list' the list of points to be sorted"
   (sort (copy-list (remove-if #'null list))
         (lambda (ers zwei) 
           (< 
@@ -41,7 +47,8 @@
 
 ;;@author Philipp Klein
 (defun add-stamped-poi (stamped)
-  "add a stamped pose to the list of pois"
+  "add a stamped pose to the list of pois
+  `stamped' the point to be added"
 	(defparameter *poi* (append *poi* (list stamped))))
 
 ;;@author Philipp Klein
@@ -52,7 +59,8 @@
 
 ;;@author Philipp Klein
 (defun add-poi-from-topic (poseArrayMsg)
-  "save the given points to the parameter poi"
+  "save the given points to the parameter poi
+  `poseArrayMsg' the message to be saved"
   (defparameter *poi* (list()))
   (roslisp:with-fields (poses) poseArrayMsg
     (mapcar 

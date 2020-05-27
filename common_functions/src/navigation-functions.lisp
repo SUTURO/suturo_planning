@@ -16,7 +16,11 @@
 
 ;;author Philipp Klein
 (defun points-around-point (distance point amountAlternatePositions turn)
-  "return a given amount of points with a given distance around a list of points"
+  "return a given amount of points with a given distance around a list of points
+  `distance' The distance, with which the points around the point are generated
+  `point' The point from which the others are to be generated
+  `amountAlternatePositions' The number of points to be generated
+  `turn' whether the robot should be turned 90 degrees to the target at the end"
   (setf *currentOrigin*
         (cl-tf::origin
          (cl-tf::transform-stamped->pose-stamped
@@ -98,7 +102,11 @@
 
 ;;author Philipp Klein
 (defun pose-with-distance-to-points (distance points amountAlternatePositions turn)
-  "move the roboter to a point with a given distance around the closest point"
+  "move the roboter to a point with a given distance around the closest point
+  `distance' The distance, with which the points around the point are generated
+  `point' The point from which the others are to be generated
+  `amountAlternatePositions' The number of points to be generated
+  `turn' whether the robot should be turned 90 degrees to the target at the end"
   (setf *Positions*
         (mapcar
          (lambda
@@ -158,7 +166,9 @@
 
 ;;author Philipp Klein
 (defun point-in-polygon (listOfEdges point)
-  "return if the point is in the polygon"
+  "return if the point is in the polygon
+  `listOfEdges' the list of all edges of the polygon
+  `point' the point to check if it is in the polygon"
   (setq *polyCorner1*  (- (length listOfEdges) 1))
   (setq *isPoly* nil)
   (loop
