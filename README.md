@@ -25,7 +25,7 @@ Repository for planning code
 7. source devel/setup.bash
 8. cd src
 9. wstool init
-10. wstool merge https://raw.githubusercontent.com/cram2/cram/master/cram-16.04.rosinstall
+10. wstool merge https://raw.githubusercontent.com/cram2/cram/master/cram-18.04.rosinstall
 11. wstool update
 12. touch iai_maps/iai_dlr_cutting_demo/CATKIN_IGNORE
 13. cd ..
@@ -37,7 +37,8 @@ Repository for planning code
 19. git clone https://github.com/Plexiglas/hsr_navigation
 20. git clone https://github.com/ToyotaResearchInstitute/hsr_meshes
 21. git clone https://github.com/ToyotaResearchInstitute/hsr_description
-22. catkin build
+22. Follow 6.2.1.3.2 Installation of the HSR simulator at https://docs.hsr.io/hsrb_user_manual_en/howto/pc_install.html 
+23. catkin build
 
 
 ## Overview over how to launch everything
