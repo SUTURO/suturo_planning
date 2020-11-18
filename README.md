@@ -8,16 +8,16 @@ Repository for planning code
 1. sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu xenial main" > /etc/apt/sources.list.d/ros-latest.list'
 2. sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
 3. sudo apt-get update
-4. sudo apt-get install ros-kinetic-desktop-full
+4. sudo apt-get install ros-melodic-desktop-full
 5. sudo rosdep init
 6. rosdep update
 7. sudo apt-get install python-catkin-tools
-8. echo "source /opt/ros/kinetic/setup.bash" >> ~/.bashrc
+8. echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
 9. source ~/.bashrc
 10. sudo apt install python-rosinstall python-rosinstall-generator python-wstool build-essential
 ###If you have ROS already installed:
 1. rosdep update
-2. sudo apt-get install ros-kinetic-roslisp-repl
+2. sudo apt-get install ros-melodic-roslisp-repl
 3. sudo apt-get install python-rosinstall python-wstool
 4. mkdir -p planning_ws/src
 5. cd ~/planning_ws
@@ -31,7 +31,7 @@ Repository for planning code
 13. cd ..
 14. rosdep install --ignore-src --from-paths src/ -r
 15. cd src && rm -rf cram
-16. git clone https://github.com/Plexiglas/cram -b hsrb
+16. git clone https://github.com/Plexiglas/cram -b boxy-melodic
 17. git clone https://github.com/SUTURO/suturo_resources
 18. git clone https://github.com/Plexiglas/snap_map_icp
 19. git clone https://github.com/Plexiglas/hsr_navigation
