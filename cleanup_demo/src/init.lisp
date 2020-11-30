@@ -5,7 +5,7 @@
 ;;Init all interface clients and start a ros node
 (defun init-interface()
   "Init all interfaces from planning to other groups"
-  (roslisp:ros-info (init-inteface) "Initialising Interfaces:")
+  (roslisp:ros-info (init-interface) "Initialising Interfaces:")
 
   ;;starts ros node
   (init-planning)
