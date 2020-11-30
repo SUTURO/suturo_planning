@@ -62,28 +62,17 @@ F6 disconnect from byobu without killing the session
 F3/F4 go to terminal left/right
 F8 rename the current terminal
 
-//////////////////////////////////////////////////////////////////////////// Deprecated
+### Start behaviour with repl:
+####Perform ros-load-system on following packages:
+- (swank:operate-on-system-for-emacs "cram-urdf-bringup" (quote load-op))
+- (swank:operate-on-system-for-emacs "cram-object-knowledge" (quote load-op))
+- (swank:operate-on-system-for-emacs "cram-hsrb-description" (quote load-op)) 
+- (swank:operate-on-system-for-emacs "low-level-interfacing" (quote load-op)) 
+- (swank:operate-on-system-for-emacs "common-functions" (quote load-op)) 
+- (swank:operate-on-system-for-emacs "cram-hsrb-pick-demo" (quote load-op))
+- (swank:operate-on-system-for-emacs "cleanup-demo" (quote load-op)) or
+(swank:operate-on-system-for-emacs "grocery-demo" (quote load-op))
 
-Use the command 'fix' to source most of the workspaces. It is currently in the bashrc, so this is done already.
-
-In the terminals to start the nodes.
-**Map and Lokalisation:**
-roslaunch hsr_navigation hsr_map_and_snap_map.launch
-
-**Environment with table and shelf:**
-roslaunch iai_hsr_robocup hsr_robocup_with_state_publisher.launch
-
-**Perception server:**
-cd ~/suturo/perception_ws
-source devel/setup.bash
-rosrun hsr_perception perception_server
-
-**Beliefstate:**
-roslaunch object_state object_state.launch
-
-**Giskard:**
-roslaunch move giskardpy_hsr.launch
-
-**Move server:**
-roslaunch move move_server.launch
+####Run:
+- (clean::init-interfaces) 
 
