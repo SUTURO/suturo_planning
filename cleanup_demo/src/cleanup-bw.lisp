@@ -1,5 +1,6 @@
 (in-package :clean)
 
+(defparameter *spawned-objects-count* 0)
 ;;@author Torge Olliges
 ;;spawns detected objects in the bulletworld
 (defun spawn-btr-objects (perception-msg)
@@ -8,48 +9,49 @@
      (roslisp::with-fields (width height depth shape pose) elem
        (roslisp::with-fields (pose) pose
          (roslisp::with-fields (position) pose
-           (roslisp::with-fields (x y z) position 
-           (print "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-           (case shape
-             (0 (print "spawn cylinder 0")
-              (print position)
-              (btr-utils:spawn-object
-                        'cylinder-0 ;;name
-                        :primit-cylinder ;;type
-                        :color (1 0 0)
+           (roslisp::with-fields (x y z) position
+             (print position)
+              (case shape
+                (0
+                    (print (concatenate 'string "spawned object-" (write-to-string *spawned-objects-count*)))
+                    (print position)
+                    (btr-utils:spawn-object
+                        (concatenate 'string "object-" (write-to-string *spawned-objects-count*))
+                        :mug
                         :pose (cl-tf::make-pose 
                               (cl-tf::make-3d-vector x y z)
-                              (cl-tf::make-identity-rotation))))
-             (1 (print "spawned cylinder 1")
-              (print position)
-              (btr-utils:spawn-object
-                        'cylinder-1
-                        :primit-cylinder
-                        :color (1 0 0)
+                              (cl-tf::make-identity-rotation)))
+                    (setf *spawned-objects-count* (+ *spawned-objects-count* 1)))
+                (1 
+                  (print position)
+                  (print (concatenate 'string "spawned object-" (write-to-string *spawned-objects-count*)))
+                  (btr-utils:spawn-object
+                        (concatenate 'string "object-" (write-to-string *spawned-objects-count*))
+                        :mug
                         :pose (cl-tf::make-pose 
                               (cl-tf::make-3d-vector x y z)
-                              (cl-tf::make-identity-rotation))))
-             (2 (print "spawn cylinder 2")
-              (print position)
-              (btr-utils:spawn-object
-                        'cylinder-2
-                        :primit-cylinder
-                        :color (1 0 0)
+                              (cl-tf::make-identity-rotation)))
+                  (setf *spawned-objects-count* (+ *spawned-objects-count* 1)))
+                (2 
+                  (print position)
+                  (print (concatenate 'string "spawned object-" (write-to-string *spawned-objects-count*)))
+                  (btr-utils:spawn-object
+                        (concatenate 'string "object-" (write-to-string *spawned-objects-count*))
+                        :mug
                         :pose (cl-tf::make-pose 
                               (cl-tf::make-3d-vector x y z)
-                              (cl-tf::make-identity-rotation))))
-             (3 (print "spawn cylinder 3")
-              (print position)
-              (btr-utils:spawn-object
-                        'cylinder-3
-                        :primit-cylinder
-                        :color (1 0 0)
+                              (cl-tf::make-identity-rotation)))
+                  (setf *spawned-objects-count* (+ *spawned-objects-count* 1)))
+                (3 
+                  (print position)
+                  (print (concatenate 'string "spawned object-" (write-to-string *spawned-objects-count*)))
+                  (btr-utils:spawn-object
+                        (concatenate 'string "object-" (write-to-string *spawned-objects-count*))
+                        :mug
                         :pose (cl-tf::make-pose 
                               (cl-tf::make-3d-vector x y z)
-                              (cl-tf::make-identity-rotation))))))))))
+                              (cl-tf::make-identity-rotation)))
+                  (setf *spawned-objects-count* (+ *spawned-objects-count* 1)))
+              ))))))
  (prolog:prolog '(and (btr:bullet-world ?world)
-                             (btr:simulate ?world 10)))))
-
-;;(prolog:prolog '(and (btr:bullet-world ?world)
-;;                     (assert (btr:object ?world :mesh mug-1 ((0 0 2) (0 0 0 1))
-;;                                         :mass 0.2 :color (1 0 0) :mesh :mug))))
+                      (btr:simulate ?world 10)))))

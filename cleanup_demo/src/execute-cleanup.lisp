@@ -52,7 +52,6 @@
     (llif::call-text-to-speech-action "I am perceiving the position now.")
     (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
     (llif::insert-knowledge-objects *perception-objects*)
-    (print *perception-objects*)
     (clean::spawn-btr-objects *perception-objects*)
     ;;percieve -> filter -> insert into knowledge
     (llif::call-take-pose-action 1))

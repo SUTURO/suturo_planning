@@ -28,7 +28,8 @@
     ;;(cram-language:par 
     ;;    (llif::call-text-to-speech-action 
     ;;        "Hello, i am moving to the table now please step out of the way.")
-    ;;    (cram-language:unwind-protect))
+    ;;    (cram-language:unwind-protect)(comf::move-to-table T))
+    (llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way.")
     (comf::move-to-table T)
 
     ;;perceiving the table
@@ -55,7 +56,8 @@
     ;;(cram-language:par
     ;;    (llif::call-text-to-speech-action 
     ;;        "Hello, i am moving to the shelf now please step out of the way.")
-    ;;    (cram-language:unwind-protect))
+    ;;    (cram-language:unwind-protect)(comf::move-to-table T))
+    (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
     (comf::move-to-shelf t)  
 
     ;;perceive shelf
@@ -72,7 +74,6 @@
     (llif::call-take-pose-action 1)
     (llif::call-text-to-speech-action "I am done perceiving the shelf now.")
   
-
     ;;TODO: uncomment when NLP works
     ;;(cram-language:pursue
     ;;(cram-language:wait-for *objects*)
@@ -129,7 +130,7 @@
               T))
    (print *perception-objects*)
    (llif::insert-knowledge-objects *perception-objects*)
-  ;; (grocery::spawn-btr-objects *perception-objects*))
+   (grocery::spawn-btr-objects *perception-objects*))
 )
 ;;@author Torge Olliges
 (defun perceive-table()
@@ -141,7 +142,7 @@
                 (vector "table") 
                 T)))
     (llif::insert-knowledge-objects *perception-objects*)
-    ;;(grocery::spawn-btr-objects *perception-objects*)
+    (grocery::spawn-btr-objects *perception-objects*)
     (llif::call-text-to-speech-action "I am done perceiving the table now.")
     (llif::call-take-pose-action 1))
 
