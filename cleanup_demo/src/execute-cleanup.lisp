@@ -18,9 +18,11 @@
 (defun execute-cleanup()
     (comf::with-hsr-process-modules
         (llif::call-text-to-speech-action "I am working now.")
-
-        (perceive-table)
-        (transport)
+      (print "before perceive")
+      (perceive-table)
+      (print "after")
+      (transport)
+      (print "after transport")
 
         (loop do
         (point-of-interest-search)
@@ -31,12 +33,10 @@
     (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0.0
                              (cl-tf::make-3d-vector 0.834 2.802 0)
                              (cl-tf::euler->quaternion :ax 0 :ay 0 :az 0 )))
-        (?desig (desig:a motion
+        (exe::perform (desig:a motion
                     (type going) 
-                    (target (desig:a location 
                     (pose ?goal-pose))))))
-        (exe:perform ?desig)))
-  
+
 
 
 ;; @author Jan Schimpf
@@ -122,7 +122,8 @@
 (defun perceive-table()
     ;;move to table
     (llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way")
-    (comf::move-to-table t)
+  (print t)
+  (comf::move-to-table t)
     ;;perceive-table
     (llif::call-text-to-speech-action "I am perceiving the table now.")
     (llif::call-take-pose-action 2)

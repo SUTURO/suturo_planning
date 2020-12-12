@@ -50,9 +50,11 @@
   (actionlib:make-action-goal (get-nav-action-client)
     target_pose pose-stamped-goal))
 
-(defun call-nav-action (x y euler-z &optional (frame-id "map"))
+(defun call-nav-action 
+    (x y euler-z &optional (frame-id "map"))
   "Calls the navigation action. Expected: x y coordinates within map, and
 euler-z gives the rotation around the z axis."
+  (print "Nav action processed")
   (unless (eq roslisp::*node-status* :running)
     (roslisp:start-ros-node "nav-action-lisp-client"))
 
@@ -75,30 +77,31 @@ euler-z gives the rotation around the z axis."
     (values result status)))
 
 (defun call-nav-action-ps (pose-stamped)
-  "calls the navigation client and passes the given `pose-stamped' to it."
-  (setf pose-stamped (cl-tf:copy-pose-stamped pose-stamped :origin
-                                              (cl-tf:copy-3d-vector
-                                               (cl-tf:origin pose-stamped)
-                                               :z 0.0)))
+  "calls the navigation client and passes the given `pose-stamped' to it."  
+  (print "NAV ACTION PS")
+   (setf pose-stamped (cl-tf:copy-pose-stamped pose-stamped :origin
+                                               (cl-tf:copy-3d-vector
+                                                (cl-tf:origin pose-stamped)
+                                                :z 0.0)))
   
-  (unless (eq roslisp::*node-status* :running)
-    (roslisp:start-ros-node "nav-action-lisp-client"))
-  (format t "Pose: ~a " pose-stamped)
-  (multiple-value-bind (result status)
-      (let ((actionlib:*action-server-timeout* 20.0)
-            (the-goal (cl-tf:to-msg
-                       pose-stamped)))
-        ;; (format t "my POSE: ~a" the-goal)
+   (unless (eq roslisp::*node-status* :running)
+     (roslisp:start-ros-node "nav-action-lisp-client"))
+   (format t "Pose: ~a " pose-stamped)
+   (multiple-value-bind (result status)
+       (let ((actionlib:*action-server-timeout* 20.0)
+             (the-goal (cl-tf:to-msg
+                        pose-stamped)))
+          (format t "my POSE: ~a" the-goal)
 
-        ;;publish the pose the robot will navigate to
-        (publish-marker-pose pose-stamped :g 1.0)
+         ;;publish the pose the robot will navigate to
+         (publish-marker-pose pose-stamped :g 1.0)
 
-        (actionlib:call-goal
-         (get-nav-action-client)
-         (make-nav-action-goal the-goal)))
-    (roslisp:ros-info (nav-action-client) "Navigation action finished.")
-    (format t "result : ~a" status)
-    (values result status)))
+         (actionlib:call-goal
+          (get-nav-action-client)
+          (make-nav-action-goal the-goal)))
+     (roslisp:ros-info (nav-action-client) "Navigation action finished.")
+     (format t "result : ~a" status)
+     (values result status)))
 
 ;;; NOTE !!!  DON'T USE THIS WITHOUT CONSULTING TUTORS FIRST !!!
 (defun smash-into-appartment (&optional (lin 100))

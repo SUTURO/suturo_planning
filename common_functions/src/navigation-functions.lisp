@@ -144,11 +144,11 @@
                         (mapcar #'cl-tf::pose-stamped->pose
                                 *Positions*))))
   (print "Started Designator")
+  (print *Positions*)
   (let* ((?successfull-pose (try-movement-stampedList *Positions*))
          (?desig (desig:a motion
                           (type going) 
-                          (target (desig:a location
-                                           (pose ?successfull-pose))))))
+                                           (pose ?successfull-pose))))
     (cpl:with-failure-handling
         (((or common-fail:low-level-failure 
               cl::simple-error

@@ -8,7 +8,7 @@
   (roslisp:ros-info (init-interface) "Initialising Interfaces:")
 
   ;;starts ros node
-  (init-planning)
+  (init-planning) ;;TODO remove here call seperate
 
   (init-navigation)
 
@@ -19,7 +19,8 @@
   (init-knowledge)
   (init-tts)
   (init-poi)
-)
+  )
+
 
 (defun init-navigation()
  "Initialize only local nodes for working without the real robot."
