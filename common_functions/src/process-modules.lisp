@@ -10,15 +10,24 @@
 
  ;;;;;;;;;;;;;;;;;;;; BASE ;;;;;;;;;;;;;;;;;;;;;;;;
  (cram-process-modules:def-process-module hsr-navigation (motion-designator)
-    (roslisp:ros-info 
-        (hsr-navigation-process-modules)
-        "hsr-navigation called with motion designator `~a'."
-        motion-designator)
-    (destructuring-bind (command target) (desig:reference motion-designator)
-        (format t "command ~a target ~a" command target)
-        (ecase command
-            (going
-                (llif::call-nav-action-ps (desig:reference target))))))
+    (destructuring-bind (command argument &rest args)
+        (desig:reference motion-designator)
+    (declare (ignore args))
+    (ecase command
+      (cram-common-designators:move-base
+       (llif::call-nav-action-ps argument)))))
+
+
+
+    ;; (roslisp:ros-info 
+    ;;     (hsr-navigation-process-modules)
+    ;;     "hsr-navigation called with motion designator `~a'."
+    ;;     motion-designator)
+    ;; (destructuring-bind (command target) (desig:reference motion-designator)
+    ;;     (format t "command ~a target ~a" command target)
+    ;;     (ecase command
+    ;;         (going
+    ;;             (llif::call-nav-action-ps (desig:reference target))))))
 
  ;;;;;;;;;;;;;;;;;;;; TEXT-TO-SPEACH ;;;;;;;;;;;;;;;;;;;;;;;;
  (cram-process-modules:def-process-module hsr-text-to-speach (motion-designator)

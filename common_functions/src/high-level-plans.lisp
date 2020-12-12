@@ -10,33 +10,30 @@
 ;;Tries a list of stamped poses in the bulletworld simulation
 ;;returns a possible pose.
 (defun try-movement-stampedList (listStamped)
-    (let ((?nav-pose listStamped))
-        (urdf-proj::without-top-level-simulated-robot
-        (cpl:with-retry-counters ((going-retry 3))
-            (cpl:with-failure-handling
-                (((or common-fail:low-level-failure 
-                      cl::simple-error
-                      cl::simple-type-error)
-                (e)
-                (setf ?nav-pose (cdr ?nav-pose))
-                (setf listStamped (cdr ?nav-pose))
-                (cpl:do-retry going-retry
-                    (roslisp:ros-warn 
-                        (going-demo movement-fail)
-                        "~%Failed to move to given position~%")
-                    (cpl:retry))
-            (roslisp:ros-warn 
-                (going-demo movement-fail)
-                "~%No more retries~%")))
-            (let ((?actual-nav-pose (car ?nav-pose))) 
-                (cram-executive:perform
-                (desig:an action
-                    (type going)
-                    (target 
-                        (desig:a location 
-                            (pose ?actual-nav-pose)))))
-                (setf listStamped (cdr ?nav-pose))
-                ?actual-nav-pose))))))
+    (car listStamped))
+;;   (let (?nav-pose listStamped)
+;;     (print ?nav-pose)
+;;         (cpl:with-retry-counters ((going-retry 3))
+;;             (cpl:with-failure-handling
+;;                 (((or common-fail:low-level-failure 
+;;                       cl::simple-error
+;;                       cl::simple-type-error)
+;;                   (e)
+;;                   (setf ?nav-pose (cdr ?nav-pose))
+;;                   (setf listStamped (cdr ?nav-pose))
+;;                   (cpl:do-retry going-retry
+;;                     (roslisp:ros-warn 
+;;                         (going-demo movement-fail) "~%Failed to move to given position~%")
+;;                     (cpl:retry))
+;;                   (roslisp:ros-warn  (going-demo movement-fail) "~%No more retries~%")))
+;;                 (let ((?actual-nav-pose (car ?nav-pose))) 
+;;                      (exe:perform
+;;                        (desig:an action
+;;                          (type going)
+;;                          (pose ?actual-nav-pose)))
+;;                      (print ?actual-nav-pose)
+;;                      (setf listStamped (cdr ?nav-pose))
+;;                  ?actual-nav-pose)))))
 
 
 ;;@author Torge Olliges
@@ -45,20 +42,17 @@
     (let* ((?successfull-pose 
         (try-movement-stampedList 
 				    (list ;;TODO: make this a list from a parameter?
-                (cl-tf::make-pose-stamped "map" 0 
-                    (cl-tf:make-3d-vector 2 3 0) 
-                    (cl-tf::make-quaternion 0 0 0 1)) 
-                    (cl-tf::make-pose-stamped "map" 0 
-                        (cl-tf:make-3d-vector 2 3 0) 
-                        (cl-tf::make-quaternion 0 0 0 1))
+                ;; (cl-tf::make-pose-stamped "map" 0 
+                ;;     (cl-tf:make-3d-vector 2 3 0) 
+                ;;     (cl-tf::make-quaternion 0 0 0 1)) 
+                ;;     (cl-tf::make-pose-stamped "map" 0 
+                ;;         (cl-tf:make-3d-vector 2 3 0) 
+                ;;         (cl-tf::make-quaternion 0 0 0 1))
 		            nav-goal-pose-stamped)))
-        (?desig 
+        (exe:perform 
             (desig:a motion
                 (type going) 
-                (target 
-                    (desig:a location
-                        (pose ?successfull-pose))))))
-        (exe:perform ?desig)))
+                    (pose ?successfull-pose))))))
 
 
 ;;;; Grasp ;;;;;
@@ -130,7 +124,10 @@
               "map"
               "base_footprint")
            translation)))
-  (pose-with-distance-to-points *poiDistance* *listOfPoi* 10 t))
+  (print "before poi")
+  (if (not *listOfPoi*) (return-from move-to-poi Nil))
+  (pose-with-distance-to-points *poiDistance* *listOfPoi* 10 t)
+  (print "after poi"))
 
 ;;@author Philipp Klein
 (defun move-to-poi-and-scan ()
@@ -155,21 +152,19 @@
     (roslisp:ros-info (move-poi) "Move to table started")
     ;;(defparameter *goalPose* nil)  
     (defparameter *postion* nil)                                            
-    (let* ((*tablePose* (llif::prolog-table-pose))) 
-    (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
+    (let* ((*tablePose* (llif::prolog-table-pose)) ;;TODO fix!
+      (?goal-pose (cl-tf::make-pose-stamped "map" 0
                 (cl-tf::make-3d-vector
                     (- (first *tablePose*) 0.45) ;;0.7 was previously 0.95
                     (+ (second *tablePose* ) 0.1)
                     0)
                 (if turn
                     (cl-tf::make-quaternion 0 0 0.39 0.91)
-                    (cl-tf::make-quaternion 0 0 -0.3 0.93))))
+                    (cl-tf::make-quaternion 0 0 -0.3 0.93)))))
         ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
-        (?desig (desig:a motion
+        (exe::perform (desig:a motion
                     (type going) 
-                    (target (desig:a location 
-                    (pose ?goal-pose))))))
-        (exe:perform ?desig))))
+                    (pose ?goal-pose)))))
 
 
 ;;@author Tom-Eric Lehmkuhl
@@ -178,40 +173,36 @@
    then the robot will move sideways to the shelf"
     (roslisp:ros-info (move-poi) "Move to shelf started")  
     (defparameter *postion* nil)                                            
-    (let* ((*shelfPose* (first (first (llif::prolog-shelf-pose))))) 
     ;; add shelf-depth to goal to insert distance (+y)
-    (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
+      (let* ((*shelfPose* (first (first (llif::prolog-shelf-pose))))
+             (?goal-pose (cl-tf::make-pose-stamped "map" 0
         (cl-tf::make-3d-vector
             (- (first *shelfPose*) 0.03) ;;was previously 0.225
             (- (second *shelfPose*) 0.9) 0)
         (if turn
             (cl-tf::make-quaternion 0 0 -1 0)
-            (cl-tf::make-quaternion 0 0 0.7 0.7))))
+            (cl-tf::make-quaternion 0 0 0.7 0.7)))))
         ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
-        (?desig (desig:a motion
+        (exe::perform (desig:a motion
                     (type going) 
-                    (target (desig:a location
-                               (pose ?goal-pose))))))  
-      (exe:perform ?desig))))
+                         (pose ?goal-pose)))))
 
 ;;@author Tom-Eric Lehmkuhl
 (defun move-to-bucket ()
    "moves the robot to the bucket."
     (roslisp:ros-info (move-poi) "Move to bucket started")  
     (defparameter *postion* nil)                                            
-  (let* ((*bucketPose* (first (first (llif::prolog-target-pose))))) 
     ;; add shelf-depth to goal to insert distance (+y)
-    (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0
+    (let* ((*bucketPose* (first (first (llif::prolog-target-pose))))
+           (?goal-pose (cl-tf::make-pose-stamped "map" 0
         (cl-tf::make-3d-vector
             (+ (first *bucketPose*) 0.7) ;;was previously 0.225
             (- (second *bucketPose*) 0.05) 0)
-            (cl-tf::make-quaternion 0 0 -1 0)))
+            (cl-tf::make-quaternion 0 0 -1 0))))
         ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
-        (?desig (desig:a motion
+        (exe::perform (desig:a motion
                     (type going) 
-                    (target (desig:a location
-                               (pose ?goal-pose))))))  
-	      (exe:perform ?desig))))
+                              (pose ?goal-pose)))))
  
 
 

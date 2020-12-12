@@ -25,11 +25,11 @@
     ;;      (cram-language:sleep 0.1)))
 
     ;;move to table
-    (cram-language:par 
-        (llif::call-text-to-speech-action 
-            "Hello, i am moving to the table now please step out of the way.")
-        (cram-language:unwind-protect
-            (comf::move-to-table T)))
+    ;;(cram-language:par 
+    ;;    (llif::call-text-to-speech-action 
+    ;;        "Hello, i am moving to the table now please step out of the way.")
+    ;;    (cram-language:unwind-protect))
+    (comf::move-to-table T)
 
     ;;perceiving the table
     (perceive-table)
@@ -45,18 +45,18 @@
     (setf *next-object* (llif::prolog-next-object))
     ;;TODO: remove this replace with context
     (llif::call-text-to-speech-action "I am grasping the Object: ")
-    (llif::call-text-to-speech-action 
-        (first (split-sequence:split-sequence #\_ *next-object*)))
+    ;;(llif::call-text-to-speech-action 
+    ;;    (first (split-sequence:split-sequence #\_ *next-object*)))
     (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
     ;;todo if this doesnt work pls tell me and use grasp-handling for the time being
     (grasp-with-failure-handling)
 
     ;;move to shelf
-    (cram-language:par
-        (llif::call-text-to-speech-action 
-            "Hello, i am moving to the shelf now please step out of the way.")
-        (cram-language:unwind-protect
-            (comf::move-to-shelf t)))  
+    ;;(cram-language:par
+    ;;    (llif::call-text-to-speech-action 
+    ;;        "Hello, i am moving to the shelf now please step out of the way.")
+    ;;    (cram-language:unwind-protect))
+    (comf::move-to-shelf t)  
 
     ;;perceive shelf
     ;;(loop for shelf_nr from 0 to 2
@@ -93,16 +93,17 @@
 
         ;;grasp object
         (llif::call-text-to-speech-action "I am grasping the Object: ")
-        (llif::call-text-to-speech-action 
-            (first (split-sequence:split-sequence #\_ *next-object*)))
+        ;;(llif::call-text-to-speech-action 
+        ;;    (first (split-sequence:split-sequence #\_ *next-object*)))
         (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
         ;;faiure handling for grasp
         ;;todo if this doesnt work pls tell me and use grasp-handling for the time being
         (grasp-with-failure-handling)
 
         ;;query for knowledge if objects left
-        (if (eq (type-of (llif::prolog-table-objects)) 'BIT) 
-            (set *no-objects* T)))))
+        ;;(if (eq (type-of (llif::prolog-table-objects)) 'BIT) 
+        ;;    (set *no-objects* T))))
+          )))
 
 
 ;;@author Torge Olliges
@@ -128,8 +129,8 @@
               T))
    (print *perception-objects*)
    (llif::insert-knowledge-objects *perception-objects*)
-   (grocery::spawn-btr-objects *perception-objects*))
-
+  ;; (grocery::spawn-btr-objects *perception-objects*))
+)
 ;;@author Torge Olliges
 (defun perceive-table()
     (llif::call-text-to-speech-action "I am perceiving the table now.")
@@ -140,7 +141,7 @@
                 (vector "table") 
                 T)))
     (llif::insert-knowledge-objects *perception-objects*)
-    (grocery::spawn-btr-objects *perception-objects*)
+    ;;(grocery::spawn-btr-objects *perception-objects*)
     (llif::call-text-to-speech-action "I am done perceiving the table now.")
     (llif::call-take-pose-action 1))
 
