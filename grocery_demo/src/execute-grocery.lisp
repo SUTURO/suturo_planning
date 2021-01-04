@@ -17,7 +17,7 @@
     ;;get in park position
     (llif::call-take-pose-action 1)
 
-    ;;TODO: uncomment when NLP works
+    ;;Todo: Uncomment when NLP works
     ;;waiting for start signal loop
     ;;(cram-language:pursue
     ;;    (cram-language:wait-for *runing-fluent*)
@@ -25,11 +25,11 @@
     ;;      (cram-language:sleep 0.1)))
 
     ;;move to table
-    ;;(cram-language:par 
-    ;;    (llif::call-text-to-speech-action 
-    ;;        "Hello, i am moving to the table now please step out of the way.")
-    ;;    (cram-language:unwind-protect)(comf::move-to-table T))
-    (llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way.")
+    ;;  (cram-language:par
+    ;; (llif::call-text-to-speech-action 
+    ;;       "Hello, i am moving to the table now please step out of the way.")
+    ;;      (cram-language:unwind-protect (comf::move-to-table T))))
+    ;(llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way.")
     (comf::move-to-table T)
 
     ;;perceiving the table
@@ -57,6 +57,8 @@
     ;;    (llif::call-text-to-speech-action 
     ;;        "Hello, i am moving to the shelf now please step out of the way.")
     ;;    (cram-language:unwind-protect)(comf::move-to-table T))
+
+      
     (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
     (comf::move-to-shelf t)  
 
@@ -90,13 +92,17 @@
 
         ;;query for next object
         (setf *next-object* 
-        (llif::prolog-next-object))
+              (llif::prolog-next-object))
+        ;;this will end the loop without an error if we get back nil
+        (when (eq *next-object* 1) (return nil)) 
 
         ;;grasp object
         (llif::call-text-to-speech-action "I am grasping the Object: ")
         ;;(llif::call-text-to-speech-action 
         ;;    (first (split-sequence:split-sequence #\_ *next-object*)))
         (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
+                 
+
         ;;faiure handling for grasp
         ;;todo if this doesnt work pls tell me and use grasp-handling for the time being
         (grasp-with-failure-handling)
@@ -104,7 +110,9 @@
         ;;query for knowledge if objects left
         ;;(if (eq (type-of (llif::prolog-table-objects)) 'BIT) 
         ;;    (set *no-objects* T))))
-          )))
+          )
+    (llif::call-text-to-speech-action "I finished storing the groceries")
+    ))
 
 
 ;;@author Torge Olliges
@@ -131,8 +139,8 @@
    (print *perception-objects*)
    (llif::insert-knowledge-objects *perception-objects*)
    (grocery::spawn-btr-objects *perception-objects*))
-)
-;;@author Torge Olliges
+
+;;@Author Torge Olliges
 (defun perceive-table()
     (llif::call-text-to-speech-action "I am perceiving the table now.")
     (llif::call-take-pose-action 2)

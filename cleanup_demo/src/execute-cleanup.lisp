@@ -25,17 +25,21 @@
       (print "after transport")
 
         (loop do
-        (point-of-interest-search)
-        (point-of-interest-transport))))
+          (point-of-interest-search)
+          (setf *next-object* (llif::prolog-next-object))
+          (when (eq *next-object* 1) (return nil)) 
+          (point-of-interest-transport))
+      (llif::call-text-to-speech-action "I finished cleaning up the room")))
 
 
-(defun goto-poihotspot ()
-    (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0.0
-                             (cl-tf::make-3d-vector 0.834 2.802 0)
-                             (cl-tf::euler->quaternion :ax 0 :ay 0 :az 0 )))
-        (exe::perform (desig:a motion
-                    (type going) 
-                    (pose ?goal-pose))))))
+
+;;(defun goto-poihotspot ()
+;;    (let* ((?goal-pose (cl-tf::make-pose-stamped "map" 0.0
+;;                             (cl-tf::make-3d-vector 0.834 2.802 0)
+;;                             (cl-tf::euler->quaternion :ax 0 :ay 0 :az 0 )))
+;;        (exe::perform (desig:a motion
+;;                    (type going) 
+;;                    (pose ?goal-pose))))))
 
 
 
@@ -45,7 +49,9 @@
 (defun point-of-interest-search()
     (llif::call-text-to-speech-action "I have found a point of interest to search.")
     ;;drive to poi
-    (goto-poihotspot)
+    (comf::move-hsr  (cl-tf::make-pose-stamped "map" 0.0
+                             (cl-tf::make-3d-vector 0.834 2.802 0)
+                             (cl-tf::euler->quaternion :ax 0 :ay 0 :az 0 )))
 
     (comf::move-to-poi) 
 
@@ -61,7 +67,8 @@
 ;; Grasps the object and places it in the goal area (currently sill the shelf)
 (defun point-of-interest-transport()
     (setf *next-object* (llif::prolog-next-object))
-    ;;(when (eq *next-object* 1) (return) )
+    ;;(if (eq *next-object* 1) (return))
+
 
     (setf *object-goal-pose* (llif::prolog-object-pose *next-object*))
   
