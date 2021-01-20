@@ -1,3 +1,4 @@
+
 ;;; Json-Prolog client for communication with KnowRob (Knowledge)
 (in-package :llif)
 
