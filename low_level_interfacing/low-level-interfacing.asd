@@ -43,6 +43,7 @@
 	          (:file "knowledge-client" :depends-on ("package"))
             (:file "take-pose-action-client" :depends-on ("package"))
 	          (:file "nlp-subscriber" :depends-on ("package"))
-	          (:file "poi-client" :depends-on("package"))
+            (:file "poi-client" :depends-on("package"))
+            (:file "poi-search" :depends-on("package")) 
 	          (:file "text-to-speech" :depends-on("package"))
             ))))
