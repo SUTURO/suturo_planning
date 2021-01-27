@@ -10,6 +10,7 @@
 (defparameter *grasp-object-result* NIL)
 (defparameter *place-object-result* NIL)
 (defparameter *grasping-retries* 0)
+(defparameter *graspmode* NIL)
 
 ;;@author Jan Schimpf
 ;; execute the clean up plan
@@ -72,8 +73,10 @@
         ;;grasp object
         (llif::call-text-to-speech-action "I am grasping the Object: ") ;;replace with NLG command  [[action, "grasp"],[object_id, *nect-object*]]
         (llif::call-text-to-speech-action (first (split-sequence:split-sequence #\_ *next-object*))) ;;replace with NLG command
-        (setf *grasp-object-result* (comf::grasp-object *next-object* 1)) 
 
+        (setf *graspmode* 1) ;;sets the graspmode should be replaces with the function from knowledge when that is finished
+        (setf *grasp-object-result* (comf::grasp-object *next-object* *graspmode*))
+        
         ;;faiure handling for grasp
         (grasp-handling)
 
@@ -86,8 +89,8 @@
 
         (multiple-value-bind (a b) (llif::prolog-object-goal-pose *next-object*)
                                    (llif:call-text-to-speech-action b))
-        (setf *place-object-result* (comf::place-object *next-object* 1))
-
+        (setf *place-object-result* (comf::place-object *next-object* graspmode))
+        
         (llif::call-text-to-speech-action "I have placed the object now.") ;;replace with NLG command
 
         (llif::call-take-pose-action 1)))
@@ -110,7 +113,8 @@
                  (setf *next-object* (llif::prolog-next-object))
                  (llif::call-text-to-speech-action "I am grasping the Object: ") ;;replace with NLG command  [[action,"place"],[object_id, *next-object*]]
                  (llif::call-text-to-speech-action (first (split-sequence:split-sequence #\_ *next-object*)))
-                 (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
+                 (setf *graspmode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
+                 (setf *grasp-object-result* (comf::grasp-object *next-object* *graspmode*))
                  ;;If it doesn't work again just stop trying
                  (if (roslisp::with-fields (error_code) *grasp-object-result* (= error_code 0)) 
                      (llif::call-text-to-speech-action "I have grapsed the object") ;;replace with NLG command
@@ -169,7 +173,7 @@
     ;;place object in bucket
     (llif::call-text-to-speech-action "I'm going to place the object in the bucket now.") ;;replace with NLG command  [[action,"place"],[object_id, *next-object*],[goal,surface_id,bucket]]
 
-    (comf::place-object *next-object* 1)
+    (comf::place-object *next-object* *graspmode*)
     (llif::call-text-to-speech-action "I have placed the object now.") ;;replace with NLG command
 
     ;;back to base position
@@ -197,7 +201,8 @@
   
         ;; grasp the object
         (llif::call-text-to-speech-action "I'm going to grasp the object now.") ;;replace with NLG command
-        (comf::grasp-object *next-object* 1)
+        (setf *graspmode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
+        (comf::grasp-object *next-object* *graspmode*)
         (llif::call-text-to-speech-action "I have grapsed the object")))) ;;replace with NLG command
   
 
