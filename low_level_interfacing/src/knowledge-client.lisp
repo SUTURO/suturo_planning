@@ -293,6 +293,40 @@
                "forget_objects_on_surface(TABLE).")
               :package :llif))))))  
 
+;; @author Jan Schimpf
+;; ask knowledge for how the object should be grasped 
+;; 1 for grasping from front and 2 for grasping from the top
+;;(defun prolog-object-grasp-mode (object-id))
+;;    "Asking knowledge what graspmode to use"
+;;    (roslisp:ros-info (json-prolog-client) "Asking knowledge what graspmode to use")
+;;    (let* ((raw-response
+;;           (with-safe-prolog
+;;             (json-prolog:prolog-simple 
+;;               
+;;              :package :llif))))))  
+
+
+;; @author  Tom-Eric Lehmkuhl, edit by Jan Schimpf
+;; ask knowledge for how the object should be grasped 
+;; 1 for grasping from front and 2 for grasping from the top 
+;; this should remain as commented out until knowledge changes the function on their side
+;;(defun prolog-object-goal-pose (object-id graspmode))
+;; "returns the goal pose for an object name"
+;;  (roslisp:ros-info (json-prolog-client)
+;;                    "Getting goal pose for object ~a." object-name)
+;;  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
+;;         (raw-response (with-safe-prolog
+;;                         (json-prolog:prolog-simple
+;;                          (concatenate 'string "object_goal_pose_offset('"
+;;                                       knowrob-name"', POSE, CONTEXT).")
+;;                          :package :llif))))
+;;    (if (eq raw-response 1)
+;;        (roslisp:ros-warn (json-prolog-client)
+;;                          "Query didn't reach any solution.")
+;;        (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
+;;                       ,(string-trim "'" (cdr (assoc '?context
+;;                                              (cut:lazy-car raw-response)))))))))
+
 ;;; former planning_communication/json-prolog.lisp
 #+deprecated
 ((defun prolog-objects-around-pose (pose &optional (threshold 3.0))

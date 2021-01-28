@@ -1,0 +1,24 @@
+- git:
+    local-name: iai_common_msgs
+    uri:   https://github.com/code-iai/iai_common_msgs 
+    version: master
+- git:
+    local-name: hsr_meshes
+    uri:  https://github.com/ToyotaResearchInstitute/hsr_meshes
+    version: master
+- git:
+    local-name: suturo_resources
+    uri:   https://github.com/SUTURO/suturo_resources.git
+    version: master
+- git:
+    local-name: snap_map_icp
+    uri:  https://github.com/code-iai/snap_map_icp.git 
+    version: master
+- git:
+    local-name: giskard_msgs
+    uri:  https://github.com/SemRoCo/giskard_msgs.git 
+    version: master
+- git:
+    local-name: hsr_description
+    uri:  https://github.com/Plexiglas/hsr_description.git
+    version: master

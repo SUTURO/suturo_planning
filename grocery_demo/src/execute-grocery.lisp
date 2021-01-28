@@ -7,7 +7,7 @@
 (defparameter *grasp-object-result* NIL)
 (defparameter *place-object-result* NIL)
 (defparameter *grasping-retries* 0)
-
+(defparameter *graspmode* NIL)
 
 ;;@author Torge Olliges, Tom-Eric Lehmkuhl
 (defun execute-grocery()
@@ -16,8 +16,7 @@
     (llif::knowledge-set-target-surfaces)
     ;;get in park position
     (llif::call-take-pose-action 1)
-
-    ;;TODO: uncomment when NLP works
+    ;;Todo: Uncomment when NLP works
     ;;waiting for start signal loop
     ;;(cram-language:pursue
     ;;    (cram-language:wait-for *runing-fluent*)
@@ -25,11 +24,11 @@
     ;;      (cram-language:sleep 0.1)))
 
     ;;move to table
-    ;;(cram-language:par 
-    ;;    (llif::call-text-to-speech-action 
-    ;;        "Hello, i am moving to the table now please step out of the way.")
-    ;;    (cram-language:unwind-protect)(comf::move-to-table T))
-    (llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way.")
+    ;;  (cram-language:par
+    ;; (llif::call-text-to-speech-action 
+    ;;       "Hello, i am moving to the table now please step out of the way.")
+    ;;      (cram-language:unwind-protect (comf::move-to-table T))))
+    ;(llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way.")
     (comf::move-to-table T)
 
     ;;perceiving the table
@@ -48,7 +47,9 @@
     (llif::call-text-to-speech-action "I am grasping the Object: ")
     ;;(llif::call-text-to-speech-action 
     ;;    (first (split-sequence:split-sequence #\_ *next-object*)))
-    (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
+    
+    (setf *graspmode* 1) ;; switch over to the knowledge function when that is finished
+    (setf *grasp-object-result* (comf::grasp-object *next-object* *graspmode*))
     ;;todo if this doesnt work pls tell me and use grasp-handling for the time being
     (grasp-with-failure-handling)
 
@@ -57,6 +58,8 @@
     ;;    (llif::call-text-to-speech-action 
     ;;        "Hello, i am moving to the shelf now please step out of the way.")
     ;;    (cram-language:unwind-protect)(comf::move-to-table T))
+
+      
     (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
     (comf::move-to-shelf t)  
 
@@ -90,13 +93,18 @@
 
         ;;query for next object
         (setf *next-object* 
-        (llif::prolog-next-object))
+              (llif::prolog-next-object))
+        ;;this will end the loop without an error if we get back nil
+        (when (eq *next-object* 1) (return nil)) 
 
         ;;grasp object
         (llif::call-text-to-speech-action "I am grasping the Object: ")
         ;;(llif::call-text-to-speech-action 
         ;;    (first (split-sequence:split-sequence #\_ *next-object*)))
-        (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
+        (setf *graspmode* 1) ;; switch over to the knowledge function when that is finished
+        (setf *grasp-object-result* (comf::grasp-object *next-object* *graspmode*))
+                 
+
         ;;faiure handling for grasp
         ;;todo if this doesnt work pls tell me and use grasp-handling for the time being
         (grasp-with-failure-handling)
@@ -104,7 +112,9 @@
         ;;query for knowledge if objects left
         ;;(if (eq (type-of (llif::prolog-table-objects)) 'BIT) 
         ;;    (set *no-objects* T))))
-          )))
+          )
+    (llif::call-text-to-speech-action "I finished storing the groceries")
+    ))
 
 
 ;;@author Torge Olliges
@@ -131,8 +141,8 @@
    (print *perception-objects*)
    (llif::insert-knowledge-objects *perception-objects*)
    (grocery::spawn-btr-objects *perception-objects*))
-)
-;;@author Torge Olliges
+
+;;@Author Torge Olliges
 (defun perceive-table()
     (llif::call-text-to-speech-action "I am perceiving the table now.")
     (llif::call-take-pose-action 2)
@@ -165,7 +175,8 @@
                  (setf *next-object* (llif::prolog-next-object))
                  (llif::call-text-to-speech-action "I am grasping the Object: ")
                  (llif::call-text-to-speech-action (first (split-sequence:split-sequence #\_ *next-object*)))
-                 (setf *grasp-object-result* (comf::grasp-object *next-object* 1))
+                 (setf *graspmode* 1) ;; switch over to the knowledge function when that is finished
+                 (setf *grasp-object-result* (comf::grasp-object *next-object* *graspmode*))
                  ;;If it doesn't work again just stop trying
                  (if (roslisp::with-fields (error_code) *grasp-object-result* (= error_code 0)) 
                      (llif::call-text-to-speech-action "I have grapsed the object") 
@@ -198,7 +209,8 @@
                     (setf *next-object* (llif::prolog-next-object))
                     (llif::call-text-to-speech-action "I am grasping the Object: ")
                     (llif::call-text-to-speech-action (first (split-sequence:split-sequence #\_ *next-object*)))
-                    (setf *grasp-object-result* (comf::grasp-object *next-object* 1)))
+                    (setf *graspmode* 1) ;; switch over to the knowledge function when that is finished
+                    (setf *grasp-object-result* (comf::grasp-object *next-object* *graspmode*)))
                 (cpl:do-retry grasping-retry
                     (roslisp:ros-warn 
                         (execute-grocery grasp-with-failure-handling)
@@ -220,7 +232,7 @@
     (multiple-value-bind (a b) (llif::prolog-object-goal-pose object-name)
                                             (llif::call-text-to-speech-action b))
     ;;place object in shelf
-    (setf *place-object-result* (comf::place-object object-name 1))
+    (setf *place-object-result* (comf::place-object object-name *graspmode*))
     (llif::call-text-to-speech-action "I have placed the object now."))
 
 

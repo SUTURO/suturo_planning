@@ -41,18 +41,12 @@
 (defun move-hsr (nav-goal-pose-stamped)
     (let* ((?successfull-pose 
         (try-movement-stampedList 
-				    (list ;;TODO: make this a list from a parameter?
-                ;; (cl-tf::make-pose-stamped "map" 0 
-                ;;     (cl-tf:make-3d-vector 2 3 0) 
-                ;;     (cl-tf::make-quaternion 0 0 0 1)) 
-                ;;     (cl-tf::make-pose-stamped "map" 0 
-                ;;         (cl-tf:make-3d-vector 2 3 0) 
-                ;;         (cl-tf::make-quaternion 0 0 0 1))
-		            nav-goal-pose-stamped)))
-        (exe:perform 
+				    (list 
+             nav-goal-pose-stamped))))
+      (exe:perform 
             (desig:a motion
                 (type going) 
-                    (pose ?successfull-pose))))))
+                    (pose ?successfull-pose)))))
 
 
 ;;;; Grasp ;;;;;
