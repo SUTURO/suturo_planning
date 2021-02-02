@@ -23,10 +23,30 @@
 
 ;;@author Philipp Klein
 (defun find-biggest-notsearched-space ()
-  "returns a position of the center in the bigest area not searched yet"
-  ;;TODO)
-
-
-
-
-
+  "returns the position of the bottom left corner of the bigest area not searched yet and the size"
+  ;;TODO
+  (roslisp:with-fields (
+                        data
+                        (resolution(resolution info))
+                        (width (width info))
+                        (x (x position origin info))
+                        (y (y position origin info)))
+      *searchMap*
+    (setf *max-size* 0)
+    (setf *bl-corner* Nil)
+    (setf *copy* (make-array (length data) :initial-element 0))
+    (loop for i from 0 to (length data) do
+      ;;(multiple-value-bind (row col) (floor i width)
+        (if (and (/= i 0) (/= i (+ width 1)) (= (aref data i) 212)) ;;212 replace with correct value
+            (setf (aref *copy* i)
+                  (+  
+                   (min (aref *copy* (- i 1))
+                       (aref *copy* (- i width))
+                       (aref *copy* (- i width 1)))
+                   1)))
+        (if (< *max-size* (aref *copy* i))
+            (setf *max-size* (aref *copy* i))
+            (setf *bl-corner* i)))
+    (multiple-value-bind (row col) (floor *bl-corner* width) ;;floor or round
+      (cl-tf:make-3d-vector (+ x (* resolution col)) (+ y (* resolution row)) 0) (* resolution *max-size*))))
+                   

@@ -20,7 +20,7 @@
                visualization_msgs-msg
                cram-json-prolog
                std_srvs-srv
-               manipulation_action_msgs-msg
+               manipulation_msgs-msg
                knowledge_msgs-msg
                cram-prolog
                cram-designators
