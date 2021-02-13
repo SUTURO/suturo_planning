@@ -15,9 +15,10 @@
 (defun init-grasp-action-client ()
   "initializes the grasp-action-client and makes sure it is connected to the
 action server."
+  (roslisp:ros-info (grasp-action) "start")
   (setf *grasp-action-client*
-        (actionlib:make-action-client "grasps_server"
-                                      "manipulation_action_msgs/GraspAction"))
+        (actionlib:make-action-client "/grasp_server"
+                                      "manipulation_msgs/GraspAction"))
   (loop until (actionlib:wait-for-server *grasp-action-client*
                                          *grasp-action-timeout*))
 
