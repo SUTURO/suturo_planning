@@ -78,7 +78,7 @@
         (setf *grasp-object-result* (comf::grasp-object *next-object* *graspmode*))
         
         ;;faiure handling for grasp
-        (grasp-handling)
+        ;;(grasp-handling)
 
         ;;place position
         (llif::call-text-to-speech-action "I am getting into a position to place from.") ;;replace with NLG command  [[action, "move"],[action,"place"]]
@@ -89,7 +89,7 @@
 
         (multiple-value-bind (a b) (llif::prolog-object-goal-pose *next-object*)
                                    (llif:call-text-to-speech-action b))
-        (setf *place-object-result* (comf::place-object *next-object* graspmode))
+        (setf *place-object-result* (comf::place-object *next-object* *graspmode*))
         
         (llif::call-text-to-speech-action "I have placed the object now.") ;;replace with NLG command
 
