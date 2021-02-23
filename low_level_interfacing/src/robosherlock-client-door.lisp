@@ -50,6 +50,6 @@
           (get-robosherlock-door-client)
           (make-action-goal-door regions-value viz-value))
       (roslisp:ros-info 
-          (robosherlock-object-action) 
-          "robosherlock action finished")
+          (robosherlock-open-action) 
+          "robosherlock open finished")
       (values result status)))

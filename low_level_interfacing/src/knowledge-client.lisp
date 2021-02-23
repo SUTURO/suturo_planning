@@ -291,7 +291,47 @@
               (concatenate
                'string "get_surface_id_by_name (table_2_center, TABLE),"
                "forget_objects_on_surface(TABLE).")
-              :package :llif))))))  
+              :package :llif))))))
+
+
+;; @author Jan Schimpf
+(defun prolog-get-door-state(door-id)
+  "Out puts the state of the door 0 is closed 1 is open"
+  (roslisp:ros-info (json-prolog-client) "Getting state of the door")
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple "get_door_state(Door,State)"
+                                                    :package :llif))))
+     (if (eq raw-response 1)
+        (roslisp:ros-warn (json-prolog-client)
+                          "Query didn't reach any solution.")
+  )))
+
+
+;; @author Jan Schimpf
+(defun prolog-get-all-door-states()
+  "Gives back an list of the door names and the state"
+  (roslisp:ros-info (json-prolog-client) "Getting all doors and their states")
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple "get_all_door_states(POSES)"
+                                                    :package :llif))))
+     (if (eq raw-response 1)
+        (roslisp:ros-warn (json-prolog-client)
+                          "Query didn't reach any solution.")
+  )))
+
+;; @author Jan Schimpf
+(defun prolog-update-door-state(door-id angle)
+  "updates the state of the door and the angle that the door was closed/opened at"
+  (roslisp:ros-info (json-prolog-client) "Updating the door state")
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple "update_door_state(Door,Angle)"
+                                                    :package :llif))))
+     (if (eq raw-response 1)
+        (roslisp:ros-warn (json-prolog-client)
+                          "Query didn't reach any solution.")
+  )))
+
+
 
 ;; @author Jan Schimpf
 ;; ask knowledge for how the object should be grasped 
