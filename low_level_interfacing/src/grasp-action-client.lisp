@@ -17,7 +17,7 @@
 action server."
   (setf *grasp-action-client*
         (actionlib:make-action-client "grasps_server"
-                                      "manipulation_action_msgs/GraspAction"))
+                                      "manipulation_msgs/GraspAction"))
   (loop until (actionlib:wait-for-server *grasp-action-client*
                                          *grasp-action-timeout*))
 
