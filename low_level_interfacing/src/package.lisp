@@ -82,7 +82,20 @@
 
    ;;poi-client
    #:sortedStampedByDistance
+
+   ;;open-door-client
+   #:get-open-door-client
+   #:init-open-door-client
+   #:make-open-door-goal
+   #:ensure-open-goal-reached
+   #:call-grasp-action
    
+   ;;robosherlock-client-door
+   #:init-robosherlock-door-action-client
+   #:get-robosherlock-door-client
+   #:make-action-goal-door
+   #:call-robosherlock-door-pipeline
+
   ;;process-module
 
 
