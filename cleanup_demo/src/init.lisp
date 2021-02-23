@@ -1,6 +1,7 @@
 (in-package :clean)
 
 (defparameter *tf-listener* nil)
+;;(defparameter *planning-node-exists* nil)
 
 ;;Init all interface clients and start a ros node
 (defun init-interface()
@@ -8,7 +9,11 @@
   (roslisp:ros-info (init-interface) "Initialising Interfaces:")
 
   ;;starts ros node
-  (init-planning) ;;TODO remove here call seperate
+  ;; (if (*planning-node-exits*) 
+  ;;  (roslisp:ros-info (init-interface) "Planning node already exists.")  
+  ;;  (init-planning))
+  (init-planning)
+  ;;TODO remove here call seperate
 
   (init-navigation)
 
@@ -85,5 +90,6 @@
   ;;start rosnode named planning_node
   (roslisp:ros-info (init-interface) "Creating ROS Node 'planning_node'")
   (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
+  ;;(setf *planning-node-exists* T)
 )
 
