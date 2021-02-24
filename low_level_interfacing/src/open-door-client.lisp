@@ -33,9 +33,10 @@ action server."
     :object_link_name door-handle-name ;;knowrob_object_id
     ))
                                                  
-(defun ensure-open-door-goal-reached (door-id-name
-                                  door-handle-name)
-
+(defun ensure-open-door-goal-reached (status
+                                      door-id-name
+                                      door-handle-name)
+  (roslisp:ros-warn (open-action) "Status ~a" status)
   status
   door-id-name
   door-handle-name
@@ -51,7 +52,8 @@ action server."
                        (make-open-door-goal door-id-name
                                             door-handle-name))
      (roslisp:ros-info (grasp-action) "open door action finished")
-     (ensure-open-door-goal-reached 
+     (ensure-open-door-goal-reached
+                                status 
                                 door-id-name
                                 door-handle-name)
      (values result status)))
