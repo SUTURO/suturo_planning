@@ -22,6 +22,7 @@
                std_srvs-srv
                manipulation_msgs-msg
                knowledge_msgs-msg
+               nlg_msgs-msg
                cram-prolog
                cram-designators
                cram-process-modules
@@ -47,4 +48,5 @@
 	    (:file "nlp-subscriber" :depends-on ("package"))
 	    (:file "poi-client" :depends-on("package"))
 	    (:file "text-to-speech" :depends-on("package"))
+      (:file "nlg-action-client" :depends-on("package"))
             ))))
