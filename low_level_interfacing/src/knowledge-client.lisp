@@ -298,26 +298,17 @@
 (defun prolog-get-door-state(door-id)
   "Out puts the state of the door 0 is closed 1 is open"
   (roslisp:ros-info (json-prolog-client) "Getting state of the door")
-  (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple "get_door_state(Door,State)"
-                                                    :package :llif))))
-     (if (eq raw-response 1)
-        (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution.")
-  )))
+  (with-safe-prolog
+                         (json-prolog:prolog-simple "get_door_state(door_1_center,State)"
+                                                    :package :llif)))
 
 
 ;; @author Jan Schimpf
 (defun prolog-get-all-door-states()
   "Gives back an list of the door names and the state"
   (roslisp:ros-info (json-prolog-client) "Getting all doors and their states")
-  (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple "get_all_door_states(POSES)"
-                                                    :package :llif))))
-     (if (eq raw-response 1)
-        (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution.")
-  )))
+  (with-safe-prolog
+                         (json-prolog:prolog-simple "get_all_door_states(POSES)")))
 
 ;; @author Jan Schimpf
 (defun prolog-update-door-state(door-id angle)
