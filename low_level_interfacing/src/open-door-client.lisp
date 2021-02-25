@@ -42,7 +42,7 @@ action server."
   T)
 
 
-(defun call-grasp-action (door-id-name
+(defun call-door-action (door-id-name
                           door-handle-name)
   "object-id' object-id of frame-id of object to grasp"
   ;;  (format t "grasp called with state: ~a" state)

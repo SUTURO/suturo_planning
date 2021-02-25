@@ -17,12 +17,8 @@
 action server."
   (roslisp:ros-info (grasp-action) "start")
   (setf *grasp-action-client*
-<<<<<<< HEAD
-        (actionlib:make-action-client "/grasp_server"
-=======
-        (actionlib:make-action-client "grasps_server"
->>>>>>> 2ddba6df6c42a1543f4ac5c62c2408ec1df75771
-                                      "manipulation_msgs/GraspAction"))
+   (actionlib:make-action-client "/grasp_server"
+                                 "manipulation_msgs/GraspAction"))
   (loop until (actionlib:wait-for-server *grasp-action-client*
                                          *grasp-action-timeout*))
 
@@ -113,6 +109,7 @@ action server."
                                 quaterion-value-3 quaterion-value-4
                                 size-x size-y size-z)
      (values result status)))
+
 
 ;;NOTE 0 0 is the deafault lookig straight position.
 (defun test-grasp-action ()
