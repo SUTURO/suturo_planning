@@ -61,6 +61,8 @@
 (defun add-poi-from-topic (poseArrayMsg)
   "save the given points to the parameter poi
   `poseArrayMsg' the message to be saved"
+  (llif::mark-position-visited 2)
+  (llif::publish-debug-search-map)
   (defparameter *poi* (list()))
   (roslisp:with-fields (poses) poseArrayMsg
     (mapcar 

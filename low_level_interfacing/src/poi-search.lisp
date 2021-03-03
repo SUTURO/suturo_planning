@@ -7,7 +7,7 @@
 (defun init-search-map ()
   "subscribes to the map topic and call the callback function save-init-map"
   (subscribe "map" "nav_msgs/OccupancyGrid" #'save-init-map)
-  (roslisp:ros-info (poi-search-map) "Map Subscribed")))
+  (roslisp:ros-info (poi-search-map) "Map Subscribed"))
 
 ;;@author Philipp Klein
 (defun save-init-map (mapMsg)
@@ -17,11 +17,54 @@
       (roslisp:ros-info (poi-search-map) "Map updated")
       (defparameter *searchMap* (roslisp:modify-message-copy mapMsg))))
 
+
 ;;@author Philipp Klein
-(defun mark-position-visited (stamped-pose radius)
-  "marks a specific area in the map as already searched"
-  ;;TODO
+(defun publish-debug-search-map ()
+   (roslisp:publish (advertise "search_map" "nav_msgs/OccupancyGrid") *searchMap*)
   )
+
+;;@author Philipp Klein
+(defun mark-position-visited (radius)
+  "marks a specific area in the map as already searched"
+  (roslisp:with-fields
+      (data
+      (resolution(resolution info))
+      (width(width info))
+      (x (x position origin info))
+      (y (y position origin info)))
+  *searchMap*
+    (setf *position* (cl-tf::transform-stamped->pose-stamped
+          (cl-tf::lookup-transform
+           cram-tf::*transformer*
+           "map" "base_footprint")))
+    (setf *vect3* (cl-tf:origin *position*))
+    (setf *indexs* 
+          (+
+           (*
+            (round
+             (/
+              (-
+               (cl-tf::y *vect3*) y)
+              resolution))
+            width)
+           (round
+            (/
+             (-
+              (cl-tf::x *vect3*) x)
+             resolution))))
+    (setf *rradius* (round (* radius resolution)))
+    (if (and
+         (>
+          (length data) *indexs*)
+         (> *indexs* 0))
+        
+        (multiple-value-bind (row col) (floor *indexs* width)
+        (loop for i from (- row *rradius*) to (+ row *rradius*) do
+          (loop for j from (- col *rradius*) to (+ col *rradius*) do
+            (setf (aref data (+(* row width) col)) 66)
+         )
+         )))
+  ))
 
 ;;@author Philipp Klein
 (defun find-biggest-notsearched-space ()
