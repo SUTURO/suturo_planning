@@ -74,11 +74,11 @@
         (llif::call-text-to-speech-action "I am grasping the Object: ") ;;replace with NLG command  [[action, "grasp"],[object_id, *nect-object*]]
         (llif::call-text-to-speech-action (first (split-sequence:split-sequence #\_ *next-object*))) ;;replace with NLG command
 
-        (setf *graspmode* 1) ;;sets the graspmode should be replaces with the function from knowledge when that is finished
+        (setf *graspmode* (dynamic-grasp *next-object*)) ;;sets the graspmode should be replaces with the function from knowledge when that is finished
         (setf *grasp-object-result* (comf::grasp-object *next-object* *graspmode*))
         
         ;;faiure handling for grasp
-        ;;(grasp-handling)
+        (grasp-handling)
 
         ;;place position
         (llif::call-text-to-speech-action "I am getting into a position to place from.") ;;replace with NLG command  [[action, "move"],[action,"place"]]
@@ -205,6 +205,11 @@
         (comf::grasp-object *next-object* *graspmode*)
         (llif::call-text-to-speech-action "I have grapsed the object")))) ;;replace with NLG command
   
+  
+(defun dynamic-grasp (object-id)
 
+  (if (< 0.1 (nth 2  (llif:prolog-object-dimensions object-id)))
+      (setf *graspmode* 1)
+      (setf *graspmode* 2)))
 
   

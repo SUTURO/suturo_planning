@@ -4,6 +4,7 @@
 (defparameter *dimensions* nil)
 (defparameter *pose* nil)
 (defparameter *place-list* nil)
+(defparameter *grasp-mode-hack-z* nil)
 
 ;;@author Jan Schimpf
 ;; Gets the object-id of the object that should be place and
@@ -15,8 +16,6 @@
     ;;get the information from knowledge
     (setf *dimensions* (llif:prolog-object-dimensions object-id))
     (setf *goal* (llif:prolog-object-goal-pose object-id))
-    (print *goal*)
-  
     ;;takes apart the messages for the needed information to consturct the place motion-designator 
     (let* (
         (?point-x-object (nth 0 (nth 0 *goal*)))
@@ -27,7 +26,7 @@
         (?quaterion-value-3 (nth 2 (nth 1 *goal*)))
         (?quaterion-value-4 (nth 3 (nth 1 *goal*)))
         (?size-x (nth 0 *dimensions*))
-        (?size-y (nth 1 *dimensions*))
+        (?size-y (nth 1 *dimensions*))       
         (?size-z (nth 2 *dimensions*))
         (?object-id object-id)
         (?grasp-mode grasp-pose)
@@ -91,13 +90,16 @@
 (defun grasp-object (object-id grasp-pose)
      ;;get the information from knowledge
     (setq *dimensions* (llif:prolog-object-dimensions object-id))
-    (setq *pose* (llif:prolog-object-pose object-id))
-
+  (setq *pose* (llif:prolog-object-pose object-id))
+  (if (eq 2 grasp-pose)
+      (setq *grasp-mode-hack-z* (+ (nth 2 (nth 2 *pose*)) 0.05))
+      (setq *grasp-mode-hack-z* (nth 2 (nth 2 *pose*))))
+      
     ;;takes apart the messages for the needed information to consturct the grasp motion-designator 
     (let* (
         (?point-x-object (nth 0 (nth 2 *pose*)))
         (?point-y-object (nth 1 (nth 2 *pose*)))
-        (?point-z-object (nth 2 (nth 2 *pose*)))
+        (?point-z-object *grasp-mode-hack-z*)
         (?quaterion-value-1 (nth 0 (nth 3 *pose*)))
         (?quaterion-value-2 (nth 1 (nth 3 *pose*)))
         (?quaterion-value-3 (nth 2 (nth 3 *pose*)))
@@ -134,7 +136,7 @@
     ;;get the information from knowledge
     (setf *dimensions* (llif:prolog-object-dimensions object-id))
     (setf *goal* (llif:prolog-object-goal-pose object-id))
-  
+    
     ;;takes apart the messages and then uses the information to create list with alternative options 
     (let* (
         (point-x-object (nth 0 (nth 0 *goal*)))
