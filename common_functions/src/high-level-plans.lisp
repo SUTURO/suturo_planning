@@ -149,7 +149,7 @@
     (let* ((*tablePose* (llif::prolog-table-pose)) ;;TODO fix!
       (?goal-pose (cl-tf::make-pose-stamped "map" 0
                 (cl-tf::make-3d-vector
-                    (- (first *tablePose*) 0.45) ;;0.7 was previously 0.95
+                    (- (first *tablePose*) 0.7) ;;0.7 was previously 0.95
                     (+ (second *tablePose* ) 0.1)
                     0)
                 (if turn

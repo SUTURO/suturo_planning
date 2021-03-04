@@ -5,6 +5,7 @@
 (defparameter *pose* nil)
 (defparameter *place-list* nil)
 (defparameter *grasp-mode-hack-z* nil)
+(defparameter *hack2* nil)
 
 ;;@author Jan Schimpf
 ;; Gets the object-id of the object that should be place and
@@ -94,10 +95,10 @@
   (if (eq 2 grasp-pose)
       (setq *grasp-mode-hack-z* (+ (nth 2 (nth 2 *pose*)) 0.05))
       (setq *grasp-mode-hack-z* (nth 2 (nth 2 *pose*))))
-      
+    (setq *hack2* (-(nth 0 (nth 2 *pose*)) 0.02))  
     ;;takes apart the messages for the needed information to consturct the grasp motion-designator 
     (let* (
-        (?point-x-object (nth 0 (nth 2 *pose*)))
+        (?point-x-object *hack2* )
         (?point-y-object (nth 1 (nth 2 *pose*)))
         (?point-z-object *grasp-mode-hack-z*)
         (?quaterion-value-1 (nth 0 (nth 3 *pose*)))
