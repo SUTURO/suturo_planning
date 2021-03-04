@@ -6,7 +6,7 @@
 ;;@author Philipp Klein
 (defun init-search-map ()
   "subscribes to the map topic and call the callback function save-init-map"
-  (subscribe "map" "nav_msgs/OccupancyGrid" #'save-init-map)
+  (subscribe "static_distance_map_ref" "nav_msgs/OccupancyGrid" #'save-init-map)
   (roslisp:ros-info (poi-search-map) "Map Subscribed"))
 
 ;;@author Philipp Klein
@@ -14,7 +14,6 @@
   "saves the given msg in the searchMap parameter
   `mapMsg' the message to be saved"
   (if (not *searchMap*)
-      (roslisp:ros-info (poi-search-map) "Map updated")
       (defparameter *searchMap* (roslisp:modify-message-copy mapMsg))))
 
 
@@ -80,9 +79,9 @@
     (setf *max-size* 0)
     (setf *bl-corner* Nil)
     (setf *copy* (make-array (length data) :initial-element 0))
-    (loop for i from 0 to (length data) do
+    (loop for i from 0 to (- (length data) 1) do
       ;;(multiple-value-bind (row col) (floor i width)
-        (if (and (/= i 0) (/= i (+ width 1)) (= (aref data i) 0)) ;;212 replace with correct value
+        (if (and (>= i (+ width 1)) (= (aref data i) 0)) ;;212 replace with correct value
             (setf (aref *copy* i)
                   (+  
                    (min (aref *copy* (- i 1))
@@ -99,6 +98,8 @@
              (+ y (* resolution row))
              0))
       (setf *realsize*  (* resolution *max-size*))
+      (print *bl-coord*)
+      (print *realsize*)
       (publish-debug-square (list *bl-coord*
                                   (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector 0 *realsize* 0))
                                   (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector *realsize* *realsize* 0))
