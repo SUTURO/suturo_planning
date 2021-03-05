@@ -19,12 +19,14 @@
 
 ;;@author Philipp Klein
 (defun publish-debug-search-map ()
+  "publishes the current searched map"
    (roslisp:publish (advertise "search_map" "nav_msgs/OccupancyGrid") *searchMap*)
   )
 
 ;;@author Philipp Klein
 (defun mark-position-visited (radius)
-  "marks a specific area in the map as already searched"
+  "marks a specific area in the map as already searched
+  `radius' the radius around the robot that should be marked as searched"
   (roslisp:with-fields
       (data
       (resolution(resolution info))
@@ -68,7 +70,6 @@
 ;;@author Philipp Klein
 (defun find-biggest-notsearched-space ()
   "returns the position of the bottom left corner of the bigest area not searched yet and the size"
-  ;;TODO
   (roslisp:with-fields (
                         data
                         (resolution(resolution info))
@@ -81,7 +82,7 @@
     (setf *copy* (make-array (length data) :initial-element 0))
     (loop for i from 0 to (- (length data) 1) do
       ;;(multiple-value-bind (row col) (floor i width)
-        (if (and (>= i (+ width 1)) (= (aref data i) 0)) ;;212 replace with correct value
+        (if (and (>= i (+ width 1)) (= (aref data i) 0))
             (setf (aref *copy* i)
                   (+  
                    (min (aref *copy* (- i 1))
@@ -107,6 +108,8 @@
 
 ;;@author Philipp Klein
 (defun publish-debug-square (pose-list)
+  "publishs a square marker, to visualise regions in rviz
+  `pose-list' the 4 corners of the square as a 3d Vector"
   (nconc pose-list (list (car pose-list)))
   (setf pose-list (mapcar #'cl-tf:make-point-msg pose-list))
   (setf point-array (make-array 5 :initial-contents pose-list))
