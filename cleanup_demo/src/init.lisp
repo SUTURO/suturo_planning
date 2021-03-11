@@ -77,6 +77,7 @@
 )
 (defun init-poi()
   ;;init action client
+  (llif::init-search-map)
   (llif::point-listener)
   (llif::obstacle-map-listener)
 )

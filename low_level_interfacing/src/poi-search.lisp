@@ -28,12 +28,12 @@
   "marks a specific area in the map as already searched
   `radius' the radius around the robot that should be marked as searched"
   (roslisp:with-fields
-      (data
+      ((datas (data))
       (resolution(resolution info))
       (width(width info))
       (x (x position origin info))
       (y (y position origin info)))
-  *searchMap*
+      *searchMap*
     (setf *position* (cl-tf::transform-stamped->pose-stamped
           (cl-tf::lookup-transform
            cram-tf::*transformer*
@@ -56,15 +56,16 @@
     (setf *rradius* (round (* radius resolution)))
     (if (and
          (>
-          (length data) *indexs*)
+          (length datas) *indexs*)
          (> *indexs* 0))
         
         (multiple-value-bind (row col) (floor *indexs* width)
         (loop for i from (- row *rradius*) to (+ row *rradius*) do
           (loop for j from (- col *rradius*) to (+ col *rradius*) do
-            (setf (aref data (+(* row width) col)) 66)
+            (setf (aref datas (+(* row width) col)) 66)
          )
-         )))
+              )))
+    (defparameter *searchMap*(roslisp:modify-message-copy *searchMap* (data) datas))
   ))
 
 ;;@author Philipp Klein
@@ -92,6 +93,7 @@
         (if (< *max-size* (aref *copy* i))
             (setf *max-size* (aref *copy* i))
             (setf *bl-corner* i)))
+    (roslisp:publish (advertise "search_map_algo" "nav_msgs/OccupancyGrid") (roslisp:modify-message-copy *searchMap* (data) *copy*))
     (multiple-value-bind (row col) (floor *bl-corner* width) ;;floor or round
       (setf *bl-coord*
             (cl-tf:make-3d-vector
