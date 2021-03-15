@@ -17,7 +17,7 @@
 action server."
   (setf *move-gripper-client*
         (actionlib:make-action-client "/move_gripper_server"
-                                      "manipulation_action_msgs/MoveGripperAction"))
+                                      "manipulation_msgs/MoveGripperAction"))
   (loop until (actionlib:wait-for-server *move-gripper-client*
                                          *move-gripper-action-timeout*))
 

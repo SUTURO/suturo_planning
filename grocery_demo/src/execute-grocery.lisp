@@ -12,6 +12,7 @@
 ;;@author Torge Olliges, Tom-Eric Lehmkuhl
 (defun execute-grocery()
   (comf::with-hsr-process-modules
+    (llif::call-nlg-action-simple "starting" "groceries")
     (llif::knowledge-set-tables-source)
     (llif::knowledge-set-target-surfaces)
     ;;get in park position
@@ -28,10 +29,14 @@
     ;; (llif::call-text-to-speech-action 
     ;;       "Hello, i am moving to the table now please step out of the way.")
     ;;      (cram-language:unwind-protect (comf::move-to-table T))))
-    ;(llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way.")
+                                        ;(llif::call-text-to-speech-action "Hello, i am moving to the table now please step out of the way.")
+    (llif::call-nlg-action (list (llif::make-key-value-msg "action" "move") (llif::make-key-value-msg "goal_surface_id" "table_0")))
+
     (comf::move-to-table T)
 
     ;;perceiving the table
+    (llif::call-nlg-action (list (llif::make-key-value-msg "action" "percieve") (llif::make-key-value-msg "goal_surface_id" "table_0")))
+
     (perceive-table)
 
     ;;move to table
@@ -47,7 +52,8 @@
     (llif::call-text-to-speech-action "I am grasping the Object: ")
     ;;(llif::call-text-to-speech-action 
     ;;    (first (split-sequence:split-sequence #\_ *next-object*)))
-    
+    (llif::call-nlg-action (list (llif::make-key-value-msg "action" "grasp") (llif::make-key-value-msg "goal_surface_id" "table_0")))
+
     (setf *graspmode* 1) ;; switch over to the knowledge function when that is finished
     (setf *grasp-object-result* (comf::grasp-object *next-object* *graspmode*))
     ;;todo if this doesnt work pls tell me and use grasp-handling for the time being
@@ -59,7 +65,8 @@
     ;;        "Hello, i am moving to the shelf now please step out of the way.")
     ;;    (cram-language:unwind-protect)(comf::move-to-table T))
 
-      
+    (llif::call-nlg-action (list (llif::make-key-value-msg "action" "move") (llif::make-key-value-msg "goal_surface_id" "shelf_0") (llif::make-key-value-msg "start_surface_id" "table_0")))
+
     (llif::call-text-to-speech-action "Hello, i am moving to the shelf now please step out of the way.")
     (comf::move-to-shelf t)  
 
@@ -67,6 +74,8 @@
     ;;(loop for shelf_nr from 0 to 2
     ;;  do   (perceive-shelf 
     ;;          (concatenate 'string "bookshelf_" (write-to-string shelf_nr))))
+    (llif::call-nlg-action (list (llif::make-key-value-msg "action" "percieve") (llif::make-key-value-msg "goal_surface_id" "shelf_0")))
+
     (llif::call-text-to-speech-action "I am perceiving shelf zero now.")
     (llif::call-take-pose-action 2)
     (perceive-shelf "bookshelf_0")
@@ -81,13 +90,17 @@
     ;;(cram-language:pursue
     ;;(cram-language:wait-for *objects*)
     (loop do
-        ;;placing
+      ;;placing
+         (llif::call-nlg-action (list (llif::make-key-value-msg "action" "place") (llif::make-key-value-msg "goal_surface_id" "shelf_0")))
+
         (place-handling *next-object*)
 
           ;;back to base position
         (llif::call-take-pose-action 1)
 
         ;;move to table
+        (llif::call-nlg-action (list (llif::make-key-value-msg "action" "move") (llif::make-key-value-msg "goal_surface_id" "table_0") (llif::make-key-value-msg "start_surface_id" "shelf_0")))
+
         (llif::call-text-to-speech-action "I am getting into a position to grasp from.")
         (comf::move-to-table NIL)
 
@@ -96,6 +109,7 @@
               (llif::prolog-next-object))
         ;;this will end the loop without an error if we get back nil
         (when (eq *next-object* 1) (return nil)) 
+        (llif::call-nlg-action (list (llif::make-key-value-msg "action" "grasp") (llif::make-key-value-msg "goal_surface_id" "table_0")))
 
         ;;grasp object
         (llif::call-text-to-speech-action "I am grasping the Object: ")

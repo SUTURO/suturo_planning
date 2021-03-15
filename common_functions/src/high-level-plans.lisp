@@ -149,7 +149,7 @@
     (let* ((*tablePose* (llif::prolog-table-pose)) ;;TODO fix!
       (?goal-pose (cl-tf::make-pose-stamped "map" 0
                 (cl-tf::make-3d-vector
-                    (- (first *tablePose*) 0.45) ;;0.7 was previously 0.95
+                    (- (first *tablePose*) 0.7) ;;0.7 was previously 0.95
                     (+ (second *tablePose* ) 0.1)
                     0)
                 (if turn
@@ -198,5 +198,32 @@
                     (type going) 
                               (pose ?goal-pose)))))
  
+;;@author Jan Schimpf
+;;asumption is that the robot is already standing in position
+(defun open-door ()
+ (cpl:with-retry-counters ((grasping-retry 2))
+    (cpl:with-failure-handling
+        (((or common-fail:low-level-failure 
+              cl::simple-error
+              cl::simple-type-error)
+        (e)
+        (roslisp:ros-info (open-door) "Retry if opening the door failed")
+        ;;insert here failure handling new position / retry / perception retry
+        (cpl:do-retry grasping-retry
+            (roslisp:ros-warn (grasp-fail)
+                                  "~%Failed to grasp the object~%")
+            (cpl:retry))
+        (roslisp:ros-warn 
+            (going-demo movement-fail)
+            "~%No more retries~%")))
+    (roslisp:ros-info (open-door) "Open the door")
+      ;; go into percieve position
+      ;; call perception client
+      ;; go back into normal position
+      ;; insert into knowledge
+      ;; query knowledge for ID
+      ;; call manipulation with ID
+      )))
+
 
 
