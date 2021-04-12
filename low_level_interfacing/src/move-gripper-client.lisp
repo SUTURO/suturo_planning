@@ -17,7 +17,7 @@
 action server."
   (setf *move-gripper-client*
         (actionlib:make-action-client "/move_gripper_server"
-                                      "manipulation_action_msgs/MoveGripperAction"))
+                                      "manipulation_msgs/MoveGripperAction"))
   (loop until (actionlib:wait-for-server *move-gripper-client*
                                          *move-gripper-action-timeout*))
 
@@ -29,12 +29,13 @@ action server."
   (actionlib:make-action-goal
       (get-move-gripper-client)
     ;; (cram-simple-actionlib-client::get-simple-action-client 'move-gripper-action) 
-    :goal_pose (cl-transforms-stamped:to-msg (cl-tf::make-pose-stamped  
-                                   "map"
-                                   0.0 
-                                   (cl-tf:make-3d-vector px py pz) 
-                                   (cl-tf:make-quaternion ox oy oz ow)))))
-                                                 
+    :goal_pose (cl-transforms-stamped:to-msg 
+                (cl-tf::make-pose-stamped  
+                  "map"
+                  0.0 
+                  (cl-tf:make-3d-vector px py pz) 
+                  (cl-tf:make-quaternion ox oy oz ow)))))
+
 (defun ensure-move-gripper-goal-reached (status pos)
   (roslisp:ros-warn (move-gripper) "Status ~a" status)
   status

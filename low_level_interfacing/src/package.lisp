@@ -9,7 +9,13 @@
    #:call-nav-action
    #:smash-into-appartment
    #:call-nav-action-ps
-   
+
+   ;;make-nav-plan-action-client
+   #:init-make-nav-plan-action-client
+   #:try-make-nav-plan-action
+   #:make-nav-plan-action-goal
+   #:get-make-nav-plan-action-client
+
    ;; move-gripper-client
    #:init-move-gripper-action-client
    #:get-move-gripper-client

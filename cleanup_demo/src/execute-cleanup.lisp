@@ -19,20 +19,20 @@
 ;; and then goes on to looking for objects on the floor and transports them to the bucked
 (defun execute-cleanup()
     (comf::with-hsr-process-modules
-      (llif::call-text-to-speech-action "I am working now.") ;;replace with NLG command ["starting","clean up"]
-      ;;starts the table section for more info look at the functions
-      (perceive-table)
-      (transport)
+        (llif::call-text-to-speech-action "I am working now.") ;;replace with NLG command ["starting","clean up"]
+        ;;starts the table section for more info look at the functions
+        (perceive-table)
+        (transport)
 
-      ;;finished with the table and starts on the floor and this loops until there are no more objects to transport
-      (loop do
-          (point-of-interest-search)
-          (setf *next-object* (llif::prolog-next-object))
-          (when (eq *next-object* 1) (return nil)) 
-          (point-of-interest-transport))
-      (llif::call-text-to-speech-action "I finished cleaning up the room")));;replace with NLG command
+        ;;finished with the table and starts on the floor and this loops until there are no more objects to transport
+        (loop do
+            (point-of-interest-search)
+            (setf *next-object* (llif::prolog-next-object))
+            (when (eq *next-object* 1) (return nil)) 
+        (point-of-interest-transport))
+        (llif::call-text-to-speech-action "I finished cleaning up the room")));;replace with NLG command
 
-;;mostly copied from execute-grocery
+;; mostly copied from execute-grocery
 ;; Looks at the table, by first moving to the table then positioning so the robot can get a better picture,
 ;; which then are inserted into knowledge after which a position is taken so the robot can start transporting the objects
 (defun perceive-table()
@@ -65,7 +65,7 @@
 
         ;;query for next object
         (setf *next-object* (llif::prolog-next-object))
-      
+
         (when (eq *next-object* 1) (return) )
 
         (comf::move-to-table NIL)
@@ -87,9 +87,10 @@
         ;;place object in shelf
         (llif::call-text-to-speech-action  "I'm going to place the object in the bucket now.") ;;replace with NLG command  [[action,"place"],[object_id, *next-object*],[goal,surface_id,bucket]]
 
-        (multiple-value-bind (a b) (llif::prolog-object-goal-pose *next-object*)
-                                   (llif:call-text-to-speech-action b))
-        (setf *place-object-result* (comf::place-object *next-object* graspmode))
+        (multiple-value-bind (a b) 
+            (llif::prolog-object-goal-pose *next-object*)
+            (llif:call-text-to-speech-action b))
+        (setf *place-object-result* (comf::place-object *next-object* *graspmode*))
         
         (llif::call-text-to-speech-action "I have placed the object now.") ;;replace with NLG command
 
@@ -97,31 +98,33 @@
 
 ;;copied from execute-grocery
 (defun grasp-handling()
-  ;;failure handling for grasping fail
-        (if (roslisp::with-fields (error_code) *grasp-object-result* (= error_code 0)) 
-          (llif::call-text-to-speech-action "I have successfully grasped the object") ;;replace with NLG command
-          (progn (llif::call-text-to-speech-action "I have not grasped the object, looking for new object to grasp") ;;replace with NLG command
-                 ;;try to perceive again to get a better position
-                 (comf::move-to-table t)
-                 (llif::prolog-forget-table-objects)
-                 (btr-utils:kill-all-objects)
-                 (perceive-table)
-                 (llif::call-take-pose-action 1)
-                 ;;Grasp again
-                 (llif::call-text-to-speech-action "I am getting into a position to grasp from.") ;;replace with NLG command  [[action, "move"],[action,"place"]]
-                 (comf::move-to-table NIL)
-                 (setf *next-object* (llif::prolog-next-object))
-                 (llif::call-text-to-speech-action "I am grasping the Object: ") ;;replace with NLG command  [[action,"place"],[object_id, *next-object*]]
-                 (llif::call-text-to-speech-action (first (split-sequence:split-sequence #\_ *next-object*)))
-                 (setf *graspmode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
-                 (setf *grasp-object-result* (comf::grasp-object *next-object* *graspmode*))
-                 ;;If it doesn't work again just stop trying
-                 (if (roslisp::with-fields (error_code) *grasp-object-result* (= error_code 0)) 
-                     (llif::call-text-to-speech-action "I have grapsed the object") ;;replace with NLG command
-                     (if (< *grasping-retries* 3)
-                        (grasp-handling)
-                        (progn 
-                          (llif::call-text-to-speech-action "I am not able to grasp any object could you please put the object into my hand?"))))))) ;;replace with NLG command
+;;failure handling for grasping fail
+    (if (roslisp::with-fields (error_code) *grasp-object-result* (= error_code 0)) 
+        (llif::call-text-to-speech-action "I have successfully grasped the object") ;;replace with NLG command
+        (progn 
+            (llif::call-text-to-speech-action "I have not grasped the object, looking for new object to grasp") ;;replace with NLG command
+            ;;try to perceive again to get a better position
+            (comf::move-to-table t)
+            (llif::prolog-forget-table-objects)
+            (btr-utils:kill-all-objects)
+            (perceive-table)
+            (llif::call-take-pose-action 1)
+            ;;Grasp again
+            (llif::call-text-to-speech-action "I am getting into a position to grasp from.") ;;replace with NLG command  [[action, "move"],[action,"place"]]
+            (comf::move-to-table NIL)
+            (setf *next-object* (llif::prolog-next-object))
+            (llif::call-text-to-speech-action "I am grasping the Object: ") ;;replace with NLG command  [[action,"place"],[object_id, *next-object*]]
+            (llif::call-text-to-speech-action (first (split-sequence:split-sequence #\_ *next-object*)))
+            (setf *graspmode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
+            (setf *grasp-object-result* (comf::grasp-object *next-object* *graspmode*))
+            ;;If it doesn't work again just stop trying
+            (if (roslisp::with-fields (error_code) *grasp-object-result* (= error_code 0)) 
+                (llif::call-text-to-speech-action "I have grapsed the object") ;;replace with NLG command
+                (if (< *grasping-retries* 3)
+                    (grasp-handling)
+                    (progn 
+                        (llif::call-text-to-speech-action 
+                            "I am not able to grasp any object could you please put the object into my hand?"))))))) ;;replace with NLG command
 
 
 ;; @author Jan Schimpf
@@ -130,9 +133,10 @@
 (defun point-of-interest-search()
     (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
     ;;drive to poi
-    (comf::move-hsr  (cl-tf::make-pose-stamped "map" 0.0
-                             (cl-tf::make-3d-vector 0.834 2.802 0)
-                             (cl-tf::euler->quaternion :ax 0 :ay 0 :az 0 )))
+    (comf::move-hsr  
+        (cl-tf::make-pose-stamped "map" 0.0
+            (cl-tf::make-3d-vector 0.834 2.802 0)
+            (cl-tf::euler->quaternion :ax 0 :ay 0 :az 0)))
 
     (comf::move-to-poi) 
 
@@ -150,26 +154,27 @@
     (setf *next-object* (llif::prolog-next-object))
 
     (setf *object-goal-pose* (llif::prolog-object-pose *next-object*))
-  
+
     ;; make sure we are in a neutral position
     (llif::call-text-to-speech-action "I'm turning towards the object, to grasp it.") ;;replace with NLG command  [[action, "percieve"],[start_surface_id,"floor"]]
     (llif::call-take-pose-action 1)
-  
+
     ;; turn to face the object
     (roslisp::with-fields (translation rotation)
         (cl-tf::lookup-transform cram-tf::*transformer* "map" "base_footprint")
-        (llif::call-nav-action-ps (cl-tf::make-pose-stamped "map" 0 translation
-                                   (cl-tf::q* rotation
-                                   (cl-tf::euler->quaternion :ax 0 :ay 0 :az -1.57)))))
-  
+        (llif::call-nav-action-ps 
+            (cl-tf::make-pose-stamped "map" 0 translation
+                (cl-tf::q* rotation
+                (cl-tf::euler->quaternion :ax 0 :ay 0 :az -1.57)))))
+
     (llif::call-text-to-speech-action *next-object*) ;;replace with NLG command  [[action,"grasp"],[object_id, *next-object*]]
     ;; grasp the object from the floor
 
     (hsr-failure-handling-grasp)
-  
+
     ;;move to bucket
     (comf::move-to-bucket)
-  
+
     ;;place object in bucket
     (llif::call-text-to-speech-action "I'm going to place the object in the bucket now.") ;;replace with NLG command  [[action,"place"],[object_id, *next-object*],[goal,surface_id,bucket]]
 
@@ -185,9 +190,10 @@
 (defun hsr-failure-handling-grasp()
     (cpl:with-retry-counters ((grasping-retry 1))
     (cpl:with-failure-handling
-        (((or common-fail:low-level-failure 
-                cl::simple-error
-         cl::simple-type-error)
+        (((or 
+            common-fail:low-level-failure 
+            cl::simple-error
+            cl::simple-type-error)
         (e)
         (llif::call-text-to-speech-action "I have failed to grasp the object
         could you please put the object into my hand? could you please give me the object ") ;;replace with NLG command
@@ -196,15 +202,10 @@
             (roslisp:ros-warn (grasp-fail) "~%Failed to grasp the object~%")
             (cpl:retry))
 
-        (roslisp:ros-warn (going-demo movement-fail)
-                           "~%No more retries~%")))
-  
+        (roslisp:ros-warn (going-demo movement-fail) "~%No more retries~%")))
+
         ;; grasp the object
         (llif::call-text-to-speech-action "I'm going to grasp the object now.") ;;replace with NLG command
         (setf *graspmode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
         (comf::grasp-object *next-object* *graspmode*)
         (llif::call-text-to-speech-action "I have grapsed the object")))) ;;replace with NLG command
-  
-
-
-  

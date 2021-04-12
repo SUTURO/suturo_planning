@@ -16,7 +16,7 @@ action server."
 (print "init-take-pose-action-client")
   (setf *take-pose-action-client*
         (actionlib:make-action-client "take_pose_server"
-                                      "manipulation_action_msgs/TakePoseAction"))
+                                      "manipulation_msgs/TakePoseAction"))
   (loop until (actionlib:wait-for-server *take-pose-action-client*
                                          *take-pose-action-timeout*))
   (roslisp:ros-info (take_pose-action) "take-pose action client created"))
