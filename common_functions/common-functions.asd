@@ -23,9 +23,8 @@
              (:file "knowledge-functions" :depends-on("package"))
              (:file "nlp-functions" :depends-on("package"))
              ;;select process modules and process modules depend on each other
-            (:file "select-process-modules" :depends-on("package"))
-	          (:file "process-modules" :depends-on("package"))
+             (:file "select-process-modules" :depends-on("package"))
+	           (:file "process-modules" :depends-on("package"))
              ;;high level plans depends on every other file in here
              (:file "high-level-plans" :depends-on("package"))
-	     (:file "safety-check" :depends-on("package")) 
-))))
+	           (:file "safety-check" :depends-on("package"))))))

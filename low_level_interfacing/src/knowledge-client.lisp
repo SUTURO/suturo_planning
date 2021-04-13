@@ -120,6 +120,19 @@
         (roslisp:ros-warn (json-prolog-client)
                           "Query didn't reach any solution."))))
 
+(defun prolog-object-supporting-surface (object-name)
+  "returns the name of the supporting surface of the object from the db"
+  (roslisp:ros-info (json-prolog-client) "Getting supporting surface for object ~a" object-name)
+  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
+         (raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                                       "find_supporting_surface('"
+                                       knowrob-name "', SURRFACE")))))
+         (if (eq raw-response 1)
+                      NIL
+                      (print (write-to-string raw-response)))))
+
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-goal-pose (object-name)
   "returns the goal pose for an object name"
@@ -346,7 +359,8 @@
                          (json-prolog:prolog-simple 
                           (concatenate
                               'string "all_not_graspable_objects_on_surface('" surface "', OBJECTS)")
-                          :package :llif)))         (object (if (eq raw-response 1) NIL 
+                          :package :llif)))
+         (object (if (eq raw-response 1) NIL 
                      (cdr (assoc '?object (cut:lazy-car raw-response))))))
     
     (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
@@ -355,12 +369,11 @@
                           "Query didn't reach any solution."))))
 
 ;; @author Torge Olliges
-(defun set-object-not-graspable (object-name, reason)
+(defun set-object-not-graspable (object-name reason)
  "returns a list of non graspable objects on a given surface"
-  (roslisp:ros-info (json-prolog-client) (concatenate "Getting non graspable objects on surface: " surface))
+  ;;(roslisp:ros-info (json-prolog-client) (concatenate "Getting non graspable objects on surface: " surface))
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
-                        (raw-response (with-safe-prolog
                           (json-prolog:prolog-simple
                             (concatenate 'string "set_not_graspable('"
                               knowrob-name "', " (write-to-string reason) ").")
@@ -372,7 +385,7 @@
     (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
         (knowrob-symbol->string object)
         (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution."))))
+                          "Query didn't reach any solution.")))
 
 ;; Reasons:
 ;;   0 Object on Table to deep, cant reach (Knowledge)
@@ -384,14 +397,13 @@
 ;; @author Torge Olliges
 (defun get-reason-for-object-goal-pose (object-name)
  "returns a list of non graspable objects on a given surface"
-  (roslisp:ros-info (json-prolog-client) (concatenate "Getting non graspable objects on surface: " surface))
+  (roslisp:ros-info (json-prolog-client) "Getting non graspable objects on surface ~a" surface)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
-                        (raw-response (with-safe-prolog
                           (json-prolog:prolog-simple
                             (concatenate 'string "object_reason_goal_pose('"
                               knowrob-name"', Reason, Obj2ID).")
-                          :package :llif))))
+                          :package :llif)))
           (object (if (eq raw-response 1) NIL 
                      (cdr (assoc '?object (cut:lazy-car raw-response))))))
     

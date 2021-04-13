@@ -48,4 +48,5 @@
 	    (:file "nlp-subscriber" :depends-on ("package"))
 	    (:file "poi-client" :depends-on("package"))
 	    (:file "text-to-speech" :depends-on("package"))
-      (:file "nlg-action-client" :depends-on("package"))))))
+      (:file "nlg-action-client" :depends-on("package"))
+      (:file "make-plan-action-client" :depends-on("package"))))))
