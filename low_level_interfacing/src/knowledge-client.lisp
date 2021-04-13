@@ -322,7 +322,83 @@
                           "Query didn't reach any solution.")
   )))
 
+;; @author Torge Olliges
+(defun prolog-next-graspable-objects ()
+ "returns the next graspable objects which are on a source surface"
+  (roslisp:ros-info (json-prolog-client) "Getting next graspable object on a source surface.")
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple 
+                          "next_graspable_objects_on_source_surface(OBJECTS)"
+                          :package :llif)))
+         (object (if (eq raw-response 1) NIL 
+                     (cdr (assoc '?object (cut:lazy-car raw-response))))))
+    
+    (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
+        (knowrob-symbol->string object)
+        (roslisp:ros-warn (json-prolog-client)
+                          "Query didn't reach any solution."))))
 
+;; @author Torge Olliges
+(defun prolog-non-graspable-objects-on-surface (surface)
+ "returns a list of non graspable objects on a given surface"
+  (roslisp:ros-info (json-prolog-client) "Getting non graspable objects on surface.")
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple 
+                          (concatenate
+                              'string "all_not_graspable_objects_on_surface('" surface "', OBJECTS)")
+                          :package :llif)))         (object (if (eq raw-response 1) NIL 
+                     (cdr (assoc '?object (cut:lazy-car raw-response))))))
+    
+    (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
+        (knowrob-symbol->string object)
+        (roslisp:ros-warn (json-prolog-client)
+                          "Query didn't reach any solution."))))
+
+;; @author Torge Olliges
+(defun set-object-not-graspable (object-name, reason)
+ "returns a list of non graspable objects on a given surface"
+  (roslisp:ros-info (json-prolog-client) (concatenate "Getting non graspable objects on surface: " surface))
+  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
+         (raw-response (with-safe-prolog
+                        (raw-response (with-safe-prolog
+                          (json-prolog:prolog-simple
+                            (concatenate 'string "set_not_graspable('"
+                              knowrob-name "', " (write-to-string reason) ").")
+                          :package :llif))))
+          ;;TODO: this is not how this works handle response properly (this shouldnt work right now...)
+         (object (if (eq raw-response 1) NIL 
+                     (cdr (assoc '?object (cut:lazy-car raw-response))))))
+    
+    (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
+        (knowrob-symbol->string object)
+        (roslisp:ros-warn (json-prolog-client)
+                          "Query didn't reach any solution."))))
+
+;; Reasons:
+;;   0 Object on Table to deep, cant reach (Knowledge)
+;;   1 Object to close to a wall, cant grasp dew to collision avoidance (Giskard)
+;;   2 Object is to small / to big for gripper (Knowledge)
+;;   3 cant move near to the object to grab (Navigation)
+;;   4 to high in a shelf (Knowledge)
+
+;; @author Torge Olliges
+(defun get-reason-for-object-goal-pose (object-name)
+ "returns a list of non graspable objects on a given surface"
+  (roslisp:ros-info (json-prolog-client) (concatenate "Getting non graspable objects on surface: " surface))
+  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
+         (raw-response (with-safe-prolog
+                        (raw-response (with-safe-prolog
+                          (json-prolog:prolog-simple
+                            (concatenate 'string "object_reason_goal_pose('"
+                              knowrob-name"', Reason, Obj2ID).")
+                          :package :llif))))
+          (object (if (eq raw-response 1) NIL 
+                     (cdr (assoc '?object (cut:lazy-car raw-response))))))
+    
+    (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
+        (knowrob-symbol->string object)
+        (roslisp:ros-warn (json-prolog-client)
+                          "Query didn't reach any solution."))))
 
 ;; @author Jan Schimpf
 ;; ask knowledge for how the object should be grasped 
@@ -335,28 +411,6 @@
 ;;             (json-prolog:prolog-simple 
 ;;               
 ;;              :package :llif))))))  
-
-
-;; @author  Tom-Eric Lehmkuhl, edit by Jan Schimpf
-;; ask knowledge for how the object should be grasped 
-;; 1 for grasping from front and 2 for grasping from the top 
-;; this should remain as commented out until knowledge changes the function on their side
-;;(defun prolog-object-goal-pose (object-id graspmode))
-;; "returns the goal pose for an object name"
-;;  (roslisp:ros-info (json-prolog-client)
-;;                    "Getting goal pose for object ~a." object-name)
-;;  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
-;;         (raw-response (with-safe-prolog
-;;                         (json-prolog:prolog-simple
-;;                          (concatenate 'string "object_goal_pose_offset('"
-;;                                       knowrob-name"', POSE, CONTEXT).")
-;;                          :package :llif))))
-;;    (if (eq raw-response 1)
-;;        (roslisp:ros-warn (json-prolog-client)
-;;                          "Query didn't reach any solution.")
-;;        (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
-;;                       ,(string-trim "'" (cdr (assoc '?context
-;;                                              (cut:lazy-car raw-response)))))))))
 
 ;;; former planning_communication/json-prolog.lisp
 #+deprecated
