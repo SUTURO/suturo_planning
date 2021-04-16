@@ -18,8 +18,9 @@
 ;; stops doing so when there are no more objects on the table
 ;; and then goes on to looking for objects on the floor and transports them to the bucked
 (defun execute-cleanup()
+    (init-interfaces)
     (comf::with-hsr-process-modules
-        (llif::call-nlg-action-simple "starting" "clean up")
+        (llif::call-text-to-speech-action (llif::call-nlg-action-simple "starting" "clean up"))
         ;;starts the table section for more info look at the functions
         (perceive-table)
         (transport)
@@ -46,11 +47,11 @@
     (comf::move-to-table t)
     ;;perceive-table
     (llif::call-text-to-speech-action 
-        (llif::call-nlg-action-simple "action" "perceive"))
+        (llif::call-nlg-action-simple "action" "percieve")) ;;TODO fix when nlg fixed percieve -> perceive
     (llif::call-take-pose-action 2)
     (setf *perception-objects*  (llif::call-robosherlock-object-pipeline (vector "table") t))
     (llif::insert-knowledge-objects *perception-objects*)
-    (comf:reachability-check (llif::prolog-next-graspable-objects))
+    (comf:reachability-check *perception-objects*)
     (clean::spawn-btr-objects *perception-objects*)
     (llif::call-text-to-speech-action "I am done perceiving the table now.") ;;replace with NLG command  [[action, "move"],[start_surface_id,"table"]] ... not sure how to say that we finished this
     (llif::call-take-pose-action 1))
@@ -66,12 +67,11 @@
         ;;back to base position
         (llif::call-take-pose-action 1)
 
-        ;;move to table
-        (llif::call-text-to-speech-action "I am getting into a position to grasp from.") ;;replace with NLG command  [[action, "move"],[action,"grasp"]]
-
         ;;query for next object
         (setf *next-object* (llif::prolog-next-object))
         (when (eq *next-object* 1) (return))
+        
+        (comf::reachability-check-grasp *next-object* 1)
 
         (llif::call-text-to-speech-action
             (llif::get-string-from-nlg-result (llif::call-nlg-action-with-list 
@@ -83,9 +83,6 @@
         (comf::move-to-table NIL)
 
         ;;grasp object
-        ;;(llif::call-text-to-speech-action "I am grasping the Object: ") ;;replace with NLG command  [[action, "grasp"],[object_id, *nect-object*]]
-        ;;(llif::call-text-to-speech-action (first (split-sequence:split-sequence #\_ *next-object*))) ;;replace with NLG command
-
         (setf *graspmode* 1) ;;sets the graspmode should be replaced with the function from knowledge when that is finished
         (setf *grasp-object-result* (comf::grasp-object *next-object* *graspmode*))
         
@@ -99,7 +96,8 @@
             (llif::get-string-from-nlg-result (llif::call-nlg-action-with-list 
                 (list 
                     (list "action" "place") 
-                    (list "object_id" *next-object*)))))
+                    (list "object_id" *next-object*)
+                    (list "target_surface_id" (llif::prolog-object-goal *next-object*))))))
 
         (comf::move-to-bucket)
         ;;place object in shelf
@@ -158,7 +156,7 @@
 
     (comf::move-to-poi) 
 
-    (llif::call-nlg-action-siimple "action" "perceive")
+    (llif::call-nlg-action-simple "action" "percieve") ;;TODO fix when nlg fixed percieve -> perceive
     (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
     (comf:reachability-check *perception-objects*)
     (llif::insert-knowledge-objects *perception-objects*)

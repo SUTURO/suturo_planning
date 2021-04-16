@@ -98,13 +98,29 @@
         (setf ?place-position (cdr ?place-position))
         ;;starts iterating over the list if after a failed try        
         (cpl:do-retry place-retry
-            (roslisp:ros-warn (place-fail)
-                                  "~%Failed to grasp the object~%")
+            (roslisp:ros-warn (place-fail) "~%Failed to grasp the object~%")
             (cpl:retry))
         ;;First element in the list is used to make a designator from it
         (let ((?actual-place-position (car ?place-position)))
         (comf::place-object-list ?actual-place-position))))))))
-   
+
+;;@author Torge Olliges
+(defun move-to-room (room-id)
+    (llif::call-text-to-speech-action
+        (llif::get-string-from-nlg-result (llif::call-nlg-action-with-list 
+            (list 
+                (list "action" "move") 
+                (list "room_id" room-id)))))) ;;TODO!!!
+
+;;@author Torge Olliges
+(defun move-to-surface (surface-id)
+    ;; if not prolog-current-room == surface-room -> (move-to-room surface-room) 
+    (llif::call-text-to-speech-action
+        (llif::get-string-from-nlg-result (llif::call-nlg-action-with-list 
+            (list 
+                (list "action" "move") 
+                (list "goal_surface_id" surface-id)))))
+    (roslisp:ros-info (move-too-room) "Moving to surface ~a" surface-id)) ;; TODO!!!
 
 ;;@author Philipp Klein
 (defun move-to-poi ()

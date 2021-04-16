@@ -19,27 +19,30 @@
     (let 
         ((make-plan-result 
             (llif::try-make-plan-action
-                (cl-tf2::stamped-transform->pose-stamped  
+                (cl-tf2::transform-stamped->pose-stamped  
                     (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))
                 object-id
                 (prolog-object-goal-pose->pose-stamped (llif::prolog-object-goal-pose object-id))
-                (llif::prolog-object-dimensions object-id)
+                (let ((dimensions (llif::prolog-object-dimensions object-id)))
+                  (cl-tf2::make-3d-vector (nth 0 dimensions) (nth 1 dimensions) (nth 2 dimensions)))
                 grasp-mode
-                'Grasp)))
+                98)))
+      (roslisp:ros-info (reachability-check-grasp) "Reachability check result: ~a" make-plan-result)
         make-plan-result))
 
 ;;@autho Torge Olliges
 (defun reachability-check-place (object-id grasp-mode)
-    (let ((make-plan-result 
+  (let ((make-plan-result 
             (llif::try-make-plan-action
                 (cl-tf2::stamped-transform->pose-stamped  
                     (cl-tf::lookup-transform  cram-tf::*transformer*  "map" "base_footprint"))
                 object-id
                 (prolog-object-goal-pose->pose-stamped (llif::prolog-object-goal-pose object-id))
-                (llif::prolog-object-dimensions object-id)
+                (let ((dimensions (llif::prolog-object-dimensions object-id)))
+                  (cl-tf2::make-3d-vector (nth 0 dimensions) (nth 1 dimensions) (nth 2 dimensions)))
                 grasp-mode
-                'Place)))
-        make-plan-result))
+                99)))
+    make-plan-result))
 
 ;;@autho Torge Olliges
 (defun prolog-object-goal-pose->pose-stamped (prolog-object-goal-pose)

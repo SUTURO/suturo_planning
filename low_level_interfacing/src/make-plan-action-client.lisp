@@ -18,14 +18,13 @@ action server."
   (loop until (actionlib:wait-for-server *make-plan-client*
                                          *make-plan-action-timeout*))
 
-  (roslisp:ros-info (gripper-action) "make plan action client created"))
+  (roslisp:ros-info (make-plan-action) "make plan action client created"))
 
 ;; NOTE most of these params have to be (v,,,ector ...)s 
 (defun make-plan-action-goal (start-pose object-frame-id goal-pose object-size gripper-mode action-mode)
   "Creates the make-plan-action-goal."
   (actionlib:make-action-goal
       (get-make-plan-action-client)
-    ;; (cram-simple-actionlib-client::get-simple-action-client 'make-plan-action) 
     :start_pose start-pose
     :object_frame_id object-frame-id
     :goal_pose goal-pose
@@ -33,17 +32,18 @@ action server."
     :gripper_mode gripper-mode
     :action_mode action-mode))
 
-(defun try-make-plan-action (start-pose object-frame-id goal-pose objet-size gripper-mode action-mode)
+(defun try-make-plan-action (start-pose object-frame-id goal-pose object-size gripper-mode action-mode)
   ""
-   (multiple-value-bind (result status)
+  (let ((goal (make-plan-action-goal 
+                                (cl-transforms-stamped:to-msg start-pose) ;;;PoseStamped
+                                object-frame-id ;;String
+                                (cl-transforms-stamped:to-msg goal-pose) ;;PoseStamped
+                                (cl-transforms-stamped:to-msg object-size) ;;Vector3
+                                gripper-mode ;;uint8 or Free, Top, Fron
+                                action-mode)))
+    (roslisp:ros-info (make-plan-action) "Make Plan Goal: ~% ~a" goal)    
+    (multiple-value-bind (result status)
         (actionlib:call-goal (get-make-plan-action-client)
-                             (make-plan-action-goal 
-                                start-pose 
-                                object-frame-id 
-                                goal-pose 
-                                objet-size 
-                                gripper-mode 
-                                action-mode))
-        (roslisp:ros-info (make-plan) "make plan action finished")
-        (values result status)))
+                             goal)
+      (values result status))))
 
