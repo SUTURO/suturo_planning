@@ -355,8 +355,7 @@
                                                     :package :llif))))
      (if (eq raw-response 1)
         (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution.")
-  )))
+                          "Query didn't reach any solution."))))
 
 ;; @author Torge Olliges
 (defun prolog-next-graspable-objects ()
@@ -454,13 +453,17 @@
 (defun prolog-perceived-room->room-id (perceived-room)
 )
 
-(defun prolog-not-perceived-surfaces-in-room ()
+(defun prolog-not-perceived-surfaces-in-room (room-id)
 )
 
 (defun prolog-get-surface-regions (surface-id)
 )
 
 (defun prolog-get-surface-room (surface-id)
+)
+
+(defun prolog-get-room-to-room-obstacles (room-start room-goal)
+  ;;  liste (obstacles (tür, position))
 )
 
 ;;; former planning_communication/json-prolog.lisp

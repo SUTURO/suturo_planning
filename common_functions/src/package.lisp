@@ -34,4 +34,14 @@
 
    ;;safety-check
    #:execute-safety-check
+   
+   ;;tts-functions
+   #:announce-movement-to-surface
+   #:announce-movement-to-room
+   #:announce-movement
+   #:announce-place-action
+   #:announce-grasp-action
+   #:announce-plan-start
+   #:announce-perceive-action-surface
+   #:announce-perceive-action
    ))
