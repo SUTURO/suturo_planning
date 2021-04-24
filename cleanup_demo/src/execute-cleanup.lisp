@@ -18,12 +18,16 @@
 ;; stops doing so when there are no more objects on the table
 ;; and then goes on to looking for objects on the floor and transports them to the bucked
 (defun execute-cleanup()
-    (init-interfaces)
+  (init-interfaces)
     (comf::with-hsr-process-modules
-        (comf::announce-plan-start "clean up")
-        ;;starts the table section for more info look at the functions
-        (perceive-table)
-        (transport)
+      (comf::announce-plan-start "clean up")
+      ;;starts the table section for more info look at the functions
+      ;;move to table
+      (comf::announce-movement-to-surface "future" "table")
+      (comf::move-to-table t)
+
+      (perceive-table)
+      (transport)
 
         ;;finished with the table and starts on the floor and this loops until there are no more objects to transport
         (loop do
@@ -37,17 +41,11 @@
 ;; Looks at the table, by first moving to the table then positioning so the robot can get a better picture,
 ;; which then are inserted into knowledge after which a position is taken so the robot can start transporting the objects
 (defun perceive-table()
-    ;;move to table
-    (comf::announce-movement-to-surface "future" "table")
-  
-    (comf::move-to-table t)
     ;;perceive-table
     (comf::announce-perceive-action-surface "present" "table")
-  
     (llif::call-take-pose-action 2)
     (setf *perception-objects*  (llif::call-robosherlock-object-pipeline (vector "table") t))
     (llif::insert-knowledge-objects *perception-objects*)
-    (comf:reachability-check *perception-objects*)
     (clean::spawn-btr-objects *perception-objects*)
     (comf::announce-perceive-action-surface "past" "table")
     (llif::call-take-pose-action 1))
@@ -122,7 +120,7 @@
                 (comf::announce-grasp-action "past" *next-object*)
                 (if (< *grasping-retries* 3)
                     (grasp-handling)
-                    (comf::announce-grasp-action "failed" *next-object*)))) ;;replace with NLG command
+                    (comf::announce-grasp-action "failed" *next-object*)))))) ;;replace with NLG command
 
 
 ;; @author Jan Schimpf

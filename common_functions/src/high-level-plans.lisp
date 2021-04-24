@@ -106,21 +106,22 @@
 
 ;;@author Torge Olliges
 (defun move-to-room (room-id)
-    (llif::call-text-to-speech-action
-        (llif::get-string-from-nlg-result (llif::call-nlg-action-with-list 
-            (list 
-                (list "action" "move") 
-                (list "room_id" room-id)))))) ;;TODO!!!
+    (announce-movement-to-rooom "present" room-id)) ;;TODO!!!
 
 ;;@author Torge Olliges
 (defun move-to-surface (surface-id)
-    ;; if not prolog-current-room == surface-room -> (move-to-room surface-room) 
-    (llif::call-text-to-speech-action
-        (llif::get-string-from-nlg-result (llif::call-nlg-action-with-list 
-            (list 
-                (list "action" "move") 
-                (list "goal_surface_id" surface-id)))))
-    (roslisp:ros-info (move-too-room) "Moving to surface ~a" surface-id)) ;; TODO!!!
+  (roslisp:ros-info (move-too-room) "Moving to surface ~a" surface-id)
+  (let* ((*surface-pose* (llif::prolog-surface-pose surface-id))
+        (?goal-pose
+          (cl-tf::make-pose-stamped
+           "map" 0
+           (cl-tf::make-3d-vector
+            (first *surface-pose*)
+            (second *surface-pose*) 0)
+           (cl-tf::make-quaternion 0 0 -1 0))))
+    (exe::perform (desig:a motion
+                           (type going)
+                           (pose ?goal-pose)))))
 
 ;;@author Philipp Klein
 (defun move-to-poi ()
@@ -155,14 +156,15 @@
       (cl-tf::q* rotation 
                  (cl-tf::euler->quaternion :ax 0 :ay 0 :az 1.57))))))
 
-;;@author Tom-Eric Lehmkuhl
+;;@author Torge Olliges
 (defun move-to-table (turn)
   "moves the robot to the table. if turn is true,
    then the robot will move sideways to the table"
     (roslisp:ros-info (move-poi) "Move to table started")
     ;;(defparameter *goalPose* nil)  
     (defparameter *postion* nil)                                            
-    (let* ((*tablePose* (llif::prolog-table-pose)) ;;TODO fix!
+  (let* ((*tablePose* (llif::prolog-surface-pose (car (car
+                       (llif::sort-by-distance (llif::prolog-tables))))))
       (?goal-pose (cl-tf::make-pose-stamped "map" 0
                 (cl-tf::make-3d-vector
                     (- (first *tablePose*) 0.45) ;;0.7 was previously 0.95
@@ -177,14 +179,14 @@
                     (pose ?goal-pose)))))
 
 
-;;@author Tom-Eric Lehmkuhl
+;;@author Torge Olliges
 (defun move-to-shelf (turn)
    "moves the robot to the shelf. if turn is true,
    then the robot will move sideways to the shelf"
-    (roslisp:ros-info (move-poi) "Move to shelf started")  
-    (defparameter *postion* nil)                                            
+    (roslisp:ros-info (move-poi) "Move to shelf started")                                           
     ;; add shelf-depth to goal to insert distance (+y)
-      (let* ((*shelfPose* (first (first (llif::prolog-shelf-pose))))
+      (let* ((*shelfPose* (llif::prolog-surface-pose (car (car
+                           (llif::sort-by-distance (llif::prolog-shelfs))))))
              (?goal-pose (cl-tf::make-pose-stamped "map" 0
         (cl-tf::make-3d-vector
             (- (first *shelfPose*) 0.03) ;;was previously 0.225
@@ -197,13 +199,14 @@
                     (type going) 
                          (pose ?goal-pose)))))
 
-;;@author Tom-Eric Lehmkuhl
+;;@author Torge Olliges
 (defun move-to-bucket ()
    "moves the robot to the bucket."
     (roslisp:ros-info (move-poi) "Move to bucket started")  
     (defparameter *postion* nil)                                            
     ;; add shelf-depth to goal to insert distance (+y)
-    (let* ((*bucketPose* (first (first (llif::prolog-target-pose))))
+    (let* ((*bucketPose* (llif::prolog-surface-pose (car (car
+                           (llif::sort-by-distance (llif::prolog-buckets))))))
            (?goal-pose (cl-tf::make-pose-stamped "map" 0
         (cl-tf::make-3d-vector
             (+ (first *bucketPose*) 0.7) ;;was previously 0.225

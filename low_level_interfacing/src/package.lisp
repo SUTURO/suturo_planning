@@ -68,19 +68,44 @@
    #:insert-knowledge-objects
    
    ;;knowledge-client
-   #:prolog-object-pose
-   #:prolog-object-in-gripper
-   #:prolog-object-dimensions
-   #:prolog-all-objects-in-shelf
-   #:prolog-object-goal-pose
-   #:prolog-object-goal
-   #:prolog-table-objects 
-   #:prolog-objects-around-pose
+   #:knowrob-symbol->string
    #:object-name->class
-   #:prolog-table-pose
-   #:prolog-shelf-pose
-   #:prolog-target-pose
+   #:prolog-add-test-objects
+   #:prolog-all-objects-in-shelf
+   #:prolog-object-in-gripper
+   #:prolog-forget-table-objects
+   
+   ;;knowledge-door-client
+   #:prolog-get-all-door-states
+   #:prolog-update-doorr-state
+   #:prolog-get-angle-to-open-door
+   
+   ;;knowledge-object-client
+   #:prolog-table-objects
+   #:prolog-object-goal
+   #:prolog-object-supporting-surface
+   #:prolog-object-goal-pose
    #:prolog-next-object
+   #:prolog-object-dimensions
+   #:prolog-object-pose
+   #:prolog-next-graspable-object
+   #:prolog-non-graspable-objects-on-surface
+   #:set-object-not-graspable
+   #:get-reason-for-object-goal-pose
+   
+   ;;knowledge-surface-client
+   #:prolog-surface-pose
+   #:prolog-tables
+   #:prolog-shelfs
+   #:prolog-buckets
+   #:prolog-get-surface-regions
+   #:prolog-get-surface-room
+   #:prolog-current-room
+   #:prolog-get-room-to-room-obstacles
+    
+   ;;knowledge-tts-client
+   #:prolog-perceived-object->object-id
+   #:prolog-perceived-room->room-id
 
    ;;nlp-subscriber
    #:static-command-listener

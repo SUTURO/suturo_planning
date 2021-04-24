@@ -10,7 +10,7 @@
         (list "action" "move")
         (list "goal_surface_id" surface))))))
 
-(defun announce-movement-to-room (room))
+(defun announce-movement-to-room (time room))
 
 (defun announce-movement (time)
   (llif::call-text-to-speech-action
