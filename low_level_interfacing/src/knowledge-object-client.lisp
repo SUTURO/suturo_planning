@@ -30,14 +30,14 @@
                          (json-prolog:prolog-simple 
                           (concatenate 'string 
                                        "object_goal_surface('"
-                                       knowrob-name "', SURFACE)," 
-                                       "surface_frame(SURFACE, FRAME)")
+                                       knowrob-name "', SURFACE)" 
+                                       )
                           :package :llif)))
          (surface (if (eq raw-response 1)
                       NIL
-                      (cdr (assoc '?frame (cut:lazy-car raw-response))))))
+                      (cdr (assoc '?surface (cut:lazy-car raw-response))))))
     (if surface
-        (format nil "environment/~a" (string-trim "'" surface))
+        (format nil  (string-trim "'" surface))
         (roslisp:ros-warn (json-prolog-client)
                           "Query didn't reach any solution."))))
 

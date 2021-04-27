@@ -167,8 +167,8 @@
                        (llif::sort-by-distance (llif::prolog-tables))))))
       (?goal-pose (cl-tf::make-pose-stamped "map" 0
                 (cl-tf::make-3d-vector
-                    (- (first *tablePose*) 0.45) ;;0.7 was previously 0.95
-                    (+ (second *tablePose* ) 0.1)
+                    (- (first *tablePose*) 0.7) ;;0.7 was previously 0.95
+                    (+ (second *tablePose* ) 0.3)
                     0)
                 (if turn
                     (cl-tf::make-quaternion 0 0 0.39 0.91)

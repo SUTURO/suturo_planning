@@ -138,9 +138,9 @@
 
     (comf::announce-perceive-action "future")
     (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
-    (comf:reachability-check *perception-objects*)
+    ;;(comf:reachability-check *perception-objects*)
     (llif::insert-knowledge-objects *perception-objects*)
-    (comf:reachability-check (llif::prolog-next-graspable-objects))
+    ;;(comf:reachability-check (llif::prolog-next-graspable-objects))
     (clean::spawn-btr-objects *perception-objects*)
     ;;percieve -> filter -> insert into knowledge
     (llif::call-take-pose-action 1))
