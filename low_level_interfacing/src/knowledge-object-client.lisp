@@ -3,7 +3,7 @@
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19.
 (defun prolog-table-objects ()
   "returns the list of all objects on the table"
-  (roslisp:ros-info (json-prolog-client) "Getting objects on the table.")
+  (roslisp:ros-info (knowledge-object-client) "Getting objects on the table.")
   (let* ((raw-response
            (with-safe-prolog
              (json-prolog:prolog-simple
@@ -16,14 +16,14 @@
                         (cdr (assoc '?instances (cut:lazy-car raw-response))))))
     (if instances
         (mapcar #'knowrob-symbol->string instances)
-        (roslisp:ros-warn (json-prolog-client)
+        (roslisp:ros-warn (knowledge-object-client)
                           "Query didn't reach any solution."))))
 
 
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-goal (object-name)
   "returns the goal shelf (tf-frame) for an object name"
-  (roslisp:ros-info (json-prolog-client)
+  (roslisp:ros-info (knowledge-object-client)
                     "Getting goal floor for object ~a." object-name)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog  
@@ -44,7 +44,7 @@
 ;; @author Torge Olliges
 (defun prolog-object-supporting-surface (object-name)
   "returns the supporting surface of an object"
-  (roslisp:ros-info (json-prolog-client)
+  (roslisp:ros-info (knowledge-object-client)
                     "Getting supporting surface for object ~a." object-name)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
@@ -57,13 +57,13 @@
                              NIL
                              (raw-response)))) ;;TODO!!!
     (or supporting-surface
-        (roslisp:ros-warn (json-prolog-client)
+        (roslisp:ros-warn (knowledge-object-client)
                           "Query didn't  reach any solution."))))
 
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-goal-pose (object-name)
   "returns the goal pose for an object name"
-  (roslisp:ros-info (json-prolog-client)
+  (roslisp:ros-info (knowledge-object-client)
                     "Getting goal pose for object ~a." object-name)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
@@ -72,7 +72,7 @@
                                        knowrob-name"', POSE, CONTEXT).")
                           :package :llif))))
     (if (eq raw-response 1)
-        (roslisp:ros-warn (json-prolog-client)
+        (roslisp:ros-warn (knowledge-object-client)
                           "Query didn't reach any solution.")
         (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
                        ,(string-trim "'" (cdr (assoc '?context
@@ -81,7 +81,7 @@
 ;; @author Tom-Eric Lehmkuhl
 (defun prolog-next-object ()
  "returns the next object to grasp"
-  (roslisp:ros-info (json-prolog-client) "Getting next object to grasp.")
+  (roslisp:ros-info (knowledge-object-client) "Getting next object to grasp.")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
                           "next_object(OBJECT)"
@@ -91,13 +91,13 @@
     
     (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
         (knowrob-symbol->string object)
-        (roslisp:ros-warn (json-prolog-client)
+        (roslisp:ros-warn (knowledge-object-client)
                           "Query didn't reach any solution."))))
                           
 ;; @author Torge Olliges
 (defun prolog-next-graspable-objects ()
  "returns the next graspable objects which are on a source surface"
-  (roslisp:ros-info (json-prolog-client) "Getting next graspable object on a source surface.")
+  (roslisp:ros-info (knowledge-object-client) "Getting next graspable object on a source surface.")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
                           "next_graspable_objects_on_source_surface(OBJECTS)"
@@ -107,13 +107,13 @@
     
     (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
         (knowrob-symbol->string object)
-        (roslisp:ros-warn (json-prolog-client)
+        (roslisp:ros-warn (knowledge-object-client)
                           "Query didn't reach any solution."))))
 
 ;; @author Torge Olliges
 (defun prolog-non-graspable-objects-on-surface (surface)
  "returns a list of non graspable objects on a given surface"
-  (roslisp:ros-info (json-prolog-client) "Getting non graspable objects on surface: ~a" surface)
+  (roslisp:ros-info (knowledge-object-client) "Getting non graspable objects on surface: ~a" surface)
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
                           (concatenate 'string "all_not_graspable_objects_on_surface('" surface "', OBJECTS)")
@@ -122,13 +122,13 @@
     
     (if (and object (string/= object "'noObjectsOnSourceSurfaces'")) ;;TODO!!!
         (knowrob-symbol->string object)
-        (roslisp:ros-warn (json-prolog-client)
+        (roslisp:ros-warn (knowledge-object-client)
                           "Query didn't reach any solution."))))
 
 ;; @author Torge Olliges
 (defun set-object-not-graspable (object-name reason)
  "returns a list of non graspable objects on a given surface"
-  (roslisp:ros-info (json-prolog-client) "")
+  (roslisp:ros-info (knowledge-object-client) "setting objects not graspable")
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
                           (json-prolog:prolog-simple
@@ -141,7 +141,7 @@
     
     (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
         (knowrob-symbol->string object)
-        (roslisp:ros-warn (json-prolog-client)
+        (roslisp:ros-warn (knowledeg-object-client)
                           "Query didn't reach any solution."))))
 
 ;; Reasons:
@@ -154,7 +154,7 @@
 ;; @author Torge Olliges
 (defun get-reason-for-object-goal-pose (object-name)
  ""
-  (roslisp:ros-info (json-prolog-client) "")
+  (roslisp:ros-info (knowledge-object-client) "")
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
                           (json-prolog:prolog-simple
@@ -166,7 +166,7 @@
     
     (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
         (knowrob-symbol->string object)
-        (roslisp:ros-warn (json-prolog-client)
+        (roslisp:ros-warn (knowledge-object-client)
                           "Query didn't reach any solution."))))
 
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
@@ -188,13 +188,13 @@
                              (cdr (assoc '?W raw-dimensions))
                              (cdr (assoc '?H raw-dimensions))))))
     (or dimensions
-        (roslisp:ros-warn (json-prolog-client)
+        (roslisp:ros-warn (knowledge-object-client)
                           "Query didn't reach any solution."))))
 
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-pose (object-name)
   "returns the pose of an object"
-  (roslisp:ros-info (json-prolog-client)
+  (roslisp:ros-info (knowledge-object-client)
                     "Getting pose for object ~a." object-name)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
@@ -203,7 +203,7 @@
                                        knowrob-name "', POSE)")
                           :package :llif))))
     (if (eq raw-response 1)
-        (roslisp:ros-warn (json-prolog-client)
+        (roslisp:ros-warn (knowledge-object-client)
                           "Query didn't reach any solution.")
         (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
                        ,(string-trim "'"

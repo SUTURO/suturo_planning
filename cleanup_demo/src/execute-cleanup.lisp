@@ -158,12 +158,12 @@
     (llif::call-take-pose-action 1)
 
     ;; turn to face the object
-    (roslisp::with-fields (translation rotation)
-        (cl-tf::lookup-transform cram-tf::*transformer* "map" "base_footprint")
-        (llif::call-nav-action-ps 
-            (cl-tf::make-pose-stamped "map" 0 translation
-                (cl-tf::q* rotation
-                (cl-tf::euler->quaternion :ax 0 :ay 0 :az -1.57)))))
+    ;;(roslisp::with-fields (translation rotation)
+    ;;    (cl-tf::lookup-transform cram-tf::*transformer* "map" "base_footprint")
+    ;;    (llif::call-nav-action-ps 
+    ;;        (cl-tf::make-pose-stamped "map" 0 translation
+    ;;            (cl-tf::q* rotation
+    ;;            (cl-tf::euler->quaternion :ax 0 :ay 0 :az -1.57)))))
     
     ;; grasp the object from the floor
     (hsr-failure-handling-grasp)
@@ -184,15 +184,15 @@
 ;;one from the table as we currently don't have a way to forget items on the floor.
 (defun hsr-failure-handling-grasp()
     (cpl:with-retry-counters ((grasping-retry 1))
-    (cpl:with-failure-handling
+      (cpl:with-failure-handling
         (((or 
             common-fail:low-level-failure 
             cl::simple-error
             cl::simple-type-error)
-        (e)
+             (e)
+           (comf::announce-grasp-action "failed" *next-object*)
         (llif::call-text-to-speech-action "I have failed to grasp the object
         could you please put the object into my hand? could you please give me the object ") ;;replace with NLG command
-
         (cpl:do-retry grasping-retry
             (roslisp:ros-warn (grasp-fail) "~%Failed to grasp the object~%")
             (cpl:retry))
