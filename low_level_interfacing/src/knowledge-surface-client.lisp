@@ -3,7 +3,7 @@
 ;; @author Torge Olliges
 (defun prolog-surface-pose (surface-name)
   "returns the pose of the table"
-  (roslisp:ros-info (knowledge-surface-client) "Getting pose from table")
+  (roslisp:ros-info (knowledge-surface-client) "Getting pose of surface ~a" surface-name)
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
                           (concatenate 'string 

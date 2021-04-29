@@ -24,7 +24,10 @@
                 object-id
                 (prolog-object-goal-pose->pose-stamped (llif::prolog-object-goal-pose object-id))
                 (let ((dimensions (llif::prolog-object-dimensions object-id)))
-                  (cl-tf2::make-3d-vector (nth 0 dimensions) (nth 1 dimensions) (nth 2 dimensions)))
+                  (cl-tf2::make-3d-vector
+                   (nth 0 dimensions)
+                   (nth 1 dimensions)
+                   (nth 2 dimensions)))
                 grasp-mode
                 98)))
       (roslisp:ros-info (reachability-check-grasp) "Reachability check result: ~a" make-plan-result)
@@ -59,33 +62,24 @@
                     (cl-tf2::make-quaternion ?qx ?qy ?qz ?qw)))) 
         stamped-pose))
 
+;;@author Torge Olliges, Jan Schimpf
 (defun get-nav-pose-for-surface (surface-id)
-  (let ((surface-pose (llif::prolog-surface-pose surface-id))
-        (surface-edge-pose (llif::prolog-surface-front-edge-pose surface-id)))
-    (cl-transforms::v+
-     (cl-tf2::make-3d-vector
-      (first (first surface-pose))
-      (second (first surface-pose)) 0)
-     (cl-tf2::make-3d-vector
-      (first (first surface-edge-pose))
-      (second (first surface-edge-pose)) 0))))
-
-
-(defun get-nav-pose-for-surface-2 (surface-id)
   (let ((surface-pose (llif::prolog-surface-pose surface-id))
         (surface-edge-pose (llif::prolog-surface-front-edge-pose surface-id)))
 
     (cl-tf2::make-pose-stamped "map" 0
      (cl-tf2::make-3d-vector
      ;; adds the x value of the Vector to the edge to create an offset
-     (+ (first (first surface-edge-pose))
+      (+ (first (first surface-edge-pose))
         ;; creates the x value of the Vector from Center to Edge
-        (- (first (first surface-edge-pose)) (first (first surface-pose))))
+        (* (- (first (first surface-edge-pose))
+           (first (first surface-pose))) 1.5))
 
      ;; adds the y value of the Vector to the edge to create an offset
-     (+ (second (first surface-edge-pose)) 
+     (+ (second (first surface-edge-pose))
         ;; creates the y value of the Vector from Center to Edge
-        (- (second (first surface-edge-pose)) (second (first surface-pose))))
+        (* (- (second (first surface-edge-pose))
+           (second (first surface-pose))) 1.5))
      0)
     (cl-tf2::make-quaternion (first (second surface-edge-pose))
                              (second (second surface-edge-pose))
