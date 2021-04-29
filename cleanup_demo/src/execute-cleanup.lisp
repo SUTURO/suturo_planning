@@ -156,7 +156,7 @@
     (comf::move-hsr  
         (cl-tf::make-pose-stamped "map" 0.0
             (cl-tf::make-3d-vector 2.32 1.5 0)
-            (cl-tf::euler->quaternion :ax 0 :ay 0 :az 0)))
+            (cl-tf::euler->quaternion :ax 0 :ay 0 :az 2.5)))
 
     (comf::move-to-poi) 
 

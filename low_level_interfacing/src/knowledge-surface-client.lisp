@@ -3,7 +3,7 @@
 ;; @author Torge Olliges
 (defun prolog-surface-pose (surface-name)
   "returns the pose of the table"
-  (roslisp:ros-info (json-prolog-client) "Getting pose from table(")
+  (roslisp:ros-info (knowledge-surface-client) "Getting pose from table")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
                           (concatenate 'string 
@@ -11,21 +11,41 @@
                                        surface-name
                                        ", [TRANSLATION, ROTATION])")
                           :package :llif))))
-     (print raw-response)
      (if (eq raw-response 1)
-        (roslisp:ros-warn (json-prolog-client)
+        (roslisp:ros-warn (knowledge-surface-client)
                           "Query didn't surface_pose_in_map reach any solution.")
-        (values-list `(,(cdr (assoc '?translation (cut:lazy-car raw-response)))
+        (values-list `(,(list (cdr (assoc '?translation (cut:lazy-car raw-response)))
+                              (cdr (assoc '?rotation (cut:lazy-car raw-response))))
                        ,(string-trim "'"
                                      (cdr
                                       (assoc '?context
                                              (cut:lazy-car raw-response)))))))))
 
+(defun prolog-surface-front-edge-pose (surface-name)
+  "returns the pose of the front edge of a surface"
+  (roslisp::ros-info (knowledge-surface-client) "Getting front edge pose for surface ~a" surface-name)
+  (let*  ((raw-response (with-safe-prolog
+                           (json-prolog:prolog-simple
+                            (concatenate 'string
+                                         "surface_front_edge_center_pose("
+                                         surface-name
+                                         ", [TRANSLATION, ROTATION])")
+                            :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-surface-client)
+                          "Query didn't surface_pose_in_map reach any solution.")
+        (values-list `(,(list (cdr (assoc '?translation (cut:lazy-car raw-response)))
+                              (cdr (assoc '?rotation (cut:lazy-car raw-response))))
+                       ,(string-trim "'"
+                                     (cdr
+                                      (assoc '?context
+                                             (cut:lazy-car raw-response)))))))))
+                                              
 
 ;; @author Torge Olliges
 (defun prolog-shelfs ()
-  "returns the pose of the shelf"
-  (roslisp:ros-info (json-prolog-client) "Getting pose for shelf")
+  "returns the names of all available shelfs"
+  (roslisp:ros-info (knowledge-surface-client) "Getting shelfs")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
                           (concatenate 'string
@@ -40,15 +60,15 @@
 
 ;; @author Torge Olliges
 (defun prolog-tables ()
-  "returns the pose of the shelf"
-  (roslisp:ros-info (json-prolog-client) "Getting pose for shelf")
+  "returns the names of all available tables"
+  (roslisp:ros-info (knowledge-surface-client) "Getting pose for shelftables")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
                           (concatenate 'string
                                        "table_surfaces(POSITIONS)")
                                                     :package :llif))))
     (if (eq raw-response 1)
-        (roslisp:ros-warn (json-prolog-client)
+        (roslisp:ros-warn (knowledge-surface-client)
                           "Query didn't shelf_surfaces reach any solution.")
         (values-list (list (mapcar
                       (lambda (x) (string-trim "'" x))
@@ -57,14 +77,14 @@
 ;; @author Torge Olliges
 (defun prolog-buckets ()
   "returns the bucket names"
-  (roslisp:ros-info (json-prolog-client) "Getting bucket names")
+  (roslisp:ros-info (knowledge-surface-client) "Getting bucket names")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
                           (concatenate 'string
                                        "bucket_surfaces(POSITIONS)")
                           :package :llif))))
     (if (eq raw-response 1)
-        (roslisp:ros-warn (json-prolog-client)
+        (roslisp:ros-warn (knowledge-surface-client)
                           "Query didn't shelf_surfaces reach any solution.")
         (values-list (list (mapcar
                       (lambda (x) (string-trim "'" x))
@@ -77,7 +97,7 @@
     (lambda (surface-name) (list
                             surface-name
                             (current-pose-prolog-pose->distance
-                             (prolog-surface-pose surface-name))))
+                             (first (prolog-surface-pose surface-name)))))
     surface-names)
    #'tuple-compare))
 

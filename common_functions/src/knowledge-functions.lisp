@@ -58,3 +58,14 @@
                     (cl-tf2::make-3d-vector ?x ?y ?z)
                     (cl-tf2::make-quaternion ?qx ?qy ?qz ?qw)))) 
         stamped-pose))
+
+(defun get-nav-pose-for-surface (surface-id)
+  (let ((surface-pose (llif::prolog-surface-pose surface-id))
+        (surface-edge-pose (llif::prolog-surface-front-edge-pose surface-id)))
+    (cl-transforms::v+
+     (cl-tf2::make-3d-vector
+      (first (first surface-pose))
+      (second (first surface-pose)) 0)
+     (cl-tf2::make-3d-vector
+      (first (first surface-edge-pose))
+      (second (first surface-edge-pose)) 0))))

@@ -126,7 +126,7 @@
 ;;@author Philipp Klein
 (defun move-to-poi ()
   "moves the robot to the closest poi point"
-  (roslisp:ros-info (move-poi) "Move to POI started")
+  (roslisp:ros-info (move-poi) "Move to point of interest started")
   (setf *listOfPoi* 
         (llif::sorted-poi-by-distance
          (roslisp::with-fields (translation)
@@ -154,25 +154,33 @@
       0
       translation 
       (cl-tf::q* rotation 
-                 (cl-tf::euler->quaternion :ax 0 :ay 0 :az 1.57))))))
+                 (cl-tf::euler->quaternion :ax 0 :ay 0 :az (/ pi 2)))))))
 
 ;;@author Torge Olliges
 (defun move-to-table (turn)
   "moves the robot to the table. if turn is true,
    then the robot will move sideways to the table"
-    (roslisp:ros-info (move-poi) "Move to table started")
-    ;;(defparameter *goalPose* nil)  
-    (defparameter *postion* nil)                                            
-  (let* ((*tablePose* (llif::prolog-surface-pose (car (car
+    (roslisp:ros-info (move-poi) "Move to table started")                                         
+  (let* ((*table-pose* (llif::prolog-surface-pose (car (car
                        (llif::sort-by-distance (llif::prolog-tables))))))
       (?goal-pose (cl-tf::make-pose-stamped "map" 0
                 (cl-tf::make-3d-vector
-                    (- (first *tablePose*) 0.7) ;;0.7 was previously 0.95
-                    (+ (second *tablePose* ) 0.3)
+                    (- (first (first *table-pose*)) 0.4) ;;0.7 was previously 0.95
+                    (+ (second (first *table-pose*)) 0.85)
                     0)
                 (if turn
-                    (cl-tf::make-quaternion 0 0 0.39 0.91)
-                    (cl-tf::make-quaternion 0 0 -0.3 0.93)))))
+                    (cl-transforms:q+
+                     (cl-tf::make-quaternion
+                      (first (second *table-pose*))
+                      (second (second *table-pose*))
+                      (third (second *table-pose*))
+                      (fourth (second *table-pose*)))
+                     (cl-transforms:euler->quaternion :ax 0 :ay 0 :az (/ pi 2)))
+                    (cl-tf::make-quaternion
+                         (first (second *table-pose*))
+                         (second (second *table-pose*))
+                         (third (second *table-pose*))
+                         (fourth (second *table-pose*)))))))
         ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
         (exe::perform (desig:a motion
                     (type going) 
@@ -185,15 +193,25 @@
    then the robot will move sideways to the shelf"
     (roslisp:ros-info (move-poi) "Move to shelf started")                                           
     ;; add shelf-depth to goal to insert distance (+y)
-      (let* ((*shelfPose* (llif::prolog-surface-pose (car (car
+      (let* ((*shelf-pose* (llif::prolog-surface-pose (car (car
                            (llif::sort-by-distance (llif::prolog-shelfs))))))
              (?goal-pose (cl-tf::make-pose-stamped "map" 0
         (cl-tf::make-3d-vector
-            (- (first *shelfPose*) 0.03) ;;was previously 0.225
-            (- (second *shelfPose*) 0.9) 0)
+            (- (first (first *shelf-pose*)) 0.03) ;;was previously 0.225
+            (- (second (first *shelf-pose*)) 0.9) 0)
         (if turn
-            (cl-tf::make-quaternion 0 0 -1 0)
-            (cl-tf::make-quaternion 0 0 0.7 0.7)))))
+            (cl-transforms:q+
+             (cl-tf::make-quaternion
+              (first (second *shelf-pose*))
+              (second (second *shelf-pose*))
+              (third (second *shelf-pose*))
+              (fourth (second *shelf-pose*)))
+             (cl-transforms:euler->quaternion :ax 0 :ay 0 :az (/ pi 2)))
+            (cl-tf::make-quaternion
+                         (first (second *shelf-pose*))
+                         (second (second *shelf-pose*))
+                         (third (second *shelf-pose*))
+                         (fourth (second *shelf-pose*)))))))
         ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
         (exe::perform (desig:a motion
                     (type going) 
@@ -202,8 +220,7 @@
 ;;@author Torge Olliges
 (defun move-to-bucket ()
    "moves the robot to the bucket."
-    (roslisp:ros-info (move-poi) "Move to bucket started")  
-    (defparameter *postion* nil)                                            
+    (roslisp:ros-info (move-poi) "Move to bucket started")                                            
     ;; add shelf-depth to goal to insert distance (+y)
     (let* ((*bucketPose* (llif::prolog-surface-pose (car (car
                            (llif::sort-by-distance (llif::prolog-buckets))))))
