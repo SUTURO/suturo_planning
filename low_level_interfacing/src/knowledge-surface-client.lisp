@@ -7,9 +7,9 @@
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
                           (concatenate 'string 
-                                       "surface_pose_in_map("
+                                       "tf_lookup_transform('map',"
                                        surface-name
-                                       ", [TRANSLATION, ROTATION])")
+                                       ",pose(TRANSLATION, ROTATION))")
                           :package :llif))))
      (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-surface-client)
