@@ -91,7 +91,7 @@
                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
 
 ;; @author Torge Olliges
-(defun sort-by-distance (surface-names)
+(defun sort-surfaces-by-distance (surface-names)
   (sort
    (mapcar
     (lambda (surface-name) (list

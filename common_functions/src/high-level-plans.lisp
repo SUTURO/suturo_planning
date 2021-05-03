@@ -1,8 +1,6 @@
 (in-package :comf)
 (defvar *place-list* NIL)
-(defparameter *listOfPoi* NIL)
-(defparameter *poiDistance* 0.75)
-(defparameter *perception-objects* NIL)
+(defparameter *poi-distance-threshold* 0.75)
 
 ;;;; Navigation ;;;;
 
@@ -49,37 +47,6 @@
                     (pose ?successfull-pose)))))
 
 
-;;;; Grasp ;;;;;
-;;@author Jan Schimpf
-;; gets object id and the grasp-pose takes care of some of the failure-handling for grasp
-;; if grasp fails, toya will get into a position to trigger perception again to update
-;; the position of objects and then retries with the new information
-;; needs to be refactored so it can take over the failurehandling for grasping
-;; from the table for both plans needs to be updated with the failure handling for
-;; grasping from the table that is currently in the grocery plan
-(defun grasp-hsr (object-id grasp-pose)    
-    (cpl:with-retry-counters ((grasping-retry 3))
-    (cpl:with-failure-handling
-        (((or common-fail:low-level-failure 
-              cl::simple-error
-              cl::simple-type-error)
-        (e)
-        (comf::move-to-table t)
-        (llif::call-take-pose-action 2) 
-        (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_table") t))
-            (llif::insert-knowledge-objects *perception-objects*)
-            (llif::call-take-pose-action 1)
-        (cpl:do-retry grasping-retry
-            (roslisp:ros-warn (grasp-fail)
-                                  "~%Failed to grasp the object~%")
-            (cpl:retry))
-        (roslisp:ros-warn 
-            (going-demo movement-fail)
-            "~%No more retries~%")))
-    (comf::grasp-object object-id grasp-pose))))
-
-
-
 ;;;; Place ;;;;
 ;;@author Jan Schimpf
 ;; Gets object id and the grasp-pose takes care of some of the failure-handling for place
@@ -109,11 +76,27 @@
     (announce-movement-to-rooom "present" room-id)) ;;TODO!!!
 
 ;;@author Torge Olliges
-(defun move-to-surface (surface-id)
+(defun move-to-surface (surface-id turn)
   (roslisp:ros-info (move-too-room) "Moving to surface ~a" surface-id)
   (let* ((surface-pose (llif::prolog-surface-pose surface-id))
         (?goal-pose
-          (get-nav-pose-for-surface surface-id)))
+          (cl-tf::make-pose-stamped
+            "map" 0
+            (roslisp::with-fields (origin)
+                (get-nav-pose-for-surface surface-id) origin)
+            (if turn
+                (cl-transforms:q+
+                 (cl-tf::make-quaternion
+                  (first (second surface-pose))
+                  (second (second surface-pose))
+                  (third (second surface-pose))
+                  (fourth (second surface-pose)))
+                 (cl-transforms:euler->quaternion :ax 0 :ay 0 :az (/ pi 2.75)))
+                (cl-tf::make-quaternion
+                 (first (second surface-pose))
+                 (second (second surface-pose))
+                 (third (second surface-pose))
+                 (fourth (second surface-pose)))))))
     (exe::perform (desig:a motion
                            (type going)
                            (pose ?goal-pose)))))
@@ -122,18 +105,17 @@
 (defun move-to-poi ()
   "moves the robot to the closest poi point"
   (roslisp:ros-info (move-poi) "Move to point of interest started")
-  (setf *listOfPoi* 
-        (llif::sorted-poi-by-distance
-         (roslisp::with-fields (translation)
-             (cl-tf::lookup-transform
-              cram-tf::*transformer*
-              "map"
-              "base_footprint")
-           translation)))
-  (print "before poi")
-  (if (not *listOfPoi*) (return-from move-to-poi Nil))
-  (pose-with-distance-to-points *poiDistance* *listOfPoi* 10 t)
-  (print "after poi"))
+  (let ((poi-list (llif::sorted-poi-by-distance
+                    (roslisp::with-fields (translation)
+                        (cl-tf::lookup-transform
+                            cram-tf::*transformer*
+                            "map"
+                            "base_footprint")
+                        translation))))
+        (when 
+            (not poi-list) 
+            (return-from move-to-poi Nil))
+        (pose-with-distance-to-points *poi-distance-threshold* poi-list 10 t)))
 
 ;;@author Philipp Klein
 (defun move-to-poi-and-scan ()
@@ -156,7 +138,7 @@
   "moves the robot to the table. if turn is true,
    then the robot will move sideways to the table"
     (roslisp:ros-info (move-poi) "Move to table started")                                         
-  (let* ((closest-table-id (car (car (llif::sort-by-distance (llif::prolog-tables)))))
+  (let* ((closest-table-id (car (car (llif::sort-surfaces-by-distance (llif::prolog-tables)))))
          (table-pose (llif::prolog-surface-pose closest-table-id))
          (?goal-pose
            (cl-tf::make-pose-stamped
@@ -192,7 +174,7 @@
   (let* ((closest-shelf-id
            (car
             (car
-             (llif::sort-by-distance (llif::prolog-shelfs)))))
+             (llif::sort-surfaces-by-distance (llif::prolog-shelfs)))))
          (shelf-pose (llif::prolog-surface-pose closest-shelf-id))
              (?goal-pose
                (cl-tf::make-pose-stamped
@@ -226,7 +208,7 @@
   (let* ((closest-bucket-id
            (car
             (car
-             (llif::sort-by-distance (llif::prolog-buckets)))))
+             (llif::sort-surfaces-by-distance (llif::prolog-buckets)))))
          (bucketPose (llif::prolog-surface-pose closest-bucket-id))
          (?goal-pose (cl-tf::make-pose-stamped
                       "map" 0
@@ -237,7 +219,7 @@
         (exe::perform (desig:a motion
                     (type going) 
                               (pose ?goal-pose)))))
- 
+
 ;;@author Jan Schimpf
 ;;asumption is that the robot is already standing in position
 (defun open-door ()

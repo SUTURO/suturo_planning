@@ -18,7 +18,7 @@
 ;; stops doing so when there are no more objects on the table
 ;; and then goes on to looking for objects on the floor and transports them to the bucked
 (defun execute-cleanup()
-  (init-interfaces)
+  ;;(init-interfaces)
     (comf::with-hsr-process-modules
       (comf::announce-plan-start "clean up")
       ;;starts the table section for more info look at the functions

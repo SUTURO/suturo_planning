@@ -17,7 +17,7 @@
     (if instances
         (mapcar #'knowrob-symbol->string instances)
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't reach any solution."))))
+                          "Query didn't all_objects_on_tables reach any solution."))))
 
 
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
@@ -39,26 +39,27 @@
     (if surface
         (format nil  (string-trim "'" surface))
         (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution."))))
+                          "Query didn't object_goal_surface reach any solution."))))
 
 ;; @author Torge Olliges
-(defun prolog-object-supporting-surface (object-name)
+(defun prolog-object-source (object-name)
   "returns the supporting surface of an object"
   (roslisp:ros-info (knowledge-object-client)
                     "Getting supporting surface for object ~a." object-name)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
-                          (concatenate 'string "object_supporting_surface('"
-                                       knowrob-name "', SURFACE)," 
-                                       "surface_frame(SURFACE, FRAME)")
+                          (concatenate 'string "find_supporting_surface('"
+                                       knowrob-name "', SURFACE),")
                           :package :llif)))
          (supporting-surface (if (eq raw-response 1)
-                             NIL
-                             (raw-response)))) ;;TODO!!!
+                                  NIL
+                                  (cdr 
+                                    (assoc '?surface 
+                                      (cut:lazy-car raw-response)))))) ;;TODO!!!
     (or supporting-surface
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't  reach any solution."))))
+                          "Query didn't find_supporting_surface reach any solution."))))
 
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-goal-pose (object-name)
@@ -78,7 +79,7 @@
                        ,(string-trim "'" (cdr (assoc '?context
                                               (cut:lazy-car raw-response)))))))))
                                               
-;; @author Tom-Eric Lehmkuhl
+;; @author Tom-Eric Lehmkuhl, Torge Olliges
 (defun prolog-next-object ()
  "returns the next object to grasp"
   (roslisp:ros-info (knowledge-object-client) "Getting next object to grasp.")
@@ -89,10 +90,10 @@
          (object (if (eq raw-response 1) NIL 
                      (cdr (assoc '?object (cut:lazy-car raw-response))))))
     
-    (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
-        (knowrob-symbol->string object)
+    (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't reach any solution."))))
+                          "Query didn't next_object reach any solution.")
+        (knowrob-symbol->string object))))
                           
 ;; @author Torge Olliges
 (defun prolog-next-graspable-objects ()
@@ -104,11 +105,10 @@
                           :package :llif)))
          (object (if (eq raw-response 1) NIL 
                      (cdr (assoc '?object (cut:lazy-car raw-response))))))
-    
-    (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
-        (knowrob-symbol->string object)
+    (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't reach any solution."))))
+                          "Query didn't next_object reach any solution.")
+        (knowrob-symbol->string object))))
 
 ;; @author Torge Olliges
 (defun prolog-non-graspable-objects-on-surface (surface)
@@ -117,13 +117,14 @@
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
                           (concatenate 'string "all_not_graspable_objects_on_surface('" surface "', OBJECTS)")
-                          :package :llif)))         (object (if (eq raw-response 1) NIL 
-                     (cdr (assoc '?object (cut:lazy-car raw-response))))))
+                          :package :llif)))         
+          (objects (if (eq raw-response 1) NIL 
+                     (cdr (assoc '?objects (cut:lazy-car raw-response))))))
     
-    (if (and object (string/= object "'noObjectsOnSourceSurfaces'")) ;;TODO!!!
-        (knowrob-symbol->string object)
+    (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't reach any solution."))))
+                          "Query didn't next_object reach any solution.")
+        (mapcar 'knowrob-symbol->string objects))))
 
 ;; @author Torge Olliges
 (defun set-object-not-graspable (object-name reason)
@@ -135,14 +136,13 @@
                             (concatenate 'string "set_not_graspable('"
                               knowrob-name "', " (write-to-string reason) ").")
                           :package :llif)))
-          ;;TODO: this is not how this works handle response properly (this shouldnt work right now...)
-         (object (if (eq raw-response 1) NIL 
-                     (cdr (assoc '?object (cut:lazy-car raw-response)))))) ;;TODO!!!
-    
-    (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
-        (knowrob-symbol->string object)
-        (roslisp:ros-warn (knowledeg-object-client)
-                          "Query didn't reach any solution."))))
+         (answer (if (eq raw-response 1) 
+                      NIL 
+                      t)))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-object-client)
+                          "Query didn't next_object reach any solution.")
+        answer)))
 
 ;; Reasons:
 ;;   0 Object on Table to deep, cant reach (Knowledge)
@@ -161,13 +161,12 @@
                             (concatenate 'string "object_reason_goal_pose('"
                               knowrob-name"', Reason, Obj2ID).")
                           :package :llif)))
-          (object (if (eq raw-response 1) NIL 
-                     (cdr (assoc '?object (cut:lazy-car raw-response)))))) ;;TODO!!!
-    
-    (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
-        (knowrob-symbol->string object)
+          (answer (if (eq raw-response 1) NIL 
+                     (cdr (assoc '?reason (cut:lazy-car raw-response))))))
+    (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't reach any solution."))))
+                          "Query didn't next_object reach any solution.")
+        answer)))
 
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-dimensions (object-name)
