@@ -24,13 +24,13 @@
   *knowledge-action-client*)
 
 
-(defun insert-knowledge-objects (objectArrayMsg)
+(defun insert-knowledge-objects (detected-objects)
   "Expects The ObjectDetectionData Msg as Input and insert the Objects to the Knowledge Database"
-  (roslisp:ros-info (knowledge-client) "Inserting object msg to knowledge"
+  (roslisp:ros-info (knowledge-client) "Sending object detection msg to knowledge.")
   (actionlib:call-goal (llif::get-knowledge-client)
-                       objectArrayMsg
+                       detected-objects
                        :timeout *robosherlock-action-timeout*
-                       :result-timeout *robosherlock-action-timeout*)))
+                       :result-timeout *robosherlock-action-timeout*))
 
 ;; @author Tom-Eric Lehmkuhl
 (defun knowledge-insertion-test ()

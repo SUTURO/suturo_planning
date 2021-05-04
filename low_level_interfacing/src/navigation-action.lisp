@@ -78,7 +78,6 @@ euler-z gives the rotation around the z axis."
 
 (defun call-nav-action-ps (pose-stamped)
   "calls the navigation client and passes the given `pose-stamped' to it."  
-  (print "NAV ACTION PS")
    (setf pose-stamped (cl-tf:copy-pose-stamped pose-stamped :origin
                                                (cl-tf:copy-3d-vector
                                                 (cl-tf:origin pose-stamped)
@@ -86,13 +85,10 @@ euler-z gives the rotation around the z axis."
   
    (unless (eq roslisp::*node-status* :running)
      (roslisp:start-ros-node "nav-action-lisp-client"))
-   (format t "Pose: ~a " pose-stamped)
    (multiple-value-bind (result status)
        (let ((actionlib:*action-server-timeout* 20.0)
              (the-goal (cl-tf:to-msg
                         pose-stamped)))
-          (format t "my POSE: ~a" the-goal)
-
          ;;publish the pose the robot will navigate to
          (publish-marker-pose pose-stamped :g 1.0)
 

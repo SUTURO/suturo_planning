@@ -7,17 +7,17 @@
 (defparameter *open-door-client* NIL)
 
 (defun get-open-door-client ()
-  "returns the currently used grasp-action client. If none yet exists,
+  "returns the currently used open-action client. If none yet exists,
    creates one."
   (or *open-door-client*
       (init-open-door-client)))
 
 (defun init-open-door-client ()
-  "initializes the grasp-action-client and makes sure it is connected to the
+  "initializes the open-action-client and makes sure it is connected to the
 action server."
   (setf *open-door-client*
-        (actionlib:make-action-client "grasps_server"
-                                      "manipulation_msgs/GraspAction"))
+        (actionlib:make-action-client "open_server"
+                                      "manipulation_msgs/OpenAction"))
   (loop until (actionlib:wait-for-server *open-door-client*
                                          *open-door-timeout*))
 
@@ -26,32 +26,34 @@ action server."
 ;; NOTE most of these params have to be (vector ...)s 
 (defun make-open-door-goal (door-id-name
                                door-handle-name)
-  "Creates the grasp-action-goal. Does not send it to the action server though."
+  "Creates the open-action-goal. Does not send it to the action server though."
   (actionlib:make-action-goal
       (get-open-door-client)
     :object_name door-id-name ;;knowrob_object_id
     :object_link_name door-handle-name ;;knowrob_object_id
     ))
                                                  
-(defun ensure-open-door-goal-reached (door-id-name
-                                  door-handle-name)
-  (roslisp:ros-warn (grasp-action) "Status ~a" status)
+(defun ensure-open-door-goal-reached (status
+                                      door-id-name
+                                      door-handle-name)
+  (roslisp:ros-warn (open-action) "Status ~a" status)
   status
   door-id-name
   door-handle-name
   T)
 
 
-(defun call-door-action (door-id-name
+(defun call-open-action (door-id-name
                           door-handle-name)
   "object-id' object-id of frame-id of object to grasp"
   ;;  (format t "grasp called with state: ~a" state)
    (multiple-value-bind (result status)
-  (actionlib:call-goal (open-door-action-client)
+  (actionlib:call-goal (get-open-door-client)
                        (make-open-door-goal door-id-name
                                             door-handle-name))
      (roslisp:ros-info (grasp-action) "open door action finished")
-     (ensure-grasp-door-goal-reached status
+     (ensure-open-door-goal-reached
+                                status 
                                 door-id-name
                                 door-handle-name)
      (values result status)))

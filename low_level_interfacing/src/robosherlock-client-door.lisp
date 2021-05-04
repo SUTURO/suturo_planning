@@ -2,38 +2,39 @@
 (in-package :llif)
 
 (defparameter *robosherlock-door-action-client* NIL)
-(defparameter *robosherlock-action-timeout* 30.0 "in seconds")
+(defparameter *robosherlock-door-action-timeout* 30.0 "in seconds")
 (defparameter *robosherlock-door-client* NIL)
 
-(defun init-robosherlock-door-action-client ()
+(defun init-robosherlock-door-client ()
     "initializes the RoboSherlock door client"
     (roslisp:ros-info 
         (init-robosherlock-door-client)
         "Creating robosherlock door action client for server 'perception_server'.")
+    (print "was here")
     (setf *robosherlock-door-action-client*
         (actionlib:make-action-client 
-            "/perception_actionserver"
-            "suturo_perception_msgs/ExtractPlaneInfo"))
+            "/perception_actionserver_plane"
+            "suturo_perception_msgs/ExtractPlaneInfoAction"))
     (roslisp:ros-info (init-robosherlock-client) "'Actionlib made action client.")
     (loop until 
         (actionlib:wait-for-server 
             *robosherlock-door-action-client*
-            *robosherlock-action-timeout*))
+            *robosherlock-door-action-timeout*))
     (roslisp:ros-info 
         (init-robosherlock-door-client)
-        "Robosherlock action client for ~a created." "'extract_object_infos'"))
+        "Robosherlock action client for ~a created." "'extract_door_infos'"))
 
 (defun get-robosherlock-door-client ()
     "returns a RoboSherlock client if one already exists. Creates one otherwise."
-    (unless *robosherlock-object-action-client*
-        (init-robosherlock-object-action-client))
-    *robosherlock-object-action-client*)
+    (unless *robosherlock-door-action-client*
+        (init-robosherlock-door-client))
+    *robosherlock-door-action-client*)
 
 ;;@author Jan Schimpf
 (defun make-action-goal-door (in-regions in-visualize)
     (actionlib::make-action-goal 
         (get-robosherlock-door-client)
-        :region in-regions
+        :regions in-regions
         :visualize in-visualize))
 
 ;;@author Jan Schimpf
@@ -50,6 +51,6 @@
           (get-robosherlock-door-client)
           (make-action-goal-door regions-value viz-value))
       (roslisp:ros-info 
-          (robosherlock-object-action) 
-          "robosherlock action finished")
+          (robosherlock-open-action) 
+          "robosherlock open finished")
       (values result status)))

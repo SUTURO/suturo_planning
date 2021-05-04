@@ -22,6 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
   manipulation_msgs
   nlg_msgs
   knowledge_msgs
+  nlg_msgs
 )
 
 catkin_package(

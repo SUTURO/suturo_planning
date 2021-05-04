@@ -11,7 +11,6 @@
 (defparameter *polyCorner1* Nil)
 (defparameter *isPoly* Nil)
 (defparameter *removed* Nil)
-(defparameter *Positions* Nil)
 (defvar *pose*)
 
 ;;author Philipp Klein
@@ -101,67 +100,62 @@
          *alternatePositions*)))
 
 ;;author Philipp Klein
-(defun pose-with-distance-to-points (distance points amountAlternatePositions turn)
+(defun pose-with-distance-to-points (distance points number-alternate-positions turn)
   "move the roboter to a point with a given distance around the closest point
   `distance' The distance, with which the points around the point are generated
   `point' The point from which the others are to be generated
   `amountAlternatePositions' The number of points to be generated
   `turn' whether the robot should be turned 90 degrees to the target at the end"
-  (setf *Positions*
-        (mapcar
-         (lambda
-             (listelem)
-           (points-around-point
-            distance
-            listelem
-            amountAlternatePositions
-            turn))
-         points ))
-	(setf *Positions*
-        (mapcar
-         (lambda
-             (listelem)
-           (remove-if-not #'llif::robot-in-obstacle-stamped listelem))
-         *Positions* ))
-	(setf *Positions*
-        (mapcar (lambda
-                    (listelem)
-                  (remove-if #'null listelem)) *Positions* ))
-  (setf *Positions* (flatten *Positions* ))
-  (publish-msg (advertise "poi_positions" "geometry_msgs/PoseArray")
-               :header
-               (roslisp:make-msg
-                "std_msgs/Header"
-                (frame_id)
-                "map"
-                (stamp)
-                (roslisp:ros-time) )
-               :poses
-               (make-array
-                (length *Positions*)
-                :initial-contents
-                (mapcar #'cl-tf::to-msg
-                        (mapcar #'cl-tf::pose-stamped->pose
-                                *Positions*))))
-  (print "Started Designator")
-  (print *Positions*)
-  (let* ((?successfull-pose (try-movement-stampedList *Positions*))
-         (?desig (desig:a motion
-                          (type going) 
-                                           (pose ?successfull-pose))))
-    (cpl:with-failure-handling
-        (((or common-fail:low-level-failure 
-              cl::simple-error
-              cl::simple-type-error)
-             (e)
-           (setf ?successfull-pose (try-movement-stampedList *Positions*))
-           (cpl:do-retry going-retry
-             (print "Failed Going Designator")
-             (roslisp:ros-warn (move-fail)
-                               "~%Failed to go to Point~%")
-             (cpl:retry))))
-      (exe:perform ?desig)))
-  (print "Going Designator Done")
+  (let* ((positions (flatten 
+                    (mapcar 
+                      (lambda
+                        (elem)
+                        (remove-if #'null elem))
+                      (mapcar
+                        (lambda
+                          (elem)
+                          (remove-if-not #'llif::robot-in-obstacle-stamped elem)) 
+                        (mapcar 
+                          (lambda
+                            (elem)
+                            (points-around-point 
+                              distance
+                              elem
+                              number-alternate-positions
+                              turn))
+                          points))))))
+      (publish-msg 
+        (advertise "poi_positions" "geometry_msgs/PoseArray")
+          :header
+          (roslisp:make-msg
+            "std_msgs/Header"
+            (frame_id)
+            "map"
+            (stamp)
+            (roslisp:ros-time))
+          :poses
+          (make-array
+            (length positions)
+            :initial-contents
+            (mapcar #'cl-tf::to-msg
+              (mapcar #'cl-tf::pose-stamped->pose
+                positions))))
+      (roslisp::ros-info (navigation-functions) "Started Designator with positions ~a" positions)
+      (let* ((?successfull-pose (try-movement-stampedList positions))
+             (?desig (desig:a motion
+                      (type going) 
+                      (pose ?successfull-pose))))
+            (cpl:with-failure-handling
+              (((or common-fail:low-level-failure 
+                    cl::simple-error
+                    cl::simple-type-error)
+                (e)
+                (setf ?successfull-pose (try-movement-stampedList positions))
+                (cpl:do-retry going-retry
+                  (print "Failed Going Designator")
+                  (roslisp:ros-warn (move-fail) "~%Failed to go to Point~%")
+                  (cpl:retry))))
+              (exe:perform ?desig))))
   (if turn (llif::call-take-pose-action 4)))
 
 ;;author Philipp Klein
