@@ -8,8 +8,13 @@
   "Init all interfaces from planning to other groups"
   (roslisp:ros-info (init-interfaces) "Initialising Interfaces:")
 
+
   ;;starts ros node
   (get-planning-node) ;;TODO remove here call seperate
+  ;;(if *planning-node-exits* 
+    (roslisp:ros-info (init-interface) "Planning node already exists.")  
+  ;; (init-planning))
+  (init-planning)
 
   (init-navigation)
 
@@ -17,6 +22,7 @@
 
   (init-perception)
 
+  (init-nlg)
   (init-knowledge)
 
   (init-tts)
@@ -82,15 +88,15 @@
 (defun init-nlg()
   (roslisp:ros-info (init-interfaces) "init nlg action client")
   (llif::init-nlg-action-client))
-
 (defun init-poi()
   ;;init action client
+  (roslisp:ros-info (init-interface) "init point of interest scanning")
   (llif::point-listener)
   (llif::obstacle-map-listener))
+
 
 (defun init-planning()
   "Initialize only local nodes for working without the real robot."  
   ;;start rosnode named planning_node
   (roslisp:ros-info (init-interfaces) "Creating ROS Node 'planning_node'")
   (setf *planning-node* (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)))
-

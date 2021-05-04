@@ -48,6 +48,7 @@
 (defun perceive-table()
     ;;perceive-table
     (comf::announce-perceive-action-surface "present" "table")
+
     (llif::call-take-pose-action 2)
     (setf *perception-objects*  (llif::call-robosherlock-object-pipeline (vector "table") t))
     (llif::insert-knowledge-objects *perception-objects*)
@@ -89,6 +90,7 @@
         (comf::move-to-bucket)
         ;;place object in shelf
         (comf::announce-place-action "future" *next-object*)
+
         
         (multiple-value-bind (a b) 
             (llif::prolog-object-goal-pose *next-object*)
@@ -179,7 +181,6 @@
     ;; make sure we are in a neutral position
     (comf::announce-grasp-action "future" *next-object*)
     (llif::call-take-pose-action 1)
-
     ;; turn to face the object
     ;;(roslisp::with-fields (translation rotation)
     ;;    (cl-tf::lookup-transform cram-tf::*transformer* "map" "base_footprint")
@@ -192,6 +193,7 @@
     (hsr-failure-handling-grasp)
     (comf::announce-movement  "future")
     ;;move to bucket
+    (llif::call-nlg-action (list (llif::make-key-value-msg "action" "move") (llif::make-key-value-msg "goal_surface_id" "bucket")))
     (comf::move-to-bucket)
 
     ;;place object in bucket
@@ -227,3 +229,4 @@
         (setf *graspmode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
         (comf::grasp-object *next-object* *graspmode*)
         (comf::announce-grasp-action "past" *next-object*)))) ;;replace with NLG command
+

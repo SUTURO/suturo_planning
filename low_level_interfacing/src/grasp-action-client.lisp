@@ -15,6 +15,7 @@
 (defun init-grasp-action-client ()
   "initializes the grasp-action-client and makes sure it is connected to the
 action server."
+  (roslisp:ros-info (grasp-action) "start")
   (setf *grasp-action-client*
         (actionlib:make-action-client "grasp_server"
                                       "manipulation_msgs/GraspAction"))
@@ -108,6 +109,7 @@ action server."
                                 quaterion-value-3 quaterion-value-4
                                 size-x size-y size-z)
      (values result status)))
+
 
 ;;NOTE 0 0 is the deafault lookig straight position.
 (defun test-grasp-action ()

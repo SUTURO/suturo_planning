@@ -137,6 +137,7 @@
 (defun move-to-table (turn)
   "moves the robot to the table. if turn is true,
    then the robot will move sideways to the table"
+<<<<<<< HEAD
     (roslisp:ros-info (move-poi) "Move to table started")                                         
   (let* ((closest-table-id (car (car (llif::sort-surfaces-by-distance (llif::prolog-tables)))))
          (table-pose (llif::prolog-surface-pose closest-table-id))
@@ -163,6 +164,24 @@
      (desig:a motion
               (type going) 
               (pose ?goal-pose)))))
+=======
+    (roslisp:ros-info (move-poi) "Move to table started")
+    ;;(defparameter *goalPose* nil)  
+    (defparameter *postion* nil)                                            
+    (let* ((*tablePose* (llif::prolog-table-pose)) ;;TODO fix!
+      (?goal-pose (cl-tf::make-pose-stamped "map" 0
+                (cl-tf::make-3d-vector
+                    (- (first *tablePose*) 0.7) ;;0.7 was previously 0.95
+                    (+ (second *tablePose* ) 0.1)
+                    0)
+                (if turn
+                    (cl-tf::make-quaternion 0 0 0.39 0.91)
+                    (cl-tf::make-quaternion 0 0 -0.3 0.93)))))
+        ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
+        (exe::perform (desig:a motion
+                    (type going) 
+                    (pose ?goal-pose)))))
+>>>>>>> master
 
 
 ;;@author Torge Olliges
