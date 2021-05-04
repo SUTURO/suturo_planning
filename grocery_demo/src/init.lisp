@@ -1,6 +1,6 @@
 (in-package :grocery)
 
-
+(defparameter *planning-node* nil)
 (defparameter *tf-listener* nil)
 
 ;;Init all interface clients and start a ros node
@@ -9,7 +9,7 @@
   (roslisp:ros-info (init-interface) "Initialising Interfaces:")
 
   ;;starts ros node
-  (init-planning)
+  (get-planning-node)
 
   (init-tts)
 
@@ -23,6 +23,10 @@
 
   (init-nlp)
 )
+
+(defun get-planning-node ()
+  (or *make-nav-plan-client*
+      (init-planning)))
 
 (defun init-navigation()
  "Initialize only local nodes for working without the real robot."
@@ -83,6 +87,5 @@
   "Initialize only local nodes for working without the real robot."  
   ;;start rosnode named planning_node
   (roslisp:ros-info (init-interface) "Creating ROS Node 'planning_node'")
-  (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)
-)
+  (setf *planning-node* (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)))
 

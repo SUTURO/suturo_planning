@@ -14,7 +14,7 @@
 action server."
   (setf *place-action-client*
         (actionlib:make-action-client "/place_server"
-                                      "manipulation_action_msgs/PlaceAction"))
+                                      "manipulation_msgs/PlaceAction"))
   (loop until (actionlib:wait-for-server *place-action-client*
                                          *place-action-timeout*))
 

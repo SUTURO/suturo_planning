@@ -9,8 +9,14 @@
    #:call-nav-action
    #:smash-into-appartment
    #:call-nav-action-ps
-   
-   ;; move-gripper-client
+
+   ;;make-plan-action-client
+   #:init-make-plan-action-client
+   #:try-make-plan-action
+   #:make-plan-action-goal
+   #:get-make-plan-action-client
+
+   ;;move-gripper-client
    #:init-move-gripper-action-client
    #:get-move-gripper-client
    #:make-move-gripper-action-goal
@@ -62,19 +68,44 @@
    #:insert-knowledge-objects
    
    ;;knowledge-client
-   #:prolog-object-pose
-   #:prolog-object-in-gripper
-   #:prolog-object-dimensions
-   #:prolog-all-objects-in-shelf
-   #:prolog-object-goal-pose
-   #:prolog-object-goal
-   #:prolog-table-objects 
-   #:prolog-objects-around-pose
+   #:knowrob-symbol->string
    #:object-name->class
-   #:prolog-table-pose
-   #:prolog-shelf-pose
-   #:prolog-target-pose
+   #:prolog-add-test-objects
+   #:prolog-all-objects-in-shelf
+   #:prolog-object-in-gripper
+   #:prolog-forget-table-objects
+   
+   ;;knowledge-door-client
+   #:prolog-get-all-door-states
+   #:prolog-update-doorr-state
+   #:prolog-get-angle-to-open-door
+   
+   ;;knowledge-object-client
+   #:prolog-table-objects
+   #:prolog-object-goal
+   #:prolog-object-supporting-surface
+   #:prolog-object-goal-pose
    #:prolog-next-object
+   #:prolog-object-dimensions
+   #:prolog-object-pose
+   #:prolog-next-graspable-object
+   #:prolog-non-graspable-objects-on-surface
+   #:set-object-not-graspable
+   #:get-reason-for-object-goal-pose
+   
+   ;;knowledge-surface-client
+   #:prolog-surface-pose
+   #:prolog-tables
+   #:prolog-shelfs
+   #:prolog-buckets
+   #:prolog-get-surface-regions
+   #:prolog-get-surface-room
+   #:prolog-current-room
+   #:prolog-get-room-to-room-obstacles
+    
+   ;;knowledge-tts-client
+   #:prolog-perceived-object->object-id
+   #:prolog-perceived-room->room-id
 
    ;;nlp-subscriber
    #:static-command-listener
@@ -82,7 +113,20 @@
 
    ;;poi-client
    #:sortedStampedByDistance
+
+   ;;open-door-client
+   #:get-open-door-client
+   #:init-open-door-client
+   #:make-open-door-goal
+   #:ensure-open-goal-reached
+   #:call-grasp-action
    
+   ;;robosherlock-client-door
+   #:init-robosherlock-door-action-client
+   #:get-robosherlock-door-client
+   #:make-action-goal-door
+   #:call-robosherlock-door-pipeline
+
   ;;process-module
 
 

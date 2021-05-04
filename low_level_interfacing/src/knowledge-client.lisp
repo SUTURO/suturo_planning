@@ -80,65 +80,6 @@
                            "create_object_on_surface(Table)")
               :package :llif))))))
 
-;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19.
-(defun prolog-table-objects ()
-  "returns the list of all objects on the table"
-  (roslisp:ros-info (json-prolog-client) "Getting objects on the table.")
-  (let* ((raw-response
-           (with-safe-prolog
-             (json-prolog:prolog-simple
-              (concatenate 'string
-                           "all_objects_on_tables(INSTANCES),"
-                           "member(INSTANCE, INSTANCES)")
-              :package :llif)))
-         (instances (if (eq raw-response 1)
-                        NIL
-                        (cdr (assoc '?instances (cut:lazy-car raw-response))))))
-    (if instances
-        (mapcar #'knowrob-symbol->string instances)
-        (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution."))))
-
-
-;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
-(defun prolog-object-goal (object-name)
-  "returns the goal shelf (tf-frame) for an object name"
-  (roslisp:ros-info (json-prolog-client)
-                    "Getting goal floor for object ~a." object-name)
-  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
-         (raw-response (with-safe-prolog  
-                         (json-prolog:prolog-simple 
-                          (concatenate 'string 
-                                       "object_goal_surface('"
-                                       knowrob-name "', SURFACE)," 
-                                       "surface_frame(SURFACE, FRAME)")
-                          :package :llif)))
-         (surface (if (eq raw-response 1)
-                      NIL
-                      (cdr (assoc '?frame (cut:lazy-car raw-response))))))
-    (if surface
-        (format nil "environment/~a" (string-trim "'" surface))
-        (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution."))))
-
-;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
-(defun prolog-object-goal-pose (object-name)
-  "returns the goal pose for an object name"
-  (roslisp:ros-info (json-prolog-client)
-                    "Getting goal pose for object ~a." object-name)
-  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
-         (raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple
-                          (concatenate 'string "object_goal_pose_offset('"
-                                       knowrob-name"', POSE, CONTEXT).")
-                          :package :llif))))
-    (if (eq raw-response 1)
-        (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution.")
-        (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
-                       ,(string-trim "'" (cdr (assoc '?context
-                                              (cut:lazy-car raw-response)))))))))
-
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-all-objects-in-shelf ()
  "returns all objects in the shelf"
@@ -155,117 +96,6 @@
         (mapcar #'knowrob-symbol->string instances)
         (roslisp:ros-warn (json-prolog-client)
                           "Query didn't reach any solution."))))
-
-;; @author Tom-Eric Lehmkuhl
-(defun prolog-next-object ()
- "returns the next object to grasp"
-  (roslisp:ros-info (json-prolog-client) "Getting next object to grasp.")
-  (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple 
-                          "next_object(OBJECT)"
-                          :package :llif)))
-         (object (if (eq raw-response 1) NIL 
-                     (cdr (assoc '?object (cut:lazy-car raw-response))))))
-    
-    (if (and object (string/= object "'noObjectsOnSourceSurfaces'"))
-        (knowrob-symbol->string object)
-        (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution."))))
-
-;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
-(defun prolog-object-dimensions (object-name)
-  "returns the dimensions of an object as list with '(depth width height)"
-  (roslisp:ros-info (json-prolog-client)
-                    "Getting dimensions for object ~a." object-name)
-  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
-         (raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple
-                          (concatenate 'string "object_dimensions('"
-                                       knowrob-name "', D, W, H)")
-                          :package :llif)))
-         (raw-dimensions (if (eq raw-response 1)
-                             NIL
-                             (cut:lazy-car raw-response)))
-         (dimensions (when raw-dimensions
-                       (list (cdr (assoc '?D raw-dimensions))
-                             (cdr (assoc '?W raw-dimensions))
-                             (cdr (assoc '?H raw-dimensions))))))
-    (or dimensions
-        (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution."))))
-
-;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
-(defun prolog-object-pose (object-name)
-  "returns the pose of an object"
-  (roslisp:ros-info (json-prolog-client)
-                    "Getting pose for object ~a." object-name)
-  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
-         (raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple 
-                          (concatenate 'string "object_pose('"
-                                       knowrob-name "', POSE)")
-                          :package :llif))))
-    (if (eq raw-response 1)
-        (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution.")
-        (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
-                       ,(string-trim "'"
-                                     (cdr 
-                                      (assoc '?context
-                                             (cut:lazy-car raw-response)))))))))    
-
-;; @author Tom-Eric Lehmkuhl
-(defun prolog-table-pose ()
-  "returns the pose of the table"
-  (roslisp:ros-info (json-prolog-client) "Getting pose from table")
-  (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple 
-                          (concatenate 'string "get_surface_id_by_name"
-                                       "(table_center, TABLE),"
-                                       "surface_pose_in_map"
-                                       "(TABLE, [TRANSLATION, ROTATION])")
-                          :package :llif))))
-    (if (eq raw-response 1)
-        (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution.")
-        (values-list `(,(cdr (assoc '?translation (cut:lazy-car raw-response)))
-                       ,(string-trim "'"
-                                     (cdr
-                                      (assoc '?context
-                                             (cut:lazy-car raw-response)))))))))
-
-;; @author Tom-Eric Lehmkuhl
-(defun prolog-shelf-pose ()
-  "returns the pose of the shelf"
-  (roslisp:ros-info (json-prolog-client) "Getting pose from shelf")
-  (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple "pose_of_shelves(POSES)"
-                                                    :package :llif))))
-    (if (eq raw-response 1)
-        (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution.")
-        (values-list `(,(cdr (assoc '?Poses (cut:lazy-car raw-response)))
-                       ,(string-trim "'"
-                                     (cdr
-                                      (assoc '?context
-                                             (cut:lazy-car raw-response)))))))))
-
-;; @author Tom-Eric Lehmkuhl
-(defun prolog-target-pose ()
-  "returns the poses of all targets surfaces"
-  (roslisp:ros-info (json-prolog-client) "Getting poses from targets")
-  (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple "pose_of_target_surfaces(POSES)"
-                                                    :package :llif))))
-    (if (eq raw-response 1)
-        (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution.")
-        (values-list `(,(cdr (assoc '?Poses (cut:lazy-car raw-response)))
-                       ,(string-trim "'"
-                                     (cdr
-                                      (assoc '?context
-                                             (cut:lazy-car raw-response)))))))))
-
 
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-in-gripper ()
@@ -292,7 +122,23 @@
               (concatenate
                'string "get_surface_id_by_name (table_2_center, TABLE),"
                "forget_objects_on_surface(TABLE).")
-              :package :llif))))))  
+              :package :llif))))))
+
+
+
+
+;; @author Jan Schimpf
+;; ask knowledge for how the object should be grasped 
+;; 1 for grasping from front and 2 for grasping from the top
+;;(defun prolog-object-grasp-mode (object-id))
+;;    "Asking knowledge what graspmode to use"
+;;    (roslisp:ros-info (json-prolog-client) "Asking knowledge what graspmode to use")
+;;    (let* ((raw-response
+;;           (with-safe-prolog
+;;             (json-prolog:prolog-simple 
+;;               
+;;              :package :llif))))))  
+
 
 ;;; former planning_communication/json-prolog.lisp
 #+deprecated

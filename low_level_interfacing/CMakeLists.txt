@@ -19,8 +19,9 @@ find_package(catkin REQUIRED COMPONENTS
   control_msgs
   #suturo_perception_msgs
   #suturo_manipulation_msgs
-  manipulation_action_msgs
+  manipulation_msgs
   knowledge_msgs
+  nlg_msgs
 )
 
 catkin_package(

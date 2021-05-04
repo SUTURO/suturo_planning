@@ -54,7 +54,7 @@
 ;;@author Philipp Klein
 (defun point-listener ()
   "subscribe to bject_finder and call the callback function add-poi-from-topic"
-  (subscribe "object_finder" "geometry_msgs/PoseArray" #'add-poi-from-topic)
+  (subscribe "/object_finder/object_finder" "geometry_msgs/PoseArray" #'add-poi-from-topic)
   (roslisp:ros-info (poi-subscriber) "POI Subscriber started"))
 
 ;;@author Philipp Klein
