@@ -18,6 +18,15 @@
 
 
 ;;@author Philipp Klein
+(defun create-map-message (map-message data-array)
+  "publishes the current searched map"
+  (roslisp:with-fields (header info) map-message
+    (roslisp::make-message "nav_msgs/OccupancyGrid"
+                           (header) header
+                           (info) info
+                           (data) data-array)))
+
+;;@author Philipp Klein
 (defun publish-debug-search-map ()
   "publishes the current searched map"
    (roslisp:publish (advertise "search_map" "nav_msgs/OccupancyGrid") *searchMap*)
@@ -65,7 +74,7 @@
             (setf (aref datas (+(* row width) col)) 66)
          )
               )))
-    (defparameter *searchMap*(roslisp:modify-message-copy *searchMap* (data) datas))
+    (defparameter *searchMap* (create-map-message *searchMap* datas))
   ))
 
 ;;@author Philipp Klein
