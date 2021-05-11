@@ -29,7 +29,7 @@
     *robosherlock-process-object-image-action-client*)
 
 ;;@author Torge Olliges
-(defun make-process-object-image-action-goal (image_id))
+(defun make-process-object-image-action-goal (image_id)
     (actionlib::make-action-goal 
         (get-robosherlock-process-object-image-client)
         :cas_id image_id))

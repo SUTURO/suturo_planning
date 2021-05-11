@@ -165,7 +165,7 @@
                      (cdr (assoc '?reason (cut:lazy-car raw-response))))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't next_object reach any solution.")
+                          "Query object_reason_goal_pose didn't next_object reach any solution.")
         answer)))
 
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
@@ -188,7 +188,7 @@
                              (cdr (assoc '?H raw-dimensions))))))
     (or dimensions
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't reach any solution."))))
+                          "Query object_dimensions didn't reach any solution."))))
 
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-pose (object-name)
@@ -203,7 +203,7 @@
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't reach any solution.")
+                          "Query object_pose didn't reach any solution.")
         (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
                        ,(string-trim "'"
                                      (cdr 
