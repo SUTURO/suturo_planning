@@ -20,10 +20,10 @@
                           (concatenate 'string "update_door_state_dynamic('"door-id"','"angle"')")))))
         (if (eq raw-response 1)
             (roslisp:ros-warn (json-prolog-client)
-                              "Query didn't reach any solution.")
+                              "Query update_door_state_dynamic didn't reach any solution.")
             (cut:lazy-car raw-response))))
 
-;; @author Jan Schimpg
+;; @author Jan Schimpf
 (defun prolog-get-angle-to-open-door (door-id)
   "returns the angle that is used to open the door"
  (let* ((raw-response (with-safe-prolog
@@ -31,5 +31,19 @@
                                        door-id "', ANGLE)")  :package :llif))))
         (if (eq raw-response 1)
             (roslisp:ros-warn (json-prolog-client)
-                              "Query didn't reach any solution.")
+                              "Query get_door_state didn't reach any solution.")
+           (cdr (car (cut:lazy-car raw-response))))))
+
+;; @author Torge Olliges
+(defun prolog-shortest-path-between-rooms (start-room-id target-room-id)
+  "returns door ids which are obstacles on the path frorm start room to target room"
+ (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple  
+                          (concatenate 'string 
+                            "shortest_path_between_rooms('"
+                            start-room-id ", " 
+                            target-room-id "', DOORS)")  :package :llif))))
+        (if (eq raw-response 1)
+            (roslisp:ros-warn (json-prolog-client)
+                              "Query shortest_path_between_rooms didn't reach any solution.")
            (cdr (car (cut:lazy-car raw-response))))))
