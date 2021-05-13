@@ -25,11 +25,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_lisp_executable(
-init cleanup-demo clean::init-interfaces
-)
 
 add_lisp_executable(
-execute-cleanup cleanup-demo clean::execute-cleanup
-
+execute-cleanup cleanup-demo clean::init-execute-cleanup
 )
