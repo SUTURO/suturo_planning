@@ -11,10 +11,8 @@
 
 
   ;;starts ros node
-  (get-planning-node) ;;TODO remove here call seperate
-  ;;(if *planning-node-exits* 
-    (roslisp:ros-info (init-interface) "Planning node already exists.")  
-  ;; (init-planning))
+  (get-planning-node) 
+  
   (init-planning)
 
   (init-navigation)
@@ -91,7 +89,7 @@
   (llif::init-nlg-action-client))
 (defun init-poi()
   ;;init action client
-  (roslisp:ros-info (init-interface) "init point of interest scanning")
+  (roslisp:ros-info (init-interfaces) "init point of interest scanning")
   (llif::point-listener)
   (llif::obstacle-map-listener))
 

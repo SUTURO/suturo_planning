@@ -24,7 +24,7 @@
 ;;@author Torge Olliges
 (defun perceive-table (table-id)
     (comf::announce-perceive-action-surface "present" table-id)
-    (llif::call-take-pose-action 2)
+    (llif::call-take-pose-action 3)
     (let ((perceived-objects (llif::call-robosherlock-object-pipeline (vector table-id) t))
           (confident-objects (comf::get-confident-objects perceived-objects)))
         (llif::insert-knowledge-objects confident-objects)
