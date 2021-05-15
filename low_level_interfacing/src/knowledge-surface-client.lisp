@@ -126,9 +126,28 @@
 
 ;; @author Torge Olliges
 (defun prolog-current-room ()
-)
+  (let* ((raw-response (with-safe-prolog
+                           (json-prolog:prolog-simple
+                           (concatenate 'string
+                                        "in_room(ROOM)")
+                           :package :llif))))
+     (if (eq raw-response 1)
+         (roslisp:ros-warn (knowledge-surface-client)
+                           "Query didn't in_room reach any solution.")
+         (values-list (list (mapcar
+                       (lambda (x) (string-trim "'" x))
+                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
 
 ;; @author Torge Olliges
-(defun prolog-get-room-to-room-obstacles (room-start room-goal)
-  ;;  liste obstacles: (obstacle (tür, position))
-)
+(defun prolog-current-room ()
+  (let* ((raw-response (with-safe-prolog
+                           (json-prolog:prolog-simple
+                              "all_rooms(ROOMS)"
+                           :package :llif))))
+     (if (eq raw-response 1)
+         (roslisp:ros-warn (knowledge-surface-client)
+                           "Query didn't all_rooms reach any solution.")
+         (values-list (list (mapcar
+                       (lambda (x) (string-trim "'" x))
+                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
+

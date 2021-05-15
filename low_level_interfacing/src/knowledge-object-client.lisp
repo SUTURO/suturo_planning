@@ -141,7 +141,7 @@
                       t)))
     (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't next_object reach any solution.")
+                          "Query didn't set_not_graspable reach any solution.")
         answer)))
 
 ;; Reasons:
@@ -210,3 +210,19 @@
                                       (assoc '?context
                                              (cut:lazy-car raw-response)))))))))
                                       
+;; @author Torge Olliges
+(defun prolog-object-room (object-id)
+  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
+         (raw-response (with-safe-prolog
+                           (json-prolog:prolog-simple
+                           (concatenate 'string
+                                        "in_room("
+                                        knowrob-name
+                                        ",ROOM)")
+                           :package :llif))))
+     (if (eq raw-response 1)
+         (roslisp:ros-warn (knowledge-surface-client)
+                           "Query didn't all_rooms reach any solution.")
+         (values-list (list (mapcar
+                       (lambda (x) (string-trim "'" x))
+                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
