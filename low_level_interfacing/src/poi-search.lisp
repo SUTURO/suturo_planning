@@ -33,9 +33,11 @@
   )
 
 ;;@author Philipp Klein
-(defun mark-position-visited (radius)
+(defun mark-position-visited (radius &optional position)
   "marks a specific area in the map as already searched
   `radius' the radius around the robot that should be marked as searched"
+  (print "marking position as visited")
+  (print position)
   (roslisp:with-fields
       ((datas (data))
       (resolution(resolution info))
@@ -43,10 +45,12 @@
       (x (x position origin info))
       (y (y position origin info)))
       *searchMap*
-    (setf *position* (cl-tf::transform-stamped->pose-stamped
+    (if position
+         (setf *position* position)
+         (setf *position* (cl-tf::transform-stamped->pose-stamped
           (cl-tf::lookup-transform
            cram-tf::*transformer*
-           "map" "base_footprint")))
+           "map" "base_footprint"))))
     (setf *vect3* (cl-tf:origin *position*))
     (setf *indexs* 
           (+
@@ -62,7 +66,9 @@
              (-
               (cl-tf::x *vect3*) x)
              resolution))))
-    (setf *rradius* (round (* radius resolution)))
+    ;;(print *position*)
+    ;;(print *vect3*)
+    (setf *rradius* (round (/ radius resolution)))
     (if (and
          (>
           (length datas) *indexs*)
@@ -71,7 +77,8 @@
         (multiple-value-bind (row col) (floor *indexs* width)
         (loop for i from (- row *rradius*) to (+ row *rradius*) do
           (loop for j from (- col *rradius*) to (+ col *rradius*) do
-            (setf (aref datas (+(* row width) col)) 66)
+            (if (< (+(* i width) j) (length datas))
+            (setf (aref datas (+(* i width) j)) 66))
          )
               )))
     (defparameter *searchMap* (create-map-message *searchMap* datas))
@@ -80,6 +87,7 @@
 ;;@author Philipp Klein
 (defun find-biggest-notsearched-space ()
   "returns the position of the bottom left corner of the bigest area not searched yet and the size"
+  (print "searching empty square")
   (roslisp:with-fields (
                         data
                         (resolution(resolution info))
@@ -92,30 +100,59 @@
     (setf *copy* (make-array (length data) :initial-element 0))
     (loop for i from 0 to (- (length data) 1) do
       ;;(multiple-value-bind (row col) (floor i width)
-        (if (and (>= i (+ width 1)) (= (aref data i) 0))
-            (setf (aref *copy* i)
+      ;;(print i)
+      (if (and
+           (>= i width)
+           (not (= 0 (mod i width)))
+           (= (aref data i) 0))
+            (progn (setf (aref *copy* i)
                   (+  
                    (min (aref *copy* (- i 1))
                        (aref *copy* (- i width))
                        (aref *copy* (- i width 1)))
-                   1)))
-        (if (< *max-size* (aref *copy* i))
-            (setf *max-size* (aref *copy* i))
-            (setf *bl-corner* i)))
+                   1))
+            (if (< *max-size* (aref *copy* i))
+              (progn
+                (setf *max-size* (aref *copy* i))
+                (setf *bl-corner* i))))
+            (setf (aref *copy* i) 0)))
     (roslisp:publish (advertise "search_map_algo" "nav_msgs/OccupancyGrid") (roslisp:modify-message-copy *searchMap* (data) *copy*))
+    (print *bl-corner*)
     (multiple-value-bind (row col) (floor *bl-corner* width) ;;floor or round
+      (print row)
+      (print col)
       (setf *bl-coord*
             (cl-tf:make-3d-vector
              (+ x (* resolution col))
              (+ y (* resolution row))
              0))
-      (setf *realsize*  (* resolution *max-size*))
+      (setf *realsize*  (* *max-size* resolution))
       (print *bl-coord*)
+      (print *max-size*)
       (print *realsize*)
       (publish-debug-square (list *bl-coord*
                                   (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector 0 *realsize* 0))
                                   (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector *realsize* *realsize* 0))
-                                  (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector *realsize* 0 0)))))))
+                                  (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector *realsize* 0 0))))
+      (setf *position* (cl-tf::transform->pose
+        (cl-tf::lookup-transform
+          cram-tf::*transformer*
+          "map" "base_footprint")))
+      (if
+       (llif::global-planner-reachable
+        *position*
+        (cl-tf:make-pose (cl-tf:v- *bl-coord*
+                                   (cl-tf:make-3d-vector (/ *realsize* 2) (/ *realsize* 2) 0))
+                         (cl-tf::make-quaternion 0 0 0 1)))
+       (print "coords")
+       (progn
+         (mark-position-visited (/ *realsize* 2)
+              (cl-tf::make-pose-stamped "map" 0
+                                        (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector (/ *realsize* 2) (/ *realsize* 2) 0))
+                                        (cl-tf::make-quaternion 0 0 0 1)))
+         (find-biggest-notsearched-space)
+         ))
+      )))
 
 ;;@author Philipp Klein
 (defun publish-debug-square (pose-list)

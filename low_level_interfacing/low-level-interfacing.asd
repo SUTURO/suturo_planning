@@ -20,6 +20,7 @@
                visualization_msgs-msg
                cram-json-prolog
                std_srvs-srv
+               navfn-srv
                manipulation_msgs-msg
                knowledge_msgs-msg
                nlg_msgs-msg
@@ -51,7 +52,8 @@
       (:file "take-pose-action-client" :depends-on ("package"))
 	  (:file "nlp-subscriber" :depends-on ("package"))
 	  (:file "poi-client" :depends-on("package"))
-            (:file "poi-search" :depends-on("package")) 
+       (:file "poi-search" :depends-on("package"))
+    (:file "global-planner" :depends-on("package"))
 	  (:file "text-to-speech" :depends-on("package"))
       (:file "nlg-action-client" :depends-on("package"))
       (:file "make-plan-action-client" :depends-on("package"))))))
