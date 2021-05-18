@@ -8,7 +8,7 @@
                          (json-prolog:prolog-simple 
                           (concatenate 'string 
                                        "tf_lookup_transform('map',"
-                                       surface-name
+                                       surface-name 
                                        ",pose(TRANSLATION, ROTATION))")
                           :package :llif))))
      (if (eq raw-response 1)
@@ -27,9 +27,9 @@
   (let*  ((raw-response (with-safe-prolog
                            (json-prolog:prolog-simple
                             (concatenate 'string
-                                         "surface_front_edge_center_pose("
+                                         "surface_front_edge_center_pose('"
                                          surface-name
-                                         ", [TRANSLATION, ROTATION])")
+                                         "', [TRANSLATION, ROTATION])")
                             :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-surface-client)
@@ -139,15 +139,15 @@
                        (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
 
 ;; @author Torge Olliges
-(defun prolog-current-room ()
-  (let* ((raw-response (with-safe-prolog
-                           (json-prolog:prolog-simple
-                              "all_rooms(ROOMS)"
-                           :package :llif))))
-     (if (eq raw-response 1)
-         (roslisp:ros-warn (knowledge-surface-client)
-                           "Query didn't all_rooms reach any solution.")
-         (values-list (list (mapcar
-                       (lambda (x) (string-trim "'" x))
-                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
+;;(defun prolog-current-room ()
+;;  (let* ((raw-response (with-safe-prolog
+;;                           (json-prolog:prolog-simple
+;;                              "all_rooms(ROOMS)"
+;;                           :package :llif))))
+;;     (if (eq raw-response 1)
+;;         (roslisp:ros-warn (knowledge-surface-client)
+;;                           "Query didn't all_rooms reach any solution.")
+;;         (values-list (list (mapcar
+;;                       (lambda (x) (string-trim "'" x))
+;;                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
 
