@@ -201,3 +201,16 @@
 ;;                       (lambda (x) (string-trim "'" x))
 ;;                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
 
+
+;; @author Jan Schimpf
+(defun prolog-get-perception-surface-region(surface-id)
+   (let* ((raw-response (with-safe-prolog
+                           (json-prolog:prolog-simple
+                            (concatenate 'string "get_perception_surface_region('"
+                                         surface-id
+                                        "',PERCEPTIONNAME).")
+                           :package :llif))))
+     (if (eq raw-response 1)
+         (roslisp:ros-warn (knowledge-surface-client)
+                           "Query didn't in_room reach any solution.")
+                           (cdr (assoc '?Perceptionname (cut:lazy-car raw-response))))))
