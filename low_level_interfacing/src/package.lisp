@@ -92,6 +92,8 @@
    #:prolog-non-graspable-objects-on-surface
    #:set-object-not-graspable
    #:get-reason-for-object-goal-pose
+   #:prolog-object-room
+   #:prolog-room-objects
    
    ;;knowledge-surface-client
    #:prolog-surface-pose
@@ -102,6 +104,15 @@
    #:prolog-get-surface-room
    #:prolog-current-room
    #:prolog-get-room-to-room-obstacles
+   #:current-pose-prolog-pose->distance
+   #:sort-surfaces-by-distance
+   #:prolog-surface-region
+   #:prolog-surface-room
+   #:prolog-room-surfaces
+   #:prolog-current-room
+   #:prolog-set-surfaces-visit-state
+   #:prolog-surfaces-not-visited
+   #:prolog-surfaces-not-visited-in-room
     
    ;;knowledge-tts-client
    #:prolog-perceived-object->object-id

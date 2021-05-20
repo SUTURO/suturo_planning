@@ -152,7 +152,7 @@
                   (second (second table-pose))
                   (third (second table-pose))
                   (fourth (second table-pose)))
-                 (cl-transforms:euler->quaternion :ax 0 :ay 0 :az (/ pi 2.75)))
+                 (cl-transforms:euler->quaternion :ax 0 :ay 0 :az (/ pi 2)))
                 (cl-tf::make-quaternion
                  (first (second table-pose))
                  (second (second table-pose))

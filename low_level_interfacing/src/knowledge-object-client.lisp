@@ -141,7 +141,7 @@
                       t)))
     (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't next_object reach any solution.")
+                          "Query didn't set_not_graspable reach any solution.")
         answer)))
 
 ;; Reasons:
@@ -165,7 +165,7 @@
                      (cdr (assoc '?reason (cut:lazy-car raw-response))))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't next_object reach any solution.")
+                          "Query object_reason_goal_pose didn't next_object reach any solution.")
         answer)))
 
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
@@ -188,7 +188,7 @@
                              (cdr (assoc '?H raw-dimensions))))))
     (or dimensions
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't reach any solution."))))
+                          "Query object_dimensions didn't reach any solution."))))
 
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-pose (object-name)
@@ -203,10 +203,43 @@
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't reach any solution.")
+                          "Query object_pose didn't reach any solution.")
         (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
                        ,(string-trim "'"
                                      (cdr 
                                       (assoc '?context
                                              (cut:lazy-car raw-response)))))))))
                                       
+;; @author Torge Olliges
+(defun prolog-object-room (object-id)
+  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
+         (raw-response (with-safe-prolog
+                           (json-prolog:prolog-simple
+                           (concatenate 'string
+                                        "object_in_room("
+                                        knowrob-name
+                                        ",ROOM)")
+                           :package :llif))))
+     (if (eq raw-response 1)
+         (roslisp:ros-warn (knowledge-surface-client)
+                           "Query didn't object_in_room reach any solution.")
+         (values-list (list (mapcar
+                       (lambda (x) (string-trim "'" x))
+                       (cdr (assoc '?Object (cut:lazy-car raw-response)))))))))
+
+;; @author Torge Olliges
+(defun prolog-room-objects (room-id)
+  (let* ((knowrob-name (format nil "~a~a" +hsr-rooms-prefix+ room-id))
+         (raw-response (with-safe-prolog
+                           (json-prolog:prolog-simple
+                           (concatenate 'string
+                                        "objects_in_room("
+                                        knowrob-name
+                                        ",OBJECTS)")
+                           :package :llif))))
+     (if (eq raw-response 1)
+         (roslisp:ros-warn (knowledge-surface-client)
+                           "Query didn't objects_in_room reach any solution.")
+         (values-list (list (mapcar
+                       (lambda (x) (string-trim "'" x))
+                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))

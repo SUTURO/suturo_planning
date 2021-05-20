@@ -1,15 +1,14 @@
 (in-package :clean)
 
-(defun execute-cleanup()
+(defun execute-cleanup-new()
     (init-interfaces)
     (comf::with-hsr-process-modules
         (comf::announce-plan-start "clean up")
         (move-to-start-position)
         ;;TODO: move to start position -> move to first room
         ;;(loop for room-name in (llif::prolog-rooms) do (what follows...))
-        ;; TODO: loop over tables in room...
-        (loop for table-id in (llif::sort-surfaces-by-distance (llif::prolog-tables))
-            do (
+        (loop for table-id in (llif::sort-surfaces-by-distance (llif::prolog-room-surfaces (llif::prolog-current-room)))
+            do 
                 (comf::announce-movement-to-surface "future" table-id)
                 (comf::move-to-surface table-id t)
                 (perceive-table table-id)
@@ -23,34 +22,36 @@
 
 ;;@author Torge Olliges
 (defun perceive-table (table-id)
-    (comf::announce-perceive-action-surface "present" table-id)
-    (llif::call-take-pose-action 2)
-    (let ((perceived-objects (llif::call-robosherlock-object-pipeline (vector table-id) t))
-          (confident-objects (comf::get-confident-objects perceived-objects)))
-        (llif::insert-knowledge-objects confident-objects)
-        (clean::spawn-btr-objects confident-objects))
-    (llif::call-take-pose-action 1))
+  (comf::announce-perceive-action-surface "present" table-id)
+  (llif::call-take-pose-action 3)
+  (let* ((perceived-objects
+           (llif::call-robosherlock-object-pipeline
+            (vector (llif::prolog-surface-region table-id)) t))
+         (confident-objects (comf::get-confident-objects perceived-objects)))
+    (llif::insert-knowledge-objects confident-objects))
+  ;;(clean::spawn-btr-objects confident-objects))
+  (llif::call-take-pose-action 1))
 
 ;;@author Torge Olliges
 (defun handle-found-objects ()
-    (let ((next-object (llif::prolog-next-object))
-          (source-surface (llif::prolog-object-source next-object))
-          (target-surface (llif::prolog-object-goal next-object)))
-        (when (eq next-object 1) (return-from handle-found-objects nil))
-        (comf::reachability-check-grasp next-object 1)
-        ;;TODO is the next-object still valid?
-
-        (comf::announce-movement-to-surface "future" source-surface)
-        (comf::move-to-surface source-surface nil)
-
-        (comf::announce-grasp-action "future" next-object)
-        (grasp-handling next-object)
-
-        (comf::announce-movement-to-surface "future" target-surface)
-        (comf::move-to-surface target-surface nil)
-        
-        (comf::announce-place-action "future" next-object)
-        (place-handling next-object)))
+  (let ((next-object (llif::prolog-next-object))
+        (source-surface (llif::prolog-object-source next-object))
+        (target-surface (llif::prolog-object-goal next-object)))
+    (when (eq next-object 1) (return-from handle-found-objects nil))
+    (comf::reachability-check-grasp next-object 1)
+    ;;TODO is the next-object still valid?
+    
+    (comf::announce-movement-to-surface "future" source-surface)
+    (comf::move-to-surface source-surface nil)
+    
+    (comf::announce-grasp-action "future" next-object)
+    (grasp-handling next-object)
+    
+    (comf::announce-movement-to-surface "future" target-surface)
+    (comf::move-to-surface target-surface nil)
+    
+    (comf::announce-place-action "future" next-object)
+    (place-handling next-object)))
 
 ;;@author Torge Olliges
 (defun grasp-handling (next-object)
@@ -83,7 +84,7 @@
             place-action-result
                 (if (eq place-action-result 0)
                     (comf::announce-place-action "past" next-object)
-                    ((cpl:with-retry-counters ((place-retries 1))
+                    (cpl:with-retry-counters ((place-retries 1))
                         (cpl:with-failure-handling
                             (((or 
                                 common-fail:low-level-failure 
@@ -98,7 +99,7 @@
                             (setf *grasp-mode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
                             (comf::place-object next-object *graspmode*)
                             (if (eq (comf::reachability-check-place next-object *grasp-mode*) 1)
-                                (throw common-fail:low-level-failure)
+                                (throw common-fail:low-level-failure "Not Reachable")
                                 (comf::place-object next-object *grasp-mode*))
                             (comf::announce-place-action "past" next-object))))))))
 
@@ -152,3 +153,5 @@
     ;;back to base position
     (llif::call-take-pose-action 1))
   ))
+
+

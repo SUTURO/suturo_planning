@@ -6,6 +6,8 @@
   "http://knowrob.org/kb/knowrob.owl#" :test 'string=)
 (alexandria:define-constant +hsr-objects-prefix+
   "http://www.semanticweb.org/suturo/ontologies/2020/3/objects#" :test 'string=)
+(alexandria:define-constant +hsr-rooms-prefix+
+  "http://www.semanticweb.org/suturo/ontologies/2021/0/rooms#" :test 'string=)
 (alexandria:define-constant +robocup-prefix+
   "http://www.semanticweb.org/suturo/ontologies/2020/2/Robocup#" :test 'string=)
 (alexandria:define-constant +srld-prefix+
@@ -29,7 +31,6 @@
   (string-trim "'" (subseq (write-to-string knowrob-symbol)
                            (1+ (position #\# (write-to-string knowrob-symbol)))
                            (- (length (write-to-string knowrob-symbol)) 2))))
-
 
 (defun object-name->class (object-name)
   "returns the class of the given object name"
@@ -123,9 +124,6 @@
                'string "get_surface_id_by_name (table_2_center, TABLE),"
                "forget_objects_on_surface(TABLE).")
               :package :llif))))))
-
-
-
 
 ;; @author Jan Schimpf
 ;; ask knowledge for how the object should be grasped 

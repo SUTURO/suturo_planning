@@ -6,10 +6,14 @@
 ;;Init all interface clients and start a ros node
 (defun init-interfaces()
   "Init all interfaces from planning to other groups"
+  (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
   (roslisp:ros-info (init-interfaces) "Initialising Interfaces:")
 
+
   ;;starts ros node
-  (get-planning-node) ;;TODO remove here call seperate
+  (get-planning-node) 
+  
+  (init-planning)
 
   (init-navigation)
 
@@ -17,6 +21,7 @@
 
   (init-perception)
 
+  (init-nlg)
   (init-knowledge)
 
   (init-tts)
@@ -82,16 +87,16 @@
 (defun init-nlg()
   (roslisp:ros-info (init-interfaces) "init nlg action client")
   (llif::init-nlg-action-client))
-
 (defun init-poi()
   ;;init action client
   (llif::init-search-map)
+  (roslisp:ros-info (init-interfaces) "init point of interest scanning")
   (llif::point-listener)
   (llif::obstacle-map-listener))
+
 
 (defun init-planning()
   "Initialize only local nodes for working without the real robot."  
   ;;start rosnode named planning_node
   (roslisp:ros-info (init-interfaces) "Creating ROS Node 'planning_node'")
   (setf *planning-node* (roslisp-utilities:startup-ros :name "planning_node" :anonymous nil)))
-

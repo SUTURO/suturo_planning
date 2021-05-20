@@ -40,6 +40,8 @@
       (:file "place-action-client" :depends-on ("package"))
       (:file "open-door-client" :depends-on ("package"))
 	  (:file "marker-publisher" :depends-on ("package"))
+    (:file "robosherlock-capture-object-image-client" :depends-on ("package"))
+    (:file "robosherlock-process-object-image-client" :depends-on ("package"))
 	  (:file "robosherlock-client-object" :depends-on ("package"))
 	  (:file "robosherlock-client-plane" :depends-on ("package"))
 	  (:file "robosherlock-client-door" :depends-on ("package"))

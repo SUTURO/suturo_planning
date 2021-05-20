@@ -89,6 +89,7 @@
 (defun perceive-table()
     ;;perceive-table
     (comf::announce-perceive-action-surface "present" "table")
+
     (llif::call-take-pose-action 2)
     (setf *perception-objects*  (llif::call-robosherlock-object-pipeline (vector "table") t))
     (llif::insert-knowledge-objects *perception-objects*)
@@ -130,6 +131,7 @@
         (comf::move-to-bucket)
         ;;place object in shelf
         (comf::announce-place-action "future" *next-object*)
+
         
         (multiple-value-bind (a b) 
             (llif::prolog-object-goal-pose *next-object*)
@@ -167,9 +169,66 @@
                 (if (< *grasping-retries* 3)
                     (grasp-handling)
                     (comf::announce-grasp-action "failed" *next-object*)))))) ;;replace with NLG command
+    (comf::announce-perceive-action "future")
+    (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
+    ;;(comf:reachability-check *perception-objects*)
+    (llif::insert-knowledge-objects *perception-objects*)
+    ;;(comf:reachability-check (llif::prolog-next-graspable-objects))
+    (clean::spawn-btr-objects *perception-objects*)
+    ;;percieve -> filter -> insert into knowledge
+    (llif::call-take-pose-action 1))
 
+(defun point-of-interest-search-second-point()
+    (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
+    ;;drive to poi
+    (comf::move-hsr  
+        (cl-tf::make-pose-stamped "map" 0.0
+            (cl-tf::make-3d-vector 2.32 1.5 0)
+            (cl-tf::euler->quaternion :ax 0 :ay 0 :az 2.5)))
 
+    (comf::move-to-poi) 
 
+    (comf::announce-perceive-action "future")
+    (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
+    ;;(comf:reachability-check *perception-objects*)
+    (llif::insert-knowledge-objects *perception-objects*)
+    ;;(comf:reachability-check (llif::prolog-next-graspable-objects))
+    (clean::spawn-btr-objects *perception-objects*)
+    ;;percieve -> filter -> insert into knowledge
+    (llif::call-take-pose-action 1))
+
+;;@author Jan Schimpf; Philipp Klein
+;; Grasps the object and places it in the goal area (currently sill the shelf)
+(defun point-of-interest-transport()
+    (setf *next-object* (llif::prolog-next-object))
+
+    (setf *object-goal-pose* (llif::prolog-object-pose *next-object*))
+
+    ;; make sure we are in a neutral position
+    (comf::announce-grasp-action "future" *next-object*)
+    (llif::call-take-pose-action 1)
+    ;; turn to face the object
+    ;;(roslisp::with-fields (translation rotation)
+    ;;    (cl-tf::lookup-transform cram-tf::*transformer* "map" "base_footprint")
+    ;;    (llif::call-nav-action-ps 
+    ;;        (cl-tf::make-pose-stamped "map" 0 translation
+    ;;            (cl-tf::q* rotation
+    ;;            (cl-tf::euler->quaternion :ax 0 :ay 0 :az -1.57)))))
+    
+    ;; grasp the object from the floor
+    (hsr-failure-handling-grasp)
+    (comf::announce-movement  "future")
+    ;;move to bucket
+    (llif::call-nlg-action (list (llif::make-key-value-msg "action" "move") (llif::make-key-value-msg "goal_surface_id" "bucket")))
+    (comf::move-to-bucket)
+
+    ;;place object in bucket
+    (comf::announce-place-action "present" *next-object*)
+
+    (comf::place-object *next-object* *graspmode*)
+    (comf::announce-place-action "past" *next-object*)
+    ;;back to base position
+    (llif::call-take-pose-action 1))
 
 
 ;;@author Jan Schimpf
@@ -197,3 +256,4 @@
         (setf *graspmode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
         (comf::grasp-object *next-object* *graspmode*)
         (comf::announce-grasp-action "past" *next-object*)))) ;;replace with NLG command
+
