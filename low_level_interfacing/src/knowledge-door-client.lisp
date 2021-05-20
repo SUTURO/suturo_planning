@@ -34,6 +34,28 @@
                               "Query get_door_state didn't reach any solution.")
            (cdr (car (cut:lazy-car raw-response))))))
 
+;; @author Jan Schimpf
+(defun prolog-perceiving-pose-of-door (door-id)
+ "returns the pose needed to perceive the door"
+ (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple  (concatenate 'string "perceiving_pose_of_door('"
+                                       door-id "', POSE)")  :package :llif))))
+        (if (eq raw-response 1)
+            (roslisp:ros-warn (json-prolog-client)
+                              "Query get_door_state didn't reach any solution.")
+            (cut:lazy-car raw-response))))
+
+;; @author Jan Schimpf
+(defun prolog-manipulating-pose-of-door(door-id)
+  "returns the pose from which we can manipulate the door"
+ (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple  (concatenate 'string "manipulating_pose_of_door('"
+                                       door-id "', POSE)")  :package :llif))))
+        (if (eq raw-response 1)
+            (roslisp:ros-warn (json-prolog-client)
+                              "Query get_door_state didn't reach any solution.")
+            (cut:lazy-car raw-response))))  
+
 ;; @author Torge Olliges
 (defun prolog-shortest-path-between-rooms (start-room-id target-room-id)
   "returns door ids which are obstacles on the path frorm start room to target room"
