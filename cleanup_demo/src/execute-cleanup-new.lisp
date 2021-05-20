@@ -9,12 +9,13 @@
         ;;(loop for room-name in (llif::prolog-rooms) do (what follows...))
         (loop for table-id in (llif::sort-surfaces-by-distance (llif::prolog-room-surfaces (llif::prolog-current-room)))
               do
+                (when (eq (search "Shelf" (car table-id)) nil)
                 (comf::announce-movement-to-surface "future" (car table-id))
                 (comf::move-to-surface (car table-id) t)
                 (perceive-table (car table-id))
                 (handle-found-objects))
         ;;POI stuff missing
-        ))
+        )))
 
 ;;@author Torge Olliges
 (defun move-to-start-position()

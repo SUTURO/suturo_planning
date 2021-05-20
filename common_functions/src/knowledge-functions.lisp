@@ -73,7 +73,7 @@
       (+ (first (first surface-edge-pose))
         ;; creates the x value of the Vector from Center to Edge
         (* (- (first (first surface-edge-pose))
-           (first (first surface-pose))) 1.75)
+           (first (first surface-pose))) 1.75))
 
      ;; adds the y value of the Vector to the edge to create an offset
      (+ (second (first surface-edge-pose))
