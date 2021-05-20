@@ -116,18 +116,6 @@
                       (third prolog-pose-values))))
     (cl-transforms:v-dist current-pose-translation prolog-pose-vector)))
 
-;; @author Torge Olliges
-(defun prolog-get-surface-region (surface-id)
-)
-
-;; @author Torge Ollige
-(defun prolog-get-room-surfaces (room-id)
-)
-
-;; @author Torge Olliges
-(defun prolog-get-surface-room (surface-id)
-)
-
 ;; @author Torge Ollige
 (defun prolog-set-surfaces-visit-state (surface-id state)
   (let* ((raw-response (with-safe-prolog
@@ -179,14 +167,61 @@
   (let* ((raw-response (with-safe-prolog
                            (json-prolog:prolog-simple
                            (concatenate 'string
-                                        "in_room(ROOM)")
+                                        "robot_in_room(ROOM)")
                            :package :llif))))
      (if (eq raw-response 1)
          (roslisp:ros-warn (knowledge-surface-client)
-                           "Query didn't in_room reach any solution.")
+                           "Query didn't robot_in_room reach any solution.")
          (values-list (list (mapcar
                        (lambda (x) (string-trim "'" x))
                        (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
+
+;; @author Torge Olliges
+(defun prolog-room-surfaces (room-id)
+  (let* ((knowrob-name (format "~a~a" +hsr-rooms-prefix+ room-id))
+    (raw-response (with-safe-prolog
+                           (json-prolog:prolog-simple
+                           (concatenate 'string
+                                        "surfaces_in_room('"
+                                        knowrob-name
+                                        "',SURFACES)")
+                           :package :llif))))
+     (if (eq raw-response 1)
+         (roslisp:ros-warn (knowledge-surface-client)
+                           "Query didn't surfaces_in_room reach any solution.")
+         (values-list (list (mapcar
+                       (lambda (x) (string-trim "'" x))
+                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
+
+(defun prolog-surface-room (surface-id)
+(let* ((raw-response (with-safe-prolog
+                        (json-prolog:prolog-simple
+                          (concatenate 'string
+                                        "surface_in_room('"
+                                        surface-id
+                                        "',ROOM)")
+                           :package :llif))))
+     (if (eq raw-response 1)
+         (roslisp:ros-warn (knowledge-surface-client)
+                           "Query didn't surface_in_room reach any solution.")
+         (values-list (list (mapcar
+                       (lambda (x) (string-trim "'" x))
+                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
+
+(defun prolog-surface-region (surface-id)
+(let* ((raw-response (with-safe-prolog
+                        (json-prolog:prolog-simple
+                          (concatenate 'string
+                                        "get_perception_surface_region('"
+                                        surface-id
+                                        "',REGION)")
+                           :package :llif))))
+     (if (eq raw-response 1)
+         (roslisp:ros-warn (knowledge-surface-client)
+                           "Query didn't surface_in_room reach any solution.")
+         (values-list (list (mapcar
+                       (lambda (x) (string-trim "'" x))
+                       (cdr (assoc '?Region (cut:lazy-car raw-response)))))))))
 
 ;; @author Torge Olliges
 ;;(defun prolog-current-room ()

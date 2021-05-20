@@ -58,7 +58,7 @@
     (comf::announce-perceive-action-surface "present" "table")
 
     (llif::call-take-pose-action 2)
-    (setf *perception-objects*  (llif::call-robosherlock-object-pipeline (vector "table") t))
+    (setf *perception-objects*  (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
     (llif::insert-knowledge-objects *perception-objects*)
     (clean::spawn-btr-objects *perception-objects*)
     (comf::announce-perceive-action-surface "past" "table")

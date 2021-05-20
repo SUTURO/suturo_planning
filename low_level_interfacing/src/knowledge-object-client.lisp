@@ -216,13 +216,30 @@
          (raw-response (with-safe-prolog
                            (json-prolog:prolog-simple
                            (concatenate 'string
-                                        "in_room("
+                                        "object_in_room("
                                         knowrob-name
                                         ",ROOM)")
                            :package :llif))))
      (if (eq raw-response 1)
          (roslisp:ros-warn (knowledge-surface-client)
-                           "Query didn't all_rooms reach any solution.")
+                           "Query didn't object_in_room reach any solution.")
+         (values-list (list (mapcar
+                       (lambda (x) (string-trim "'" x))
+                       (cdr (assoc '?Object (cut:lazy-car raw-response)))))))))
+
+;; @author Torge Olliges
+(defun prolog-room-objects (room-id)
+  (let* ((knowrob-name (format nil "~a~a" +hsr-rooms-prefix+ room-id))
+         (raw-response (with-safe-prolog
+                           (json-prolog:prolog-simple
+                           (concatenate 'string
+                                        "objects_in_room("
+                                        knowrob-name
+                                        ",OBJECTS)")
+                           :package :llif))))
+     (if (eq raw-response 1)
+         (roslisp:ros-warn (knowledge-surface-client)
+                           "Query didn't objects_in_room reach any solution.")
          (values-list (list (mapcar
                        (lambda (x) (string-trim "'" x))
                        (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))

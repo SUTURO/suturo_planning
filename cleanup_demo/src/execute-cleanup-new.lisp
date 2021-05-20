@@ -1,14 +1,13 @@
 (in-package :clean)
 
-(defun execute-cleanup()
+(defun execute-cleanup-new()
     (init-interfaces)
     (comf::with-hsr-process-modules
         (comf::announce-plan-start "clean up")
         (move-to-start-position)
         ;;TODO: move to start position -> move to first room
         ;;(loop for room-name in (llif::prolog-rooms) do (what follows...))
-        ;; TODO: loop over tables in room...
-        (loop for table-id in (llif::sort-surfaces-by-distance (llif::prolog-tables))
+        (loop for table-id in (llif::sort-surfaces-by-distance (llif::prolog-room-surfaces (llif::prolog-current-room)))
             do (
                 (comf::announce-movement-to-surface "future" table-id)
                 (comf::move-to-surface table-id t)
@@ -25,7 +24,7 @@
 (defun perceive-table (table-id)
     (comf::announce-perceive-action-surface "present" table-id)
     (llif::call-take-pose-action 3)
-    (let ((perceived-objects (llif::call-robosherlock-object-pipeline (vector table-id) t))
+    (let ((perceived-objects (llif::call-robosherlock-object-pipeline (vector (llif::prolog-surface-region table-id))) t))
           (confident-objects (comf::get-confident-objects perceived-objects)))
         (llif::insert-knowledge-objects confident-objects)
         (clean::spawn-btr-objects confident-objects))
