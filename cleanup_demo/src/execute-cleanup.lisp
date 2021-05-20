@@ -30,17 +30,58 @@
       (transport)
 
         ;;finished with the table and starts on the floor and this loops until there are no more objects to transport
-        (loop do
-            (point-of-interest-search)
-            (setf *next-object* (llif::prolog-next-object))
-            (when (eq *next-object* 1) (return nil)) 
-            (point-of-interest-transport))
-      (loop do
-        (point-of-interest-search-second-point)
-            (setf *next-object* (llif::prolog-next-object))
-            (when (eq *next-object* 1) (return nil)) 
-        (point-of-interest-transport))
-        (llif::call-text-to-speech-action "I finished cleaning up the room")));;replace with NLG command
+      (poi-search)))
+
+(defun poi-search ()
+  (loop do
+    (block continue
+    (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
+
+  (if (not (comf::move-to-poi))
+      (progn (comf::move-hsr (llif::find-biggest-notsearched-space T))
+             (return-from continue)))
+
+    (comf::announce-perceive-action "future")
+    (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
+    ;;(comf:reachability-check *perception-objects*)
+    (llif::insert-knowledge-objects *perception-objects*)
+    ;;(comf:reachability-check (llif::prolog-next-graspable-objects))
+    (clean::spawn-btr-objects *perception-objects*)
+    ;;percieve -> filter -> insert into knowledge
+    (llif::call-take-pose-action 1)
+    (setf *next-object* (llif::prolog-next-object))
+    (when (eq *next-object* 1) (return-from continue))
+
+    (setf *object-goal-pose* (llif::prolog-object-pose *next-object*))
+
+    (comf::announce-grasp-action "future" *next-object*)
+    (llif::call-take-pose-action 1)
+
+    ;; turn to face the object
+    ;;(roslisp::with-fields (translation rotation)
+    ;;    (cl-tf::lookup-transform cram-tf::*transformer* "map" "base_footprint")
+    ;;    (llif::call-nav-action-ps 
+    ;;        (cl-tf::make-pose-stamped "map" 0 translation
+    ;;            (cl-tf::q* rotation
+    ;;            (cl-tf::euler->quaternion :ax 0 :ay 0 :az -1.57)))))
+    
+    ;; grasp the object from the floor
+    (hsr-failure-handling-grasp)
+    (comf::announce-movement  "future")
+    ;;move to bucket
+    (comf::move-to-bucket)
+
+    ;;place object in bucket
+    (comf::announce-place-action "present" *next-object*)
+
+    (comf::place-object *next-object* *graspmode*)
+    (comf::announce-place-action "past" *next-object*)
+    ;;back to base position
+    (llif::call-take-pose-action 1))
+  ))
+
+
+
 
 ;; mostly copied from execute-grocery
 ;; Looks at the table, by first moving to the table then positioning so the robot can get a better picture,
@@ -128,79 +169,8 @@
                     (comf::announce-grasp-action "failed" *next-object*)))))) ;;replace with NLG command
 
 
-;; @author Jan Schimpf
-;; goes to detected point of interest to scan them for objects, filters the objects,
-;; then inserts them into the knowledge base and bulletworld and positions toya back into a neutral pose
-(defun point-of-interest-search()
-    (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
-    ;;drive to poi
-    (comf::move-hsr  
-        (cl-tf::make-pose-stamped "map" 0.0
-            (cl-tf::make-3d-vector 1.45 -0.01 0)
-            (cl-tf::euler->quaternion :ax 0 :ay 0 :az 0)))
 
-    (comf::move-to-poi) 
 
-    (comf::announce-perceive-action "future")
-    (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
-    ;;(comf:reachability-check *perception-objects*)
-    (llif::insert-knowledge-objects *perception-objects*)
-    ;;(comf:reachability-check (llif::prolog-next-graspable-objects))
-    (clean::spawn-btr-objects *perception-objects*)
-    ;;percieve -> filter -> insert into knowledge
-    (llif::call-take-pose-action 1))
-
-(defun point-of-interest-search-second-point()
-    (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
-    ;;drive to poi
-    (comf::move-hsr  
-        (cl-tf::make-pose-stamped "map" 0.0
-            (cl-tf::make-3d-vector 2.32 1.5 0)
-            (cl-tf::euler->quaternion :ax 0 :ay 0 :az 2.5)))
-
-    (comf::move-to-poi) 
-
-    (comf::announce-perceive-action "future")
-    (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
-    ;;(comf:reachability-check *perception-objects*)
-    (llif::insert-knowledge-objects *perception-objects*)
-    ;;(comf:reachability-check (llif::prolog-next-graspable-objects))
-    (clean::spawn-btr-objects *perception-objects*)
-    ;;percieve -> filter -> insert into knowledge
-    (llif::call-take-pose-action 1))
-
-;;@author Jan Schimpf; Philipp Klein
-;; Grasps the object and places it in the goal area (currently sill the shelf)
-(defun point-of-interest-transport()
-    (setf *next-object* (llif::prolog-next-object))
-
-    (setf *object-goal-pose* (llif::prolog-object-pose *next-object*))
-
-    ;; make sure we are in a neutral position
-    (comf::announce-grasp-action "future" *next-object*)
-    (llif::call-take-pose-action 1)
-
-    ;; turn to face the object
-    ;;(roslisp::with-fields (translation rotation)
-    ;;    (cl-tf::lookup-transform cram-tf::*transformer* "map" "base_footprint")
-    ;;    (llif::call-nav-action-ps 
-    ;;        (cl-tf::make-pose-stamped "map" 0 translation
-    ;;            (cl-tf::q* rotation
-    ;;            (cl-tf::euler->quaternion :ax 0 :ay 0 :az -1.57)))))
-    
-    ;; grasp the object from the floor
-    (hsr-failure-handling-grasp)
-    (comf::announce-movement  "future")
-    ;;move to bucket
-    (comf::move-to-bucket)
-
-    ;;place object in bucket
-    (comf::announce-place-action "present" *next-object*)
-
-    (comf::place-object *next-object* *graspmode*)
-    (comf::announce-place-action "past" *next-object*)
-    ;;back to base position
-    (llif::call-take-pose-action 1))
 
 ;;@author Jan Schimpf
 ;;Failure handling for grasping from the floor much more basic then from the

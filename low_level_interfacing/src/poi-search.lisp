@@ -46,12 +46,13 @@
       (y (y position origin info)))
       *searchMap*
     (if position
-         (setf *position* position)
-         (setf *position* (cl-tf::transform-stamped->pose-stamped
-          (cl-tf::lookup-transform
-           cram-tf::*transformer*
-           "map" "base_footprint"))))
-    (setf *vect3* (cl-tf:origin *position*))
+         (setf *vect3* (cl-tf:origin position))
+         (setf *vect3* (roslisp::with-fields (translation)
+                            (cl-tf::lookup-transform
+                            cram-tf::*transformer*
+                            "map"
+                            "base_footprint")
+                        translation)))
     (setf *indexs* 
           (+
            (*
@@ -85,7 +86,7 @@
   ))
 
 ;;@author Philipp Klein
-(defun find-biggest-notsearched-space ()
+(defun find-biggest-notsearched-space (&optional debug)
   "returns the position of the bottom left corner of the bigest area not searched yet and the size"
   (print "searching empty square")
   (roslisp:with-fields (
@@ -142,15 +143,19 @@
        (llif::global-planner-reachable
         *position*
         (cl-tf:make-pose (cl-tf:v- *bl-coord*
-                                   (cl-tf:make-3d-vector (/ *realsize* 2) (/ *realsize* 2) 0))
-                         (cl-tf::make-quaternion 0 0 0 1)))
-       (print "coords")
+           (cl-tf:make-3d-vector (/ *realsize* 2) (/ *realsize* 2) 0))
+              (cl-tf::make-quaternion 0 0 0 1)))
+       ;;TODO maybe change it from middle to smth else
+       (cl-tf:make-pose-stamped "map" 0 (cl-tf:v- *bl-coord*
+          (cl-tf:make-3d-vector (/ *realsize* 2) (/ *realsize* 2) 0))
+             (cl-tf::make-quaternion 0 0 0 1))
        (progn
          (mark-position-visited (/ *realsize* 2)
               (cl-tf::make-pose-stamped "map" 0
-                                        (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector (/ *realsize* 2) (/ *realsize* 2) 0))
-                                        (cl-tf::make-quaternion 0 0 0 1)))
+                  (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector (/ *realsize* 2) (/ *realsize* 2) 0))
+                  (cl-tf::make-quaternion 0 0 0 1)))
          (find-biggest-notsearched-space)
+         (if (not debug) (sleep 0.5))
          ))
       )))
 
