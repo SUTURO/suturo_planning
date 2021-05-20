@@ -102,14 +102,17 @@
                                 (comf::place-object next-object *grasp-mode*))
                             (comf::announce-place-action "past" next-object))))))))
 
-(defun poi-search ()
+(defun poi-search-new ()
   (loop do
     (block continue
     (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
 
   (if (not (comf::move-to-poi))
-      (progn (comf::move-hsr (llif::find-biggest-notsearched-space T))
-             (return-from continue)))
+      (progn (
+              (exe:perform (desig:a motion
+                         (type going)
+                         (pose (llif::find-biggest-notsearched-space T))))
+             (return-from continue))))
 
     (comf::announce-perceive-action "future")
     (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
