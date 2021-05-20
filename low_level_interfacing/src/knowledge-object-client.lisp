@@ -87,13 +87,17 @@
                          (json-prolog:prolog-simple 
                           "next_object(OBJECT)"
                           :package :llif)))
-         (object (if (eq raw-response 1) NIL 
-                     (cdr (assoc '?object (cut:lazy-car raw-response))))))
+         (object (if (eq raw-response nil)
+                     1
+                     (remove-string +HSR-OBJECTS-PREFIX+
+                                    (string-trim "'"
+                                                 (cdr
+                                                  (assoc '?object (cut:lazy-car raw-response))))))))
     
-    (if (eq raw-response 1)
+    (if (eq object nil)
         (roslisp:ros-warn (knowledge-object-client)
                           "Query didn't next_object reach any solution.")
-        (knowrob-symbol->string object))))
+        object)))
                           
 ;; @author Torge Olliges
 (defun prolog-next-graspable-objects ()

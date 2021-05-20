@@ -1,17 +1,17 @@
 (in-package :clean)
 
 (defun execute-cleanup-new()
-    (init-interfaces)
+    ;;(init-interfaces)
     (comf::with-hsr-process-modules
         (comf::announce-plan-start "clean up")
-        (move-to-start-position)
+        ;;(move-to-start-position)
         ;;TODO: move to start position -> move to first room
         ;;(loop for room-name in (llif::prolog-rooms) do (what follows...))
         (loop for table-id in (llif::sort-surfaces-by-distance (llif::prolog-room-surfaces (llif::prolog-current-room)))
-            do 
-                (comf::announce-movement-to-surface "future" table-id)
-                (comf::move-to-surface table-id t)
-                (perceive-table table-id)
+              do
+                (comf::announce-movement-to-surface "future" (car table-id))
+                (comf::move-to-surface (car table-id) t)
+                (perceive-table (car table-id))
                 (handle-found-objects))
         ;;POI stuff missing
         ))
@@ -34,24 +34,24 @@
 
 ;;@author Torge Olliges
 (defun handle-found-objects ()
-  (let ((next-object (llif::prolog-next-object))
-        (source-surface (llif::prolog-object-source next-object))
-        (target-surface (llif::prolog-object-goal next-object)))
-    (when (eq next-object 1) (return-from handle-found-objects nil))
-    (comf::reachability-check-grasp next-object 1)
-    ;;TODO is the next-object still valid?
-    
-    (comf::announce-movement-to-surface "future" source-surface)
-    (comf::move-to-surface source-surface nil)
-    
-    (comf::announce-grasp-action "future" next-object)
-    (grasp-handling next-object)
-    
-    (comf::announce-movement-to-surface "future" target-surface)
-    (comf::move-to-surface target-surface nil)
-    
-    (comf::announce-place-action "future" next-object)
-    (place-handling next-object)))
+  (let ((next-object (llif::prolog-next-object)))
+        (when (eq next-object 1) (return-from handle-found-objects nil))
+      (let ((source-surface (llif::prolog-object-source next-object))
+            (target-surface (llif::prolog-object-goal next-object)))
+        (comf::reachability-check-grasp next-object 1)
+        ;;TODO is the next-object still valid?
+        
+        (comf::announce-movement-to-surface "future" source-surface)
+        (comf::move-to-surface source-surface nil)
+        
+        (comf::announce-grasp-action "future" next-object)
+        (grasp-handling next-object)
+        
+        (comf::announce-movement-to-surface "future" target-surface)
+        (comf::move-to-surface target-surface nil)
+        
+        (comf::announce-place-action "future" next-object)
+        (place-handling next-object))))
 
 ;;@author Torge Olliges
 (defun grasp-handling (next-object)

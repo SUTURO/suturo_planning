@@ -7,6 +7,8 @@
   "http://www.semanticweb.org/suturo/ontologies/2020/3/objects#" :test 'string=)
 (alexandria:define-constant +hsr-rooms-prefix+
   "http://www.semanticweb.org/suturo/ontologies/2021/0/rooms#" :test 'string=)
+(alexandria:define-constant +hsr-surface-prefix+
+  "http://www.semanticweb.org/suturo/ontologies/2021/0/rooms#" :test 'string=)
 (alexandria:define-constant +robocup-prefix+
   "http://www.semanticweb.org/suturo/ontologies/2020/2/Robocup#" :test 'string=)
 (alexandria:define-constant +srld-prefix+
