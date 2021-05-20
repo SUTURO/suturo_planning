@@ -94,7 +94,7 @@
                                                  (cdr
                                                   (assoc '?object (cut:lazy-car raw-response))))))))
     
-    (if (eq object nil)
+    (if (eq object 1)
         (roslisp:ros-warn (knowledge-object-client)
                           "Query didn't next_object reach any solution.")
         object)))
