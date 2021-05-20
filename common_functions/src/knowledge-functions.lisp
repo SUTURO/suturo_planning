@@ -73,13 +73,13 @@
       (+ (first (first surface-edge-pose))
         ;; creates the x value of the Vector from Center to Edge
         (* (- (first (first surface-edge-pose))
-           (first (first surface-pose))) 1.5))
+           (first (first surface-pose))) 1.75)
 
      ;; adds the y value of the Vector to the edge to create an offset
      (+ (second (first surface-edge-pose))
         ;; creates the y value of the Vector from Center to Edge
         (* (- (second (first surface-edge-pose))
-           (second (first surface-pose))) 1.5))
+           (second (first surface-pose))) 1.75))
      0)
     (cl-tf2::make-quaternion (first (second surface-edge-pose))
                              (second (second surface-edge-pose))

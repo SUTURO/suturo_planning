@@ -85,13 +85,13 @@
             (roslisp::with-fields (origin)
                 (get-nav-pose-for-surface surface-id) origin)
             (if turn
-                (cl-transforms:q+
+                (cl-transforms:q* 
                  (cl-tf::make-quaternion
                   (first (second surface-pose))
                   (second (second surface-pose))
                   (third (second surface-pose))
                   (fourth (second surface-pose)))
-                 (cl-transforms:euler->quaternion :ax 0 :ay 0 :az (/ pi 2.75)))
+                 (cl-transforms:euler->quaternion :ax 0 :ay 0 :az (/ pi 2)))
                 (cl-tf::make-quaternion
                  (first (second surface-pose))
                  (second (second surface-pose))
