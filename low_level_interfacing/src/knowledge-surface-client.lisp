@@ -178,48 +178,49 @@
 
 ;; @author Torge Olliges
 (defun prolog-room-surfaces (room-id)
-  (let* ((knowrob-name (format "~a~a" +hsr-rooms-prefix+ room-id))
-    (raw-response (with-safe-prolog
-                           (json-prolog:prolog-simple
-                           (concatenate 'string
-                                        "surfaces_in_room('"
-                                        knowrob-name
-                                        "',SURFACES)")
-                           :package :llif))))
-     (if (eq raw-response 1)
-         (roslisp:ros-warn (knowledge-surface-client)
-                           "Query didn't surfaces_in_room reach any solution.")
-         (values-list (list (mapcar
-                       (lambda (x) (string-trim "'" x))
-                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
+  (let* ((knowrob-name (format nil "~a~a" +hsr-rooms-prefix+ room-id))
+         (raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                                       "surfaces_in_room('"
+                                       knowrob-name
+                                       "',SURFACES)")
+                          :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-surface-client)
+                          "Query didn't surfaces_in_room reach any solution.")
+        (values-list (list (mapcar
+                            (lambda (x) (string-trim "'" x))
+                            (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
 
 (defun prolog-surface-room (surface-id)
-(let* ((raw-response (with-safe-prolog
-                        (json-prolog:prolog-simple
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
                           (concatenate 'string
-                                        "surface_in_room('"
-                                        surface-id
-                                        "',ROOM)")
-                           :package :llif))))
-     (if (eq raw-response 1)
-         (roslisp:ros-warn (knowledge-surface-client)
-                           "Query didn't surface_in_room reach any solution.")
-         (values-list (list (mapcar
-                       (lambda (x) (string-trim "'" x))
-                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
+                                       "surface_in_room('"
+                                       surface-id
+                                       "',ROOM)")
+                          :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-surface-client)
+                          "Query didn't surface_in_room reach any solution.")
+        (values-list (list (mapcar
+                            (lambda (x) (string-trim "'" x))
+                            (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
+
 
 (defun prolog-surface-region (surface-id)
-(let* ((raw-response (with-safe-prolog
-                        (json-prolog:prolog-simple
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
                           (concatenate 'string
-                                        "get_perception_surface_region('"
-                                        surface-id
-                                        "',REGION)")
-                           :package :llif))))
-     (if (eq raw-response 1)
-         (roslisp:ros-warn (knowledge-surface-client)
-                           "Query didn't surface_in_room reach any solution.")
-         (values-list (list (mapcar
-                       (lambda (x) (string-trim "'" x))
-                       (cdr (assoc '?Region (cut:lazy-car raw-response)))))))))
+                                       "get_perception_surface_region('"
+                                       surface-id
+                                       "',REGION)")
+                          :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-surface-client)
+                          "Query didn't surface_in_room reach any solution.")
+        (values-list (list (mapcar
+                            (lambda (x) (string-trim "'" x))
+                            (cdr (assoc '?Region (cut:lazy-car raw-response)))))))))
 
