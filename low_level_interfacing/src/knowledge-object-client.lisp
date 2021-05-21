@@ -49,14 +49,16 @@
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
-                          (concatenate 'string "find_supporting_surface('"
-                                       knowrob-name "', SURFACE),")
+                          (concatenate 'string
+                                       "object_supported_by_surface('"
+                                       knowrob-name
+                                       "', SURFACE)")
                           :package :llif)))
          (supporting-surface (if (eq raw-response 1)
-                                  NIL
-                                  (cdr 
+                                 NIL
+                                 (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" (cdr 
                                     (assoc '?surface 
-                                      (cut:lazy-car raw-response)))))) ;;TODO!!!
+                                      (cut:lazy-car raw-response))))))))
     (or supporting-surface
         (roslisp:ros-warn (knowledge-object-client)
                           "Query didn't find_supporting_surface reach any solution."))))
