@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>got_get_it_demo</name>
+  <name>go_get_it_demo</name>
   <version>0.0.0</version>
-  <description>The got_get_it_demo package</description>
+  <description>The go_get_it_demo package</description>
 
   <maintainer email="tolliges@uni-bremen.de">Torge Olliges</maintainer>
 

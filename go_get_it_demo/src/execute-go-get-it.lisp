@@ -1,4 +1,4 @@
-(in-package :get-it)
+(in-package :go-get-it)
 
 ;;@author Torge Olliges
 (defun execute-go-get-it()
@@ -16,38 +16,40 @@
 
 ;;@author Torge Olliges
 (defun wait-for-orders()
-    (subscribe "fetch_request" "nlp_msgs/FetchRequest" #handle-fetch-request))
+    (subscribe "fetch_request" "nlp_msgs/FetchRequest" #'handle-fetch-request))
 
 ;;@author Torge Olliges
 (defun handle-fetch-request (fetch-request)
     (roslisp::with-fields (perceived_object_name perceived_room_name)
         (let ((room-id (llif::prolog-perceived-room->room-id perceived_room_name))) 
-        (if (eq room-id 1) 
-            ((roslisp:ros-info (handle-fetch-request) "No room found for perceived name ~a" perceived_room_name)
-             (wait-for-orders)) 
-            ((let ((object-id (llif::prolog-perceived-object->object-id perceived_object_name room-id)))
-                (if (eq object-id 1)
-                    (find-object-in-room perceived_object_name room-id)
-                    (retrieve-object-from-room object-id room-id))))))))
+        (when (eq room-id 1) 
+          (roslisp:ros-info (handle-fetch-request)
+                            "No room found for perceived name ~a" perceived_room_name)
+          (wait-for-orders))) 
+      (let ((object-id (llif::prolog-perceived-object->object-id perceived_object_name room-id)))
+        (when (eq object-id 1)
+          (return-from handle-fetch-request nil))
+            (find-object-in-room perceived_object_name room-id)
+        (retrieve-object-from-room object-id room-id))
+      fetch-request))
 
 ;;@author Torge Olliges
 (defun find-object-in-room (perceived-object-name room-id)
     (comf::move-to-room room-id)
     (loop for surface-name in (llif::prolog-not-perceived-surfaces-in-room room-id)
-        do (
-            (comf::move-to-surface surface-name)
+        do 
+            (comf::move-to-surface surface-name t)
             (perceive-surface surface-name)
-            ((let ((object-id (llif::prolog-perceived-object->object-id perceived_object_name room-id)))
+            (let ((object-id (llif::prolog-perceived-object->object-id perceived_object_name room-id)))
                 (if (eq object-id 1)
                     (roslisp:ros-info (find-object-in-room) "Object ~a wasn't on surface ~a" perceived_object_name surface-name)
-                    (retrieve-object-from-room object-id room-id)))))))
+                    (retrieve-object-from-room object-id room-id)))))
 
 ;;@author Torge Olliges
 (defun retreive-object-from-room (object-id room-id)
-    (if (eq (llif::prolog-current-room) room-id)
-        ()
+    (or (eq (llif::prolog-current-room) room-id)
         (comf::move-to-room room-id))
-    (comf::move-to-surface (llif::prolog-object-supporting-surface object-id))
+  (comf::move-to-surface (llif::prolog-object-source object-id) t)
     (setf *graspmode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
     (setf *grasp-object-result* (comf::grasp-object *next-object* *graspmode*))
     ;;If it doesn't work again just stop trying
@@ -66,11 +68,11 @@
         (llif::call-nlg-action-simple "action" "percieve"));;TODO fix when nlg fixed percieve -> perceive
 
     (if (search "table" surface-name)
-        (perceive-table)
+        (perceive-table surface-name)
         (if (search "shelf" surface-name)
-            (perceive-shelf)
+            (perceive-shelf surface-name)
             (roslisp:ros-info (perceive-surface) "Neither table nor shelf but: ~a" surface-name))))
-    )
+    
 
 ;;@author Torge Olliges
 (defun perceive-table ()
@@ -83,11 +85,11 @@
     (llif::call-take-pose-action 1))
 
 ;;@author Torge Olliges
-(defun perceive-shelf () ;;TODO: fix this because... not dynamic but hardcoded
-    ;; (llif::prolog-get-surface-regions)
-    (llif::call-take-pose-action 2)
-    (perceive-shelf "bookshelf_0")
-    (perceive-shelf "bookshelf_1")
-    (llif::call-take-pose-action 3)
-    (perceive-shelf "bookshelf_2")
-    (llif::call-take-pose-action 1))
+(defun perceive-shelf (surface-id) ;;TODO: fix this because... not dynamic but hardcoded
+  ;; (llif::prolog-get-surface-regions)
+  (let ((surface-pose (first (llif::prolog-surface-pose surface-id))))
+    (llif::call-take-pose-action 5 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+                                 (first surface-pose)
+                                 (second surface-pose)
+                                 (third surface-pose)))
+  (llif::call-robosherlock-object-pipeline (vector (llif::prolog-surface-region surface-id)) t))

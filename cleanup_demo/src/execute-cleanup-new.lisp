@@ -22,12 +22,16 @@
     )
 
 ;;@author Torge Olliges
-(defun perceive-table (table-id)
-  (comf::announce-perceive-action-surface "present" table-id)
-  (llif::call-take-pose-action 3)
+(defun perceive-surface (surface-id)
+  (comf::announce-perceive-action-surface "present" surface-id)
+  (let ((surface-pose (first (llif::prolog-surface-pose surface-id))))
+    (llif::call-take-pose-action 5 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+                                 (first surface-pose)
+                                 (second surface-pose)
+                                 (third surface-pose)))
   (let* ((perceived-objects
            (llif::call-robosherlock-object-pipeline
-            (vector (llif::prolog-surface-region table-id)) t))
+            (vector (llif::prolog-surface-region surface-id)) t))
          (confident-objects (comf::get-confident-objects perceived-objects)))
     (llif::insert-knowledge-objects confident-objects))
   ;;(clean::spawn-btr-objects confident-objects))
@@ -93,7 +97,7 @@
                                 cl::simple-error
                                 cl::simple-type-error)
                                 (e)
-                                (comf::announce-place-action "failed"  nex-object)
+                                (comf::announce-place-action "failed"  next-object)
                                 (cpl:do-retry place-retries
                                     (roslisp:ros-warn (place-handling) "~%Failed to grasp the object~%")
                                     (cpl:retry))

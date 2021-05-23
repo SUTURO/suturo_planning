@@ -9,7 +9,7 @@
   ((:module "src"
             :components
             ((:file "package")
-            (:file "init" :depends-on ("package"))
-            ;;execute cleanup depends on init
-            (:file "execute-go-fetch" :depends-on ("package"))
-            ))))
+             (:file "init" :depends-on ("package"))
+             ;;execute cleanup depends on init
+             (:file "execute-go-get-it" :depends-on ("package"))
+             (:file "go-get-it-bw" :depends-on ("package"))))))

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(got_get_it_demo)
+project(go_get_it_demo)
 
 find_package(catkin REQUIRED COMPONENTS
   roslisp

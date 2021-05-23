@@ -24,20 +24,19 @@
 (defun prolog-object-goal (object-name)
   "returns the goal shelf (tf-frame) for an object name"
   (roslisp:ros-info (knowledge-object-client)
-                    "Getting goal floor for object ~a." object-name)
+                    "Getting goal surface for object ~a." object-name)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog  
                          (json-prolog:prolog-simple 
                           (concatenate 'string 
                                        "object_goal_surface('"
-                                       knowrob-name "', SURFACE)" 
-                                       )
+                                       knowrob-name
+                                       "', SURFACE)")
                           :package :llif)))
          (surface (if (eq raw-response 1)
                       NIL
-                      (cdr (assoc '?surface (cut:lazy-car raw-response))))))
-    (if surface
-        (format nil  (string-trim "'" surface))
+                      (string-trim "'" (cdr (assoc '?surface (cut:lazy-car raw-response)))))))
+    (or surface
         (roslisp:ros-warn (json-prolog-client)
                           "Query didn't object_goal_surface reach any solution."))))
 
@@ -90,16 +89,14 @@
                           "next_object(OBJECT)"
                           :package :llif)))
          (object (if (eq raw-response nil)
-                     1
+                     nil
                      (remove-string +HSR-OBJECTS-PREFIX+
                                     (string-trim "'"
                                                  (cdr
                                                   (assoc '?object (cut:lazy-car raw-response))))))))
-    
-    (if (eq object 1)
+    (or object
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't next_object reach any solution.")
-        object)))
+                          "Query didn't next_object reach any solution."))))
                           
 ;; @author Torge Olliges
 (defun prolog-next-graspable-objects ()
@@ -122,7 +119,10 @@
   (roslisp:ros-info (knowledge-object-client) "Getting non graspable objects on surface: ~a" surface)
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
-                          (concatenate 'string "all_not_graspable_objects_on_surface('" surface "', OBJECTS)")
+                          (concatenate 'string
+                                       "all_not_graspable_objects_on_surface('"
+                                       surface
+                                       "', OBJECTS)")
                           :package :llif)))         
           (objects (if (eq raw-response 1) NIL 
                      (cdr (assoc '?objects (cut:lazy-car raw-response))))))
@@ -139,8 +139,10 @@
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog
                           (json-prolog:prolog-simple
-                            (concatenate 'string "set_not_graspable('"
-                              knowrob-name "', " (write-to-string reason) ").")
+                           (concatenate 'string
+                                        "set_not_graspable('"
+                                        knowrob-name "', "
+                                        (write-to-string reason) ").")
                           :package :llif)))
          (answer (if (eq raw-response 1) 
                       NIL 

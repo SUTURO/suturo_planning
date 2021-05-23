@@ -1,7 +1,6 @@
 ;;; Adapted from https://github.com/cram2/cram/blob/master/cram_boxy/cram_boxy_designators/src/motions.lisp
 ;;; use these instead: https://github.com/cram2/cram/tree/master/cram_pr2/cram_pr2_fetch_deliver_plans/src
 (in-package :comf)
-;; TODO Adapt to HSR
 
 (cram-prolog:def-fact-group hsr-motion-designators (desig:motion-grounding)
   ;; for each kind of motion define a desig
@@ -16,7 +15,7 @@
     (desig:desig-prop ?designator (:x ?x))
     (desig:desig-prop ?designator (:y ?y))
     (desig:desig-prop ?designator (:angle ?angle)))
-   
+
   ;;;;;;;;;;;;;;;;;;;; TORSO ;;;;;;;;;;;;;;;;;;;;;;;;
 
   ;; move robot up and down

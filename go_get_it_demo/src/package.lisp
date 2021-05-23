@@ -1,13 +1,10 @@
 (defpackage :go-get-it
-  (:nicknames :get-it)
+  (:nicknames :go-get-it)
   (:use :roslisp :cpl)
   (:export
-   ;;execute-cleanup.lisp
+   ;;execute-go-get-it.lisp
    #:execute-go-get-it
-   
-   ;;demo.lisp
-   #:demo
 
-  ;;grocery_bw.lisp
+  ;;go-get-it-bw.lisp
   #:spawn-btr-objects
 ))
