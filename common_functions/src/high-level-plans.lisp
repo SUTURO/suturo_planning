@@ -221,8 +221,8 @@
                               (pose ?goal-pose)))))
 
 ;;@author Jan Schimpf
-;;asumption is that the robot is already standing in position
-(defun open-door ()
+;;Gets the door id as input and move into position to open it, currently only for one door as the position query isn't done yet
+(defun open-door (door-id)
  (cpl:with-retry-counters ((grasping-retry 2))
     (cpl:with-failure-handling
         (((or common-fail:low-level-failure 
@@ -238,14 +238,25 @@
         (roslisp:ros-warn 
             (going-demo movement-fail)
             "~%No more retries~%")))
-    (roslisp:ros-info (open-door) "Open the door")
-      ;; go into percieve position
-      ;; call perception client
-      ;; go back into normal position
-      ;; insert into knowledge
-      ;; query knowledge for ID
-      ;; call manipulation with ID
-      )))
+      (roslisp:ros-info (open-door) "Open the door")
+
+      ;;this is here for testing purposes only / until it is replaced with the proper querry
+      (comf::get-nav-pose-for-doors (llif::prolog-manipulating-pose-of-door door-id) t)
+      ;; go into percieve position (as manipulation works with its own angle this isn't needed yet)
+      
+      
+      
+      (roslisp::with-fields (translation rotation)     ;; go back into normal position
+
+     
+      ;; insert into knowledge ...
+      
+      ;; query knowledge for ID (manipulation doesn't use this currently ...
+      (llif::call-open-action door-id door-id)    ;; call manipulation with ID
+
+      (llif::prolog-update-door-state door-id 2)
+      ))))
+
 
 
 
