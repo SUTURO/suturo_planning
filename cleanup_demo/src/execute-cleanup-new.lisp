@@ -6,14 +6,22 @@
         (comf::announce-plan-start "clean up")
         ;;(move-to-start-position)
         ;;TODO: move to start position -> move to first room
-        ;;(loop for room-name in (llif::prolog-rooms) do (what follows...))
-        (loop for table-id in (llif::sort-surfaces-by-distance (llif::prolog-room-surfaces (llif::prolog-current-room)))
+      ;;(loop for room-name in (llif::prolog-rooms) do (what follows...))
+      (setf distances-from-current-position
+            (llif::sort-surfaces-by-distance
+             (llif::prolog-room-surfaces
+              (llif::prolog-current-room))))
+        (loop for surface-info in distances-from-current-position
               do
-                (when (eq (search "Shelf" (car table-id)) nil)
-                (comf::announce-movement-to-surface "future" (car table-id))
-                (comf::move-to-surface (car table-id) t)
-                (perceive-table (car table-id))
+                (when (eq (search "Shelf" (car surface-info)) nil)
+                (comf::announce-movement-to-surface "future" (car surface-info))
+                (comf::move-to-surface (car surface-info) t)
+                (perceive-surface (car surface-info))
                 (handle-found-objects))
+                (setf distances-from-current-position
+                      (llif::sort-surfaces-by-distance
+                       (llif::prolog-room-surfaces
+                        (llif::prolog-current-room))))
         ;;POI stuff missing
         )))
 
@@ -25,7 +33,7 @@
 (defun perceive-surface (surface-id)
   (comf::announce-perceive-action-surface "present" surface-id)
   (let ((surface-pose (first (llif::prolog-surface-pose surface-id))))
-    (llif::call-take-pose-action 5 0.0 0.0 0.0 0.0 0.0 0.0 0.0
+    (llif::call-take-pose-action 5 0.0 -20.0 0.0 0.0 0.0 0.0 0.0
                                  (first surface-pose)
                                  (second surface-pose)
                                  (third surface-pose)))
@@ -88,7 +96,7 @@
     (let ((place-action-result (comf::place-object next-object 1)))
         (roslisp::with-fields (error_code)
             place-action-result
-                (if (eq place-action-result 0)
+                (if (eq error_code 0)
                     (comf::announce-place-action "past" next-object)
                     (cpl:with-retry-counters ((place-retries 1))
                         (cpl:with-failure-handling
@@ -103,7 +111,7 @@
                                     (cpl:retry))
                                 (roslisp:ros-warn (going-demo movement-fail) "~%No more retries~%")))
                             (setf *grasp-mode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
-                            (comf::place-object next-object *graspmode*)
+                            (comf::place-object next-object *grasp-mode*)
                             (if (eq (comf::reachability-check-place next-object *grasp-mode*) 1)
                                 (throw common-fail:low-level-failure "Not Reachable")
                                 (comf::place-object next-object *grasp-mode*))

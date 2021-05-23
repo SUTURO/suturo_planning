@@ -35,7 +35,7 @@
                           :package :llif)))
          (surface (if (eq raw-response 1)
                       NIL
-                      (string-trim "'" (cdr (assoc '?surface (cut:lazy-car raw-response)))))))
+                      (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" (cdr (assoc '?surface (cut:lazy-car raw-response))))))))
     (or surface
         (roslisp:ros-warn (json-prolog-client)
                           "Query didn't object_goal_surface reach any solution."))))

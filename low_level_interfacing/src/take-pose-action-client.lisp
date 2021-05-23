@@ -73,8 +73,6 @@ action server."
                                           (py 0.0) (pz 0.0))
   "torso-joint-state' state of torso-joint.
    take-pose-mode int value to describe take-pose-mode"
-  ;;  (format t "take_pose called with state: ~a" state)
-  (print "1")
   (multiple-value-bind (result status)
       (actionlib:call-goal (get-take-pose-action-client)
                            (make-take-pose-action-goal pose-mode head-pan
@@ -82,9 +80,7 @@ action server."
                                                        arm-flex arm-roll
                                                        wrist-flex wrist-roll
                                                        px py pz))
-    (print "2")
-
-    (roslisp:ros-info (take-pose-action) "take-pose action finished")
+    (roslisp:ros-info (take-pose-action) "Take pose action ~a finished" pose-mode)
     (ensure-take-pose-goal-reached status pose-mode
                                    head-pan head-tilt
                                    arm-lift arm-flex
@@ -95,3 +91,10 @@ action server."
 
 
 
+(defun call-take-pose-action-gaze (&key ((:head-tilt head-tilt) 0)((:px px) 0.0) ((:py py) 0.0) ((:pz pz) 0.0))
+  (multiple-value-bind (result status)
+      (actionlib:call-goal (get-take-pose-action-client)
+                           (make-take-pose-action-goal 5 0 0 0 0 0 0 0 px py pz))
+    (roslisp:ros-info (take-pose-action) "Take pose action GAZE finished point: (~a, ~a, ~a) and head tilt: ~a" px py pz head-tilt)
+    (ensure-take-pose-goal-reached status 5 0 0 0 0 0 0 0 px py pz)
+      (values result status)))
