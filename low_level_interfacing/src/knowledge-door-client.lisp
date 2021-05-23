@@ -63,7 +63,7 @@
                          (json-prolog:prolog-simple  
                           (concatenate 'string 
                             "shortest_path_between_rooms('"
-                            start-room-id ", " 
+                            start-room-id "', '" 
                             target-room-id "', DOORS)")  :package :llif))))
         (if (eq raw-response 1)
             (roslisp:ros-warn (json-prolog-client)

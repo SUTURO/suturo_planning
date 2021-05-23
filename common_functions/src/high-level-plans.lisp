@@ -1,5 +1,4 @@
 (in-package :comf)
-(defvar *place-list* NIL)
 (defparameter *poi-distance-threshold* 0.75)
 
 ;;;; Navigation ;;;;
@@ -73,7 +72,11 @@
 
 ;;@author Torge Olliges
 (defun move-to-room (room-id)
-    (announce-movement-to-rooom "present" room-id)) ;;TODO!!!
+    (announce-movement-to-rooom "present" room-id)
+    (let ((shortest-path (llif::prolog-shortest-path-between-rooms
+                           (llif::prolog-current-roomm) room-id)))
+        (print shortest-path)
+    ))
 
 ;;@author Torge Olliges
 (defun move-to-surface (surface-id turn)
@@ -133,93 +136,6 @@
       (cl-tf::q* rotation 
                  (cl-tf::euler->quaternion :ax 0 :ay 0 :az (/ pi 2)))))))
 
-;;@author Torge Olliges
-(defun move-to-table (turn)
-  "moves the robot to the table. if turn is true,
-   then the robot will move sideways to the table"
-    (roslisp:ros-info (move-poi) "Move to table started")                                         
-  (let* ((closest-table-id (car (car (llif::sort-surfaces-by-distance (llif::prolog-tables)))))
-         (table-pose (llif::prolog-surface-pose closest-table-id))
-         (?goal-pose
-           (cl-tf::make-pose-stamped
-            "map" 0
-            (roslisp::with-fields (origin)
-                (get-nav-pose-for-surface closest-table-id) origin)
-            (if turn
-                (cl-transforms:q+
-                 (cl-tf::make-quaternion
-                  (first (second table-pose))
-                  (second (second table-pose))
-                  (third (second table-pose))
-                  (fourth (second table-pose)))
-                 (cl-transforms:euler->quaternion :ax 0 :ay 0 :az (/ pi 2)))
-                (cl-tf::make-quaternion
-                 (first (second table-pose))
-                 (second (second table-pose))
-                 (third (second table-pose))
-                 (fourth (second table-pose)))))))
-    ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
-    (exe::perform
-     (desig:a motion
-              (type going) 
-              (pose ?goal-pose)))))
-
-
-;;@author Torge Olliges
-(defun move-to-shelf (turn)
-   "moves the robot to the shelf. if turn is true,
-   then the robot will move sideways to the shelf"
-    (roslisp:ros-info (move-poi) "Move to shelf started")                                           
-    ;; add shelf-depth to goal to insert distance (+y)
-  (let* ((closest-shelf-id
-           (car
-            (car
-             (llif::sort-surfaces-by-distance (llif::prolog-shelfs)))))
-         (shelf-pose (llif::prolog-surface-pose closest-shelf-id))
-             (?goal-pose
-               (cl-tf::make-pose-stamped
-                "map" 0
-                (roslisp::with-fields (origin)
-                    (get-nav-pose-for-surface closest-shelf-id) origin)
-                (if turn
-                    (cl-transforms:q+
-                     (cl-tf::make-quaternion
-                      (first (second shelf-pose))
-                      (second (second shelf-pose))
-                      (third (second shelf-pose))
-                      (fourth (second shelf-pose)))
-                     (cl-transforms:euler->quaternion :ax 0 :ay 0 :az (/ pi 2)))
-                    (cl-tf::make-quaternion
-                     (first (second shelf-pose))
-                     (second (second shelf-pose))
-                     (third (second shelf-pose))
-                     (fourth (second shelf-pose)))))))
-        ;;(?goal-pose (try-movement-stampedList (list ?goal-pose)))
-        (exe::perform
-         (desig:a motion
-                  (type going) 
-                  (pose ?goal-pose)))))
-
-;;@author Torge Olliges
-(defun move-to-bucket ()
-   "moves the robot to the bucket."
-    (roslisp:ros-info (move-poi) "Move to bucket started")                                            
-    ;; add shelf-depth to goal to insert distance (+y)
-  (let* ((closest-bucket-id
-           (car
-            (car
-             (llif::sort-surfaces-by-distance (llif::prolog-buckets)))))
-         (bucketPose (llif::prolog-surface-pose closest-bucket-id))
-         (?goal-pose (cl-tf::make-pose-stamped
-                      "map" 0
-                      (roslisp::with-fields (origin)
-                          (get-nav-pose-for-surface closest-bucket-id) origin)
-                      (roslisp::with-fields (orientation)
-                          (get-nav-pose-for-surface closest-bucket-id) orientation))))
-        (exe::perform (desig:a motion
-                    (type going) 
-                              (pose ?goal-pose)))))
-
 ;;@author Jan Schimpf
 ;;asumption is that the robot is already standing in position
 (defun open-door ()
@@ -246,6 +162,73 @@
       ;; query knowledge for ID
       ;; call manipulation with ID
       )))
+
+;;@author Torge Olliges
+(defun perceive-surface (surface-id)
+  (comf::announce-perceive-action-surface "present" surface-id)
+  (let ((surface-pose (first (llif::prolog-surface-pose surface-id))))
+    (llif::call-take-gaze-pose-action
+                                 :px (first surface-pose)
+                                 :py (second surface-pose)
+                                 :pz (third surface-pose)))
+  (let* ((perceived-objects
+           (llif::call-robosherlock-object-pipeline
+            (vector (llif::prolog-surface-region surface-id)) t))
+         (confident-objects (comf::get-confident-objects perceived-objects)))
+    (llif::insert-knowledge-objects confident-objects))
+  ;;(clean::spawn-btr-objects confident-objects))
+  (llif::call-take-pose-action 1))
+
+;;@author Torge Olliges
+(defun grasp-handling (next-object)
+  (let ((grasp-action-result (comf::grasp-object next-object 1)))
+    (roslisp::with-fields (error_code)
+        grasp-action-result
+      (if (eq error_code 0)
+          (comf::announce-grasp-action "past" next-object)
+          (cpl:with-retry-counters ((grasp-retries 1))
+            (cpl:with-failure-handling
+                (((or 
+                   common-fail:low-level-failure 
+                   cl::simple-error
+                   cl::simple-type-error)
+                     (e)
+                   (comf::announce-grasp-action "failed"  next-object)
+                   (cpl:do-retry grasp-retries
+                     (roslisp:ros-warn (grasp-handling) "~%Failed to grasp the object~%")
+                     (cpl:retry))
+                   (roslisp:ros-warn (grasp-handling) "~%No more retries~%")))
+              (setf *grasp-mode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
+              (comf::grasp-object next-object *grasp-mode*)
+              (comf::announce-grasp-action "past" next-object)))))))
+
+;;@author Torge Olliges
+(defun place-handling (next-object)
+  (let ((place-action-result (comf::place-object next-object 1)))
+    (roslisp::with-fields (error_code)
+        place-action-result
+      (if (eq error_code 0)
+          (comf::announce-place-action "past" next-object)
+          (cpl:with-retry-counters ((place-retries 1))
+            (cpl:with-failure-handling
+                (((or 
+                   common-fail:low-level-failure 
+                   cl::simple-error
+                   cl::simple-type-error)
+                     (e)
+                   (comf::announce-place-action "failed"  next-object)
+                   (cpl:do-retry place-retries
+                     (roslisp:ros-warn (place-handling) "~%Failed to grasp the object~%")
+                     (cpl:retry))
+                   (roslisp:ros-warn (place-action) "~%No more retries~%")))
+              (setf *grasp-mode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when with-hash-table-iterator is finished
+              (comf::place-object next-object *grasp-mode*)
+              (if (eq (comf::reachability-check-place next-object *grasp-mode*) 1)
+                  (throw common-fail:low-level-failure "Not Reachable")
+                  (comf::place-object next-object *grasp-mode*))
+              (comf::announce-place-action "past" next-object)))))))
+
+
 
 
 

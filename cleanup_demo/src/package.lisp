@@ -4,9 +4,6 @@
   (:export
    ;;execute-cleanup.lisp
    #:execute-cleanup
-
-   ;;execute-cleanup-new.lisp
-   #:execute-cleanup-new
    
    ;;demo.lisp
    #:demo
