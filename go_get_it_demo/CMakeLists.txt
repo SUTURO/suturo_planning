@@ -4,6 +4,7 @@ project(go_get_it_demo)
 find_package(catkin REQUIRED COMPONENTS
   roslisp
   std_msgs
+  nlp_msgs
   cl_tf2
 )
 

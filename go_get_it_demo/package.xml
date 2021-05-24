@@ -12,11 +12,12 @@
   <build_depend>roslisp</build_depend>
   <build_depend>cl_tf2</build_depend>
   <build_depend>std_msgs</build_depend>
+  <build_depend>nlp_msgs</build_depend>
   <build_export_depend>roslisp</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <exec_depend>roslisp</exec_depend>
   <exec_depend>std_msgs</exec_depend>
-
+  <exec_depend>nlp_msgs</exec_depend>
 
 
   <export>

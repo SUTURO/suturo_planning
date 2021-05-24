@@ -20,10 +20,12 @@
 
 ;;@author Torge Olliges
 (defun wait-for-orders()
-    (subscribe "fetch_request" "nlp_msgs/FetchRequest" #'handle-fetch-request))
+  (llif::call-take-pose-action 1)
+    (subscribe "/fetch_request" "nlp_msgs/FetchRequest" #'handle-fetch-request))
 
 ;;@author Torge Olliges
 (defun handle-fetch-request (fetch-request)
+  (print fetch-request)
     (roslisp::with-fields (perceived_object_name perceived_room_name)
         (let ((room-id (llif::prolog-perceived-room->room-id perceived_room_name))) 
             (when (eq room-id 1) 
@@ -33,14 +35,14 @@
             (let ((existent-object (llif::prolog-perceived-object->object-id perceived_object_name room-id)))
                  (when (eq existent-obj nil)
                     (roslisp::ros-info (handle-fetch-request) "Object ~a not yet known" perceived_object_name)
-                    (find-object-in-room room-id))
+                    (find-object-in-room perceived_object_name room-id))
                  (retrieve-object-from-room 
                     (llif::prolog-perceived-object->object-id perceived_object_name room-id) 
                     room-id)))
       fetch-request))
 
 ;;@author Torge Olliges
-(defun find-object-in-room (room-id object-id)
+(defun find-object-in-room (perceived_object_name room-id)
     (comf::move-to-room room-id)
     (loop for surface-info in (llif::sort-surfaces-by-distance 
                                 (llif::prolog-surfaces-not-visited-in-room room-id))
@@ -53,12 +55,12 @@
                         "Object ~a wasn't on surface ~a" perceived_object_name (car surface-info))))))
 
 ;;@author Torge Olliges
-(defun retreive-object-from-room (object-id room-id)
+(defun retrieve-object-from-room (object-id room-id)
     (or (eq (llif::prolog-current-room) room-id)
         (comf::move-to-room room-id))
     (comf::move-to-surface (llif::prolog-object-source object-id) nil)
     (setf grasp-mode 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
-    (comf::grasp-handling object-id grasp-mode)
+    (comf::grasp-handling object-id)
     (comf::move-to-room *starting-room*)
     (comf::move-hsr *starting-position*)
-    (comf::call-take-pose-action 6))
+    (llif::call-take-pose-action 6))
