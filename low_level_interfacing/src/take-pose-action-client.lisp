@@ -91,7 +91,11 @@ action server."
 
 
 
-(defun call-take-gaze-pose-action (&key ((:head-tilt head-tilt) 0)((:px px) 0.0) ((:py py) 0.0) ((:pz pz) 0.0))
+(defun call-take-gaze-pose-action (&key
+                                     ((:head-tilt head-tilt) 0)
+                                     ((:px px) 0.0)
+                                     ((:py py) 0.0)
+                                     ((:pz pz) 0.0))
   (multiple-value-bind (result status)
       (actionlib:call-goal (get-take-pose-action-client)
                            (make-take-pose-action-goal 5 0 0 0 0 0 0 0 px py pz))

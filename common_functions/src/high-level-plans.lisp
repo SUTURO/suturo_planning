@@ -72,9 +72,10 @@
 
 ;;@author Torge Olliges
 (defun move-to-room (room-id)
-    (announce-movement-to-rooom "present" room-id)
+  (roslisp::ros-info (move-to-room) "Starting movement to room ~a" room-id)
+  (announce-movement "present")
     (let ((shortest-path (llif::prolog-shortest-path-between-rooms
-                           (llif::prolog-current-roomm) room-id)))
+                           (llif::prolog-current-room) room-id)))
         (print shortest-path)
     ))
 
@@ -176,17 +177,19 @@
             (vector (llif::prolog-surface-region surface-id)) t))
          (confident-objects (comf::get-confident-objects perceived-objects)))
     (llif::insert-knowledge-objects confident-objects))
+  (llif::prolog-set-surfaces-visit-state surface-id)
   ;;(clean::spawn-btr-objects confident-objects))
   (llif::call-take-pose-action 1))
 
 ;;@author Torge Olliges
 (defun grasp-handling (next-object)
+  (roslisp::ros-info (grasp-handling) "Starting grasp handling for object ~a" next-object)
   (let ((grasp-action-result (comf::grasp-object next-object 1)))
     (roslisp::with-fields (error_code)
         grasp-action-result
       (if (eq error_code 0)
           (comf::announce-grasp-action "past" next-object)
-          (cpl:with-retry-counters ((grasp-retries 1))
+          (cpl:with-retry-counters ((grasp-retries 3))
             (cpl:with-failure-handling
                 (((or 
                    common-fail:low-level-failure 

@@ -119,20 +119,18 @@
     (cl-transforms:v-dist current-pose-translation prolog-pose-vector)))
 
 ;; @author Torge Ollige
-(defun prolog-set-surfaces-visit-state (surface-id state)
+(defun prolog-set-surfaces-visit-state (surface-id)
   (let* ((raw-response (with-safe-prolog
                           (json-prolog:prolog-simple
                             (concatenate 'string
-                                        "assign_visit_state("
-                                        surface-id 
-                                        ","
-                                        state
-                                        ")")
+                                        "update_visit_state('"
+                                        surface-id
+                                        "')")
                             :package :llif))))
       (if (eq raw-response 1)
           (roslisp:ros-warn (knowledge-surface-client)
                             "Query didn't assign_visit_state reach any solution.")
-          (roslisp:ros-info (Knowledge-surface-client) "Visit state for object ~a was set to ~a" surface-id state))))
+          (roslisp:ros-info (Knowledge-surface-client) "Visit state for object ~a was updated" surface-id))))
 
 ;; @author Torge Ollige
 (defun prolog-surfaces-not-visited ()
@@ -145,23 +143,24 @@
         (roslisp:ros-warn (knowledge-surface-client)
                           "Query didn't surfaces_not_visited reach any solution.")
         (values-list (list (mapcar
-                      (lambda (x) (string-trim "'" x))
+                            (lambda (x) (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" x)))
                       (cdr (assoc '?Surfaces (cut:lazy-car raw-response)))))))))
 
 ;; @author Torge Ollige
 (defun prolog-surfaces-not-visited-in-room (room-id)
-  (let* ((raw-response (with-safe-prolog
+  (let* ((knowrob-name (format nil "~a~a" +HSR-ROOMS-PREFIX+ room-id))
+         (raw-response (with-safe-prolog
                           (json-prolog:prolog-simple
                             (concatenate 'string
-                                        "surfaces_not_visited("
-                                        room-id
-                                        ",SURFACES)")
+                                        "surfaces_not_visited('"
+                                        knowrob-name
+                                        "',SURFACES)")
                             :package :llif))))
       (if (eq raw-response 1)
           (roslisp:ros-warn (knowledge-surface-client)
                             "Query didn't shelf_surfaces reach any solution.")
           (values-list (list (mapcar
-                        (lambda (x) (string-trim "'" x))
+                        (lambda (x) (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" x)))
                         (cdr (assoc '?Surfaces (cut:lazy-car raw-response)))))))))
 
 ;; @author Torge Olliges

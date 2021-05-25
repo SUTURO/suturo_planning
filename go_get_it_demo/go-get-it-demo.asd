@@ -4,7 +4,8 @@
 	             cram-hsrb-pick-demo
                cram-urdf-bringup
                common-functions
-               low-level-interfacing)
+               low-level-interfacing
+               nlp_msgs-msg)
   :components
   ((:module "src"
             :components
