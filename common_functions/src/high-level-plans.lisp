@@ -232,30 +232,25 @@
         (roslisp:ros-info (open-door) "Retry if opening the door failed")
         ;;insert here failure handling new position / retry / perception retry
         (cpl:do-retry grasping-retry
-            (roslisp:ros-warn (grasp-fail)
-                                  "~%Failed to grasp the object~%")
-            (cpl:retry))
+            (roslisp:ros-warn (grasp-fail) "~%Failed to grasp the object~%")
+          (cpl:retry))
+          (comf::get-nav-pose-for-doors (llif::prolog-manipulating-pose-of-door door-id) t)
         (roslisp:ros-warn 
             (going-demo movement-fail)
             "~%No more retries~%")))
-      (roslisp:ros-info (open-door) "Open the door")
 
       ;;this is here for testing purposes only / until it is replaced with the proper querry
-      (comf::get-nav-pose-for-doors (llif::prolog-manipulating-pose-of-door door-id) t)
+      (comf::get-nav-pose-for-doors (llif::prolog-perceiving-pose-of-door door-id) t)
       ;; go into percieve position (as manipulation works with its own angle this isn't needed yet)
-      
-      
-      
-      (roslisp::with-fields (translation rotation)     ;; go back into normal position
 
      
       ;; insert into knowledge ...
       
       ;; query knowledge for ID (manipulation doesn't use this currently ...
-      (llif::call-open-action door-id door-id)    ;; call manipulation with ID
+       (llif::call-open-action "kitchen:outside:door_handle_outside" "iai_kitchen/kitchen:outside:door_handle_outside")
 
-      (llif::prolog-update-door-state door-id 2)
-      ))))
+      (llif::prolog-update-door-state door-id 1.22)
+      )))
 
 
 
