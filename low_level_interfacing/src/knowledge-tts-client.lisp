@@ -14,12 +14,14 @@
                                        room-knowrob-name
                                        "',OBJECT)")
                           :package :llif))))
-    
-    (if raw-response
-        (remove-string +HSR-OBJECTS-PREFIX+ 
-            (string-trim "'" (cdr (assoc '?Object (cut:lazy-car raw-response)))))
+    (when raw-response
+      (when (eq raw-response 1)
         (roslisp:ros-warn (knowledge-surface-client)
-                          "Query didn't surface_in_room reach any solution."))))
+                          "Query didn't surface_in_room reach any solution.")
+        (return-from prolog-perceived-object->object-id nil))
+      (remove-string +HSR-OBJECTS-PREFIX+ 
+                     (string-trim "'" (cdr (assoc '?Object (cut:lazy-car raw-response))))))
+    ))
 
 ;; @author Torge Olliges
 (defun prolog-perceived-room->room-id (perceived-room)

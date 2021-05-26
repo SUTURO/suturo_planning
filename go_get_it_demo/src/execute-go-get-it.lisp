@@ -9,7 +9,7 @@
     ;;(comf::with-hsr-process-modules
 
     ;; move to predefined location
-    ;;(move-to-start-position)
+    (move-to-start-position)
     (wait-for-orders))
 
 ;;@author Torge Olliges
@@ -35,8 +35,9 @@
                           "No room found for perceived room name ~a" perceived_room_name)
         (return-from handle-fetch-request nil))
       (let ((object-id (llif::prolog-perceived-object->object-id perceived_object_name room-id)))
-
-        (when (eq object-id 1)
+        (print "Handle fetch request")
+        (print object-id)
+        (when (eq object-id nil)
           (roslisp::ros-info (handle-fetch-request)
                              "Object ~a not yet known" perceived_object_name)
           (find-object-in-room perceived_object_name room-id))
@@ -55,10 +56,11 @@
             (comf::move-to-surface (car surface-info) t)
             (comf::perceive-surface (car surface-info))
             (let ((object-id (llif::prolog-perceived-object->object-id perceived_object_name room-id)))
+              (print "Find object in room")
+              (print object-id)
               (when object-id
-                (when (/= object-id 1)
                   (roslisp::ros-info (find-object-in-room) "Object ~a found as ~a" perceived_object_name object-id)
-                  (return-from find-object-in-room nil)))
+                  (return-from find-object-in-room object-id))
               (roslisp:ros-info (find-object-in-room) 
                                 "Object ~a wasn't on surface ~a" perceived_object_name (car surface-info))))
   (roslisp::ros-warn (find-object-in-room) "Object ~a wasn't found on any surface in room ~a" perceived_object_name room-id))
