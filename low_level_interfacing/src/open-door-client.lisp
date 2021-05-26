@@ -25,37 +25,44 @@ action server."
 
 ;; NOTE most of these params have to be (vector ...)s 
 (defun make-open-door-goal (door-id-name
-                               door-handle-name)
+                            door-handle-name
+                            angle)
   "Creates the open-action-goal. Does not send it to the action server though."
   (actionlib:make-action-goal
       (get-open-door-client)
     :object_name door-id-name ;;knowrob_object_id
     :object_link_name door-handle-name ;;knowrob_object_id
+    :angle_goal angle
     ))
                                                  
 (defun ensure-open-door-goal-reached (status
                                       door-id-name
-                                      door-handle-name)
+                                      door-handle-name
+                                      angle)
   (roslisp:ros-warn (open-action) "Status ~a" status)
   status
   door-id-name
   door-handle-name
+  angle
   T)
 
 
 (defun call-open-action (door-id-name
-                          door-handle-name)
+                         door-handle-name
+                         angle)
   "object-id' object-id of frame-id of object to grasp"
   ;;  (format t "grasp called with state: ~a" state)
    (multiple-value-bind (result status)
   (actionlib:call-goal (get-open-door-client)
                        (make-open-door-goal door-id-name
-                                            door-handle-name))
+                                            door-handle-name
+                                            angle))
      (roslisp:ros-info (grasp-action) "open door action finished")
      (ensure-open-door-goal-reached
                                 status 
                                 door-id-name
-                                door-handle-name)
+                                door-handle-name
+                                angle)
      (values result status)))
 
 

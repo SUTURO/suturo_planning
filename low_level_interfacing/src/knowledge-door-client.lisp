@@ -67,11 +67,13 @@
                         (json-prolog:prolog-simple
                          (concatenate 'string "perceiving_pose_of_door('"
                                       knowrob-name
-                                      "', POSE)")  :package :llif))))
+                                      "', POSE, DOORHANDLE)")  :package :llif))))
         (if (eq raw-response 1)
             (roslisp:ros-warn (json-prolog-client)
                               "Query get_door_state didn't reach any solution.")
-             (cdr (assoc '?Pose (cut:lazy-car raw-response))))))
+            (list (cdr (assoc '?Pose (cut:lazy-car raw-response)))
+                  (string-trim +hsr-rooms-prefix+
+                               (string-trim "'" (cdr (assoc '?Doorhandle (cut:lazy-car raw-response)))))))))
 
 ;; @author Jan Schimpf
 (defun prolog-manipulating-pose-of-door(door-id)
