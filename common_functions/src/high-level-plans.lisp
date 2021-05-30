@@ -240,21 +240,22 @@
             "~%No more retries~%")))
 
       ;;this is here for testing purposes only / until it is replaced with the proper querry
-      (comf::get-nav-pose-for-doors (car (llif::prolog-perceiving-pose-of-door door-id)) t)
+      (comf::get-nav-pose-for-doors (llif::prolog-manipulating-pose-of-door door-id) t)
       ;; go into percieve position (as manipulation works with its own angle this isn't needed yet)
 
      
       ;; insert into knowledge ...
       
       ;; query knowledge for ID (manipulation doesn't use this currently ...
-      (let ((knowledge-doorhandle-id (llif::prolog-knowrob-name-to-urdf-link
-                                      (car (cdr (llif::prolog-perceiving-pose-of-door door-id)))))
+      (let ((knowledge-doorhandle-id (concatenate 'string "iai_kitchen/" (llif::prolog-knowrob-name-to-urdf-link
+                                                                          (car (cdr (llif::prolog-perceiving-pose-of-door door-id))))))
+            (knowledge-pose   (car (llif::prolog-perceiving-pose-of-door door-id)))
             (knowledge-open-door-angle (llif::prolog-get-angle-to-open-door door-id)))
         (llif::call-open-action knowledge-doorhandle-id
                                 knowledge-doorhandle-id
-                                knowledge-open-door-angle))
-
-        (llif::prolog-update-door-state door-id "1.22"))))
+                                1.35)
+        (llif::prolog-update-door-state door-id "1.35")
+        (comf::get-nav-pose-for-doors knowledge-pose t)))))
 
 
 
