@@ -1,34 +1,59 @@
 (in-package :llif)
 
+;; @author Jan Schimpg
+(defun prolog-get-door-state(door-id)
+  "Gives back the state of that door"
+  (roslisp:ros-info (json-prolog-client) "Getting the state for the door")
+  (let* ((knowrob-name (format nil "~a~a" +hsr-rooms-prefix+ door-id))
+         (raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string "get_door_state('"
+                                       knowrob-name
+                                       "',DOORSTATE).") :package :llif))))
+    (if (eq raw-response 1)
+            (roslisp:ros-warn (json-prolog-client)
+                              "Query didn't reach any solution.")
+            (cdr (assoc '?Doorstate (cut:lazy-car raw-response) )))))
+
 ;; @author Jan Schimpf
 (defun prolog-get-all-door-states()
   "Gives back an list of the door names and the state"
   (roslisp:ros-info (json-prolog-client) "Getting all doors and their states")
   (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple "get_all_door_states(POSES)"  :package :llif))))
+                         (json-prolog:prolog-simple "get_all_door_states(POSES)."  :package :llif))))
       (if (eq raw-response 1)
             (roslisp:ros-warn (json-prolog-client)
                               "Query didn't reach any solution.")
-               (cdr (car (cut:lazy-car raw-response))))))
+           (mapcar
+             (lambda (x)
+               (list (string-trim +hsr-rooms-prefix+ (string-trim "'"(car x))) (car (cdr x))))
+                (cdr (assoc '?Poses (cut:lazy-car raw-response)))))))
 
 ;; @author Jan Schimpf
 (defun prolog-update-door-state(door-id angle)
   "updates the state of the door and the angle that the door was closed/opened at"
   (roslisp:ros-info (json-prolog-client) "Updating the door state")
-  (let* ((raw-response (with-safe-prolog
+  (let* ((knowrob-name (format nil "~a~a" +hsr-rooms-prefix+ door-id))
+         (raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
-                          (concatenate 'string "update_door_state_dynamic('"door-id"','"angle"')")))))
+                          (concatenate 'string "update_door_state_dynamic('"
+                                       knowrob-name
+                                       "',"
+                                       angle").")))))
         (if (eq raw-response 1)
             (roslisp:ros-warn (json-prolog-client)
                               "Query update_door_state_dynamic didn't reach any solution.")
-            (cut:lazy-car raw-response))))
+            raw-response)))
 
 ;; @author Jan Schimpf
 (defun prolog-get-angle-to-open-door (door-id)
   "returns the angle that is used to open the door"
- (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple  (concatenate 'string "get_door_state('"
-                                       door-id "', ANGLE)")  :package :llif))))
+  (let* ((knowrob-name (format nil "~a~a" +hsr-rooms-prefix+ door-id))
+         (raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string "get_angle_to_open_door('"
+                                       knowrob-name
+                                       "', ANGLE)")  :package :llif))))
         (if (eq raw-response 1)
             (roslisp:ros-warn (json-prolog-client)
                               "Query get_door_state didn't reach any solution.")
@@ -37,24 +62,32 @@
 ;; @author Jan Schimpf
 (defun prolog-perceiving-pose-of-door (door-id)
  "returns the pose needed to perceive the door"
- (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple  (concatenate 'string "perceiving_pose_of_door('"
-                                       door-id "', POSE)")  :package :llif))))
+  (let* ((knowrob-name (format nil "~a~a" +hsr-rooms-prefix+ door-id))
+         (raw-response (with-safe-prolog
+                        (json-prolog:prolog-simple
+                         (concatenate 'string "perceiving_pose_of_door('"
+                                      knowrob-name
+                                      "', POSE, DOORHANDLE)")  :package :llif))))
         (if (eq raw-response 1)
             (roslisp:ros-warn (json-prolog-client)
                               "Query get_door_state didn't reach any solution.")
-            (cut:lazy-car raw-response))))
+            (list (cdr (assoc '?Pose (cut:lazy-car raw-response)))
+                  (string-trim +hsr-rooms-prefix+
+                               (string-trim "'" (cdr (assoc '?Doorhandle (cut:lazy-car raw-response)))))))))
 
 ;; @author Jan Schimpf
 (defun prolog-manipulating-pose-of-door(door-id)
   "returns the pose from which we can manipulate the door"
- (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple  (concatenate 'string "manipulating_pose_of_door('"
-                                       door-id "', POSE)")  :package :llif))))
+  (let* ((knowrob-name (format nil "~a~a" +HSR-ROOMS-PREFIX+ door-id))
+         (raw-response (with-safe-prolog
+                        (json-prolog:prolog-simple
+                         (concatenate 'string "manipulating_pose_of_door('"
+                                      knowrob-name
+                                      "', POSE)")  :package :llif))))
         (if (eq raw-response 1)
             (roslisp:ros-warn (json-prolog-client)
                               "Query get_door_state didn't reach any solution.")
-            (cut:lazy-car raw-response))))  
+            (cdr (assoc '?Pose (cut:lazy-car raw-response))))))
 
 ;; @author Torge Olliges
 (defun prolog-shortest-path-between-rooms (start-room-id target-room-id)
@@ -69,3 +102,17 @@
             (roslisp:ros-warn (json-prolog-client)
                               "Query shortest_path_between_rooms didn't reach any solution.")
            (cdr (car (cut:lazy-car raw-response))))))
+
+;; @author Jan Schimpf
+(defun prolog-knowrob-name-to-urdf-link(id)
+  "returns the urdf link that has to do is linked to the knowrob name"
+  (let* ((knowrob-name (format nil "~a~a" +HSR-ROOMS-PREFIX+ id))     
+         (raw-response (with-safe-prolog
+                        (json-prolog:prolog-simple
+                         (concatenate 'string "has_urdf_name('"
+                                      knowrob-name
+                                      "',URDFNAME)")  :package :llif))))
+        (if (eq raw-response 1)
+            (roslisp:ros-warn (json-prolog-client)
+                              "Query get_door_state didn't reach any solution.")
+          (string-trim "'" (cdr (assoc '?UrdfName (cut:lazy-car raw-response)))))))

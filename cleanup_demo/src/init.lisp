@@ -69,7 +69,12 @@
   (llif:init-take-pose-action-client)
 
   (roslisp:ros-info (init-interfaces) "init make plan action client")
-  (llif::init-make-plan-action-client))
+  (llif::init-make-plan-action-client)
+
+  (roslisp:ros-info (init-interfaces) "init make open door action client")
+  (llif::init-open-door-client)
+
+  )
 
 (defun init-perception()
  "Initialize only local nodes for working without the real robot."

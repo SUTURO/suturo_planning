@@ -222,8 +222,8 @@
                               (pose ?goal-pose)))))
 
 ;;@author Jan Schimpf
-;;asumption is that the robot is already standing in position
-(defun open-door ()
+;;Gets the door id as input and move into position to open it, currently only for one door as the position query isn't done yet
+(defun open-roomdoor (door-id)
  (cpl:with-retry-counters ((grasping-retry 2))
     (cpl:with-failure-handling
         (((or common-fail:low-level-failure 
@@ -233,20 +233,31 @@
         (roslisp:ros-info (open-door) "Retry if opening the door failed")
         ;;insert here failure handling new position / retry / perception retry
         (cpl:do-retry grasping-retry
-            (roslisp:ros-warn (grasp-fail)
-                                  "~%Failed to grasp the object~%")
-            (cpl:retry))
+            (roslisp:ros-warn (grasp-fail) "~%Failed to grasp the object~%")
+          (cpl:retry))
+          (comf::get-nav-pose-for-doors (llif::prolog-manipulating-pose-of-door door-id) t)
         (roslisp:ros-warn 
             (going-demo movement-fail)
             "~%No more retries~%")))
-    (roslisp:ros-info (open-door) "Open the door")
-      ;; go into percieve position
-      ;; call perception client
-      ;; go back into normal position
-      ;; insert into knowledge
-      ;; query knowledge for ID
-      ;; call manipulation with ID
-      )))
+
+      ;;this is here for testing purposes only / until it is replaced with the proper querry
+      (comf::get-nav-pose-for-doors (llif::prolog-manipulating-pose-of-door door-id) t)
+      ;; go into percieve position (as manipulation works with its own angle this isn't needed yet)
+
+     
+      ;; insert into knowledge ...
+      
+      ;; query knowledge for ID (manipulation doesn't use this currently ...
+      (let ((knowledge-doorhandle-id (concatenate 'string "iai_kitchen/" (llif::prolog-knowrob-name-to-urdf-link
+                                                                          (car (cdr (llif::prolog-perceiving-pose-of-door door-id))))))
+            (knowledge-pose   (car (llif::prolog-perceiving-pose-of-door door-id)))
+            (knowledge-open-door-angle (llif::prolog-get-angle-to-open-door door-id)))
+        (llif::call-open-action knowledge-doorhandle-id
+                                knowledge-doorhandle-id
+                                1.35)
+        (llif::prolog-update-door-state door-id "1.35")
+        (comf::get-nav-pose-for-doors knowledge-pose t)))))
+
 
 
 
