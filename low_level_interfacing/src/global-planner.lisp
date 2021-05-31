@@ -7,8 +7,8 @@
       (ros-warn nil "Timed out waiting for service global-planner-make-plan")
       (roslisp:with-fields (plan_found)
           (call-service "planner/make_plan" 'navfn-srv:makenavplan
-                        :start (cl-tf:make-pose-stamped-msg from "map" (roslisp:ros-time))
-                        :goal (cl-tf:make-pose-stamped-msg to "map" (roslisp:ros-time)))
+                        :start (cl-tf::to-msg from)
+                        :goal (cl-tf::to-msg to))
         (if (= plan_found 1) 1 Nil))))
 
 

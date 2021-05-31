@@ -115,19 +115,13 @@
                 (setf *bl-corner* i))))
             (setf (aref *copy* i) 0)))
     (roslisp:publish (advertise "search_map_algo" "nav_msgs/OccupancyGrid") (roslisp:modify-message-copy *searchMap* (data) *copy*))
-    (print *bl-corner*)
     (multiple-value-bind (row col) (floor *bl-corner* width) ;;floor or round
-      (print row)
-      (print col)
       (setf *bl-coord*
             (cl-tf:make-3d-vector
              (+ x (* resolution col))
              (+ y (* resolution row))
              0))
       (setf *realsize*  (* *max-size* resolution))
-      (print *bl-coord*)
-      (print *max-size*)
-      (print *realsize*)
       (publish-debug-square (list *bl-coord*
                                   (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector 0 *realsize* 0))
                                   (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector *realsize* *realsize* 0))
@@ -136,26 +130,24 @@
         (cl-tf::lookup-transform
           cram-tf::*transformer*
           "map" "base_footprint")))
-      (roslisp::ros-info (TTTTTTTEEEEEEEEEESSSST) "pose ~a" *position*)
-      (if
-       (llif::global-planner-reachable
-        *position*
-        (cl-tf:make-pose (cl-tf:v- *bl-coord*
-           (cl-tf:make-3d-vector (/ *realsize* 2) (/ *realsize* 2) 0))
-              (cl-tf::make-quaternion 0 0 0 1)))
-       ;;TODO maybe change it from middle to smth else
-       (cl-tf:make-pose-stamped "map" 0 (cl-tf:v- *bl-coord*
+      (let ((center (cl-tf:make-pose-stamped "map" 0 (cl-tf:v- *bl-coord*
           (cl-tf:make-3d-vector (/ *realsize* 2) (/ *realsize* 2) 0))
-             (cl-tf::make-quaternion 0 0 0 1))
+             (cl-tf::make-quaternion 0 0 0 1))))
+      (if
+       (and
+        (llif::global-planner-reachable *position* center)
+        (not (llif::prolog-is-pose-outside
+         (cl-tf::x center)
+         (cl-tf::y center)
+         (cl-tf::z center))))
+       ;;TODO maybe change it from middle to smth else
+       center
        (progn
-         (mark-position-visited (/ *realsize* 2)
-              (cl-tf::make-pose-stamped "map" 0
-                  (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector (/ *realsize* 2) (/ *realsize* 2) 0))
-                  (cl-tf::make-quaternion 0 0 0 1)))
+         (mark-position-visited (/ *realsize* 2) center)
          (find-biggest-notsearched-space)
-         (if (not debug) (sleep 0.5))
+         (if debug (sleep 0.5))
          ))
-      )))
+      ))))
 
 ;;@author Philipp Klein
 (defun publish-debug-square (pose-list)
