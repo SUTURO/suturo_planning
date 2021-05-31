@@ -1,4 +1,4 @@
-(in-package :fetch)
+(in-package :go-get-it)
 
 (defparameter *spawned-objects-count* 0)
 ;;@author Torge Olliges

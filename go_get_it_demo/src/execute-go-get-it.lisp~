@@ -1,4 +1,4 @@
-(in-package :get-it)
+(in-package :go-get-it)
 
 ;;@author Torge Olliges
 (defun execute-go-get-it()
