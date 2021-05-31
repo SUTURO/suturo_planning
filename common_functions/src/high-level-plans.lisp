@@ -7,30 +7,28 @@
 ;;Tries a list of stamped poses in the bulletworld simulation
 ;;returns a possible pose.
 (defun try-movement-stampedList (listStamped)
-   (car listStamped))
- ;;  (let (?nav-pose listStamped)
-;;     (print ?nav-pose)
-;;         (cpl:with-retry-counters ((going-retry 3))
-;;             (cpl:with-failure-handling
-;;                 (((or common-fail:low-level-failure 
-;;                       cl::simple-error
-;;                       cl::simple-type-error)
-;;                   (e)
-;;                   (setf ?nav-pose (cdr ?nav-pose))
-;;                   (setf listStamped (cdr ?nav-pose))
-;;                   (cpl:do-retry going-retry
-;;                     (roslisp:ros-warn 
-;;                         (going-demo movement-fail) "~%Failed to move to given position~%")
-;;                     (cpl:retry))
-;;                   (roslisp:ros-warn  (going-demo movement-fail) "~%No more retries~%")))
-;;                 (let ((?actual-nav-pose (car ?nav-pose))) 
-;;                      (exe:perform
-;;                        (desig:an action
-;;                          (type going)
-;;                          (pose ?actual-nav-pose)))
-;;                      (print ?actual-nav-pose)
-;;                      (setf listStamped (cdr ?nav-pose))
-;;                  ?actual-nav-pose)))))
+ ;;  (car listStamped))
+   (let ((?nav-pose listStamped))
+     (cpl:with-retry-counters ((going-retry 3))
+       (cpl:with-failure-handling
+           (((or common-fail:low-level-failure 
+                 cl::simple-error
+                 cl::simple-type-error)
+                (e)
+              (setf ?nav-pose (cdr ?nav-pose))
+              (setf listStamped (cdr ?nav-pose))
+              (cpl:do-retry going-retry
+                (roslisp:ros-warn 
+                 (going-demo movement-fail) "~%Failed to move to given position~%")
+                (cpl:retry))
+              (roslisp:ros-warn  (going-demo movement-fail) "~%No more retries~%")))
+         (let ((?actual-nav-pose (car ?nav-pose))) 
+           (exe:perform
+            (desig:a motion
+                      (type going)
+                      (pose ?actual-nav-pose)))
+           (setf listStamped (cdr ?nav-pose))
+           ?actual-nav-pose)))))
 
 
 ;;@author Torge Olliges
@@ -108,23 +106,23 @@
 ;;@author Philipp Klein
 (defun move-to-poi ()
   "moves the robot to the closest poi point"
-  (roslisp:ros-info (move-poi) "Move to point of interest started")
+  (roslisp:ros-info (move-to-poi) "Move to point of interest started")
   (let ((poi-list (llif::sorted-poi-by-distance
-                    (roslisp::with-fields (translation)
-                        (cl-tf::lookup-transform
-                            cram-tf::*transformer*
-                            "map"
-                            "base_footprint")
-                        translation))))
-         (when 
-            (not poi-list) 
-           (return-from move-to-poi Nil))
+                   (roslisp::with-fields (translation)
+                       (cl-tf::lookup-transform
+                        cram-tf::*transformer*
+                        "map"
+                        "base_footprint")
+                     translation))))
+    (when 
+        (not poi-list) 
+      (return-from move-to-poi Nil))
     (roslisp:ros-info (move-to-poi) "Poi with positions called ~a" poi-list)
-        (pose-with-distance-to-points *poi-distance-threshold* poi-list 10 t)))
+    (pose-with-distance-to-points *poi-distance-threshold* poi-list 10 t)))
 
 ;;@author Philipp Klein
 (defun move-to-poi-and-scan ()
-  "moves the robot to a poi and perceive it"
+  "moves the robot to a poi and perceives it"
   (move-to-poi)
   (llif::call-take-pose-action 1)
   (roslisp::with-fields
@@ -188,7 +186,13 @@
            (llif::call-robosherlock-object-pipeline
             (vector (llif::prolog-surface-region surface-id)) t))
          (confident-objects (comf::get-confident-objects perceived-objects)))
-    (llif::insert-knowledge-objects confident-objects))
+
+    (roslisp::with-fields (detectiondata)
+          confident-objects
+        (progn
+          (roslisp::ros-info (poi-search) "Number of objects detected: ~a" (length detectiondata))
+          (when (> (length detectiondata) 0)
+              (llif::insert-knowledge-objects confident-objects)))))
   (llif::prolog-set-surfaces-visit-state surface-id)
   ;;(clean::spawn-btr-objects confident-objects))
   (llif::call-take-pose-action 1))
@@ -213,7 +217,7 @@
                      (roslisp:ros-warn (grasp-handling) "~%Failed to grasp the object~%")
                      (cpl:retry))
                    (roslisp:ros-warn (grasp-handling) "~%No more retries~%")))
-              (setf *grasp-mode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
+              (setf *grasp-mode* 1)  ;;sets the graspmode should be replaced with the function from knowledge when that is finished
               (comf::grasp-object next-object *grasp-mode*)
               (comf::announce-grasp-action "past" next-object)))))))
 
@@ -238,6 +242,7 @@
                    (roslisp:ros-warn (place-action) "~%No more retries~%")))
               (setf *grasp-mode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when with-hash-table-iterator is finished
               (comf::place-object next-object *grasp-mode*)
+              (llif::call-take-pose-action 1)
               (if (eq (comf::reachability-check-place next-object *grasp-mode*) 1)
                   (throw common-fail:low-level-failure "Not Reachable")
                   (comf::place-object next-object *grasp-mode*))

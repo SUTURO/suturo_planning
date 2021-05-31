@@ -84,70 +84,74 @@
   ))
 
 ;;@author Philipp Klein
-(defun find-biggest-notsearched-space (&optional debug)
+(defun find-biggest-unsearched-space (&optional debug)
   "returns the position of the bottom left corner of the bigest area not searched yet and the size"
-  (print "searching empty square")
+  (roslisp::ros-info (find-biggest-unsearched-space) "Searching for empty square")
   (roslisp:with-fields (data
                         (resolution(resolution info))
                         (width (width info))
                         (x (x position origin info))
                         (y (y position origin info)))
       *searchMap*
-    (setf *max-size* 0)
-    (setf *bl-corner* Nil)
-    (setf *copy* (make-array (length data) :initial-element 0))
-    (loop for i from 0 to (- (length data) 1) do
-      ;;(multiple-value-bind (row col) (floor i width)
-      ;;(print i)
-      (if (and
-           (>= i width)
-           (not (= 0 (mod i width)))
-           (= (aref data i) 0))
-            (progn (setf (aref *copy* i)
-                  (+  
-                   (min (aref *copy* (- i 1))
-                       (aref *copy* (- i width))
-                       (aref *copy* (- i width 1)))
-                   1))
-            (if (< *max-size* (aref *copy* i))
-              (progn
-                (setf *max-size* (aref *copy* i))
-                (setf *bl-corner* i))))
-            (setf (aref *copy* i) 0)))
-    (roslisp:publish (advertise "search_map_algo" "nav_msgs/OccupancyGrid") (roslisp:modify-message-copy *searchMap* (data) *copy*))
+    (let ((max-size 0)
+            (bl-corner nil)
+            (copy (make-array (length data) :initial-element 0)))
+      (loop for i from 0 to (1- (length data)) do
+        ;;(multiple-value-bind (row col) (floor i width)
+        ;;(print i)
+        (if (and
+             (>= i width)
+             (not (= 0 (mod i width)))
+             (= (aref data i) 0))
+            (progn (setf (aref copy i)
+                         (+  
+                          (min (aref copy (- i 1))
+                               (aref copy (- i width))
+                               (aref copy (- i width 1)))
+                          1))
+                   (if (< max-size (aref copy i))
+                       (progn
+                         (setf max-size (aref copy i))
+                         (setf bl-corner i))))
+            (setf (aref copy i) 0)))
+      (roslisp:publish (advertise "search_map_algo" "nav_msgs/OccupancyGrid") (roslisp:modify-message-copy *searchMap* (data) copy)))
     (multiple-value-bind (row col) (floor *bl-corner* width) ;;floor or round
-      (setf *bl-coord*
-            (cl-tf:make-3d-vector
-             (+ x (* resolution col))
-             (+ y (* resolution row))
-             0))
-      (setf *realsize*  (* *max-size* resolution))
-      (publish-debug-square (list *bl-coord*
-                                  (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector 0 *realsize* 0))
-                                  (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector *realsize* *realsize* 0))
-                                  (cl-tf:v- *bl-coord* (cl-tf:make-3d-vector *realsize* 0 0))))
-      (setf *position* (cl-tf::transform->pose
-        (cl-tf::lookup-transform
-          cram-tf::*transformer*
-          "map" "base_footprint")))
-      (let ((center (cl-tf:make-pose-stamped "map" 0 (cl-tf:v- *bl-coord*
-          (cl-tf:make-3d-vector (/ *realsize* 2) (/ *realsize* 2) 0))
-             (cl-tf::make-quaternion 0 0 0 1))))
-      (if
-       (and
-        (llif::global-planner-reachable *position* center)
-        (not (llif::prolog-is-pose-outside
-         (cl-tf::x center)
-         (cl-tf::y center)
-         (cl-tf::z center))))
-       ;;TODO maybe change it from middle to smth else
-       center
-       (progn
-         (mark-position-visited (/ *realsize* 2) center)
-         (find-biggest-notsearched-space)
-         (if debug (sleep 0.5))
-         ))
-      ))))
+      (let* ((bl-coord (cl-tf:make-3d-vector
+                        (+ x (* resolution col))
+                        (+ y (* resolution row))
+                        0))
+             (real-size (* *max-size* resolution))
+             (current-position (cl-tf::transform-stamped->pose-stamped
+                               (cl-tf::lookup-transform
+                                cram-tf::*transformer*
+                                "map" "base_footprint")))
+             (square-center (cl-tf:make-pose-stamped
+                             "map" 0 (cl-tf:v- bl-coord
+                                               (cl-tf:make-3d-vector
+                                                (/ real-size 2)
+                                                (/ real-size 2) 0))
+                             (cl-tf::make-quaternion 0 0 0 1))))
+        (publish-debug-square (list bl-coord
+                                    (cl-tf:v- bl-coord (cl-tf:make-3d-vector 0 real-size 0))
+                                    (cl-tf:v- bl-coord (cl-tf:make-3d-vector real-size real-size 0))
+                                    (cl-tf:v- bl-coord (cl-tf:make-3d-vector real-size 0 0))))
+        ;;(roslisp::ros-info (find-biggest-unsearched-space) "Position ~a center ~a" *position* center)
+
+        (if
+         (and
+          (llif::global-planner-reachable current-position square-center)
+          (not (llif::prolog-is-pose-outside
+                (cl-tf::x (cl-tf::origin square-center))
+                (cl-tf::y (cl-tf::origin square-center))
+                (cl-tf::z (cl-tf::origin square-center)))))
+         ;;TODO maybe change it from middle to smth else
+         (progn
+           (roslisp::ros-info (find-biggest-unsearched-space) "Square center: ~a" square-center)
+           square-center)
+         (progn
+           (mark-position-visited (/ real-size 2) square-center)
+           (find-biggest-unsearched-space)
+           (when debug (sleep 0.5))))))))
 
 ;;@author Philipp Klein
 (defun publish-debug-square (pose-list)

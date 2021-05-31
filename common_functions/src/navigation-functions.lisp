@@ -106,98 +106,75 @@
   `point' The point from which the others are to be generated
   `amountAlternatePositions' The number of points to be generated
   `turn' whether the robot should be turned 90 degrees to the target at the end"
-  (let* ((positions (flatten 
-                    (mapcar 
-                      (lambda
-                        (elem)
-                        (remove-if #'null elem))
-                      (mapcar
-                        (lambda
-                          (elem)
-                          (remove-if-not #'llif::robot-in-obstacle-stamped elem)) 
-                        (mapcar 
-                          (lambda
-                            (elem)
-                            (points-around-point 
-                              distance
-                              elem
-                              number-alternate-positions
-                              turn))
+  (let* ((positions
+           (flatten 
+            (mapcar 
+             (lambda (elem) (remove-if #'null elem))
+             (mapcar
+              (lambda (elem) (remove-if-not #'llif::robot-in-obstacle-stamped elem)) 
+              (mapcar 
+               (lambda (elem) (points-around-point
+                               distance elem  number-alternate-positions turn))
                           points))))))
       (publish-msg 
         (advertise "poi_positions" "geometry_msgs/PoseArray")
           :header
-          (roslisp:make-msg
-            "std_msgs/Header"
-            (frame_id)
-            "map"
-            (stamp)
-            (roslisp:ros-time))
+          (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time))
           :poses
-          (make-array
-            (length positions)
-            :initial-contents
-            (mapcar #'cl-tf::to-msg
-              (mapcar #'cl-tf::pose-stamped->pose
-                positions))))
-      (roslisp::ros-info (navigation-functions) "Started Designator with positions ~a" positions)
-      (let* ((?successfull-pose (try-movement-stampedList positions))
-             (?desig (desig:a motion
-                      (type going) 
-                      (pose ?successfull-pose))))
-            (cpl:with-failure-handling
-              (((or common-fail:low-level-failure 
-                    cl::simple-error
-                    cl::simple-type-error)
-                (e)
-                (setf ?successfull-pose (try-movement-stampedList positions))
-                (cpl:do-retry going-retry
-                  (print "Failed Going Designator")
-                  (roslisp:ros-warn (move-fail) "~%Failed to go to Point~%")
-                  (cpl:retry))))
-              (exe:perform ?desig))))
+          (make-array (length positions)
+                      :initial-contents
+                      (mapcar #'cl-tf::to-msg
+                              (mapcar #'cl-tf::pose-stamped->pose
+                                      positions))))
+    (roslisp::ros-info (navigation-functions) "Started Designator with positions ~a" positions)
+    (let* ((?successfull-pose (try-movement-stampedList positions))
+           (?desig (desig:a motion
+                            (type going) 
+                            (pose ?successfull-pose))))
+      (cpl:with-failure-handling
+          (((or common-fail:low-level-failure 
+                cl::simple-error
+                cl::simple-type-error)
+               (e)
+             (setf ?successfull-pose (try-movement-stampedList positions))
+             (cpl:do-retry going-retry
+               (print "Failed Going Designator")
+               (roslisp:ros-warn (move-fail) "~%Failed to go to Point~%")
+               (cpl:retry))))
+        (exe:perform ?desig))))
   (if turn (llif::call-take-pose-action 4)))
 
 ;;author Philipp Klein
-(defun point-in-polygon (listOfEdges point)
+(defun point-in-polygon (edges-list point)
   "return if the point is in the polygon
   `listOfEdges' the list of all edges of the polygon
   `point' the point to check if it is in the polygon"
-  (setq *polyCorner1*  (- (length listOfEdges) 1))
-  (setq *isPoly* nil)
+  (setq poly-corner-1  (- (length edges-list) 1))
+  (setq is-poly nil)
   (loop
-    for i from 0 to (- (length listOfEdges) 1)
+    for i from 0 to (- (length edges-list) 1)
     do
+       (if
+        (not(and
+             (> (cl-tf::y (nth i edges-list))
+                (cl-tf::y point))
+             (> (cl-tf::y (nth poly-corner-1 edges-list))
+                (cl-tf::y point))))
         (if
-          (not(and
-           (>
-            (cl-tf::y (nth i listOfEdges))
-            (cl-tf::y point))
-           (>
-            (cl-tf::y (nth *polyCorner1* listOfEdges))
-            (cl-tf::y point))))
-          (if
-          (<
-           (cl-tf::x (nth i listOfEdges))
-           (+
-            (cl-tf::x (nth i listOfEdges))
-            (/
-             (*
-              (-
-               (cl-tf::x (nth *polyCorner1* listOfEdges))
-               (cl-tf::x (nth i listOfEdges)))
-              (-
-               (cl-tf::y point)
-               (cl-tf::y (nth i listOfEdges))))
-             (-
-              (cl-tf::y (nth *polyCorner1* listOfEdges))
-              (cl-tf::y (nth i listOfEdges))))))
-          (setq *isPoly* (not *isPoly*))
-          (print "hit")))
-        (setf *polyCorner1* i)
-        (print "next edge")
-        (print *isPoly*))
-  *isPoly*)
+            (< (cl-tf::x (nth i edges-list))
+               (+ (cl-tf::x (nth i edges-list))
+                  (/
+                   (* (- (cl-tf::x (nth poly-corner-1 edges-list))
+                         (cl-tf::x (nth i edges-list)))
+                      (-(cl-tf::y point)
+                        (cl-tf::y (nth i edges-list))))
+                   (- (cl-tf::y (nth poly-corner-1 edges-list))
+                      (cl-tf::y (nth i edges-list))))))
+            (setq is-poly (not is-poly))
+            (roslisp::ros-info (point-in-polygon) "Hit"))
+            (setq poly-corner-1 i)))
+  (roslisp::ros-info (point-in-polygon) "Next edge found: ~a" is-poly)
+  is-poly)
 
 ;;source: https://stackoverflow.com/questions/2680864/how-to-remove-nested-parentheses-in-lisp
 (defun flatten (l)
@@ -208,31 +185,33 @@
 
 (defun create-move-position-list(object-id)
     (setq *pose* (llif:prolog-object-pose object-id))
-    (let 
-  	((?nav-pose (list (cl-tf::make-pose-stamped "map" 0 
-                                                (cl-tf:make-3d-vector
-                                                 (- (nth 0 (nth 2 *pose*)) 0.5) ;;x-cordinate
-                                                 (nth 1 (nth 2 *pose*))  ;;y-cordinate
-                                                 0) 
-                                               (cl-tf::make-quaternion 0 0 0 1)) 
-                     (cl-tf::make-pose-stamped "map" 0 
-                                               (cl-tf:make-3d-vector
-                                                (+ (nth 0 (nth 2 *pose*)) 0.5) 
-                                                (nth 1 (nth 2 *pose*))
-                                                3.14) 
-                                                (cl-tf::make-quaternion 0 0 0 1))
-                     (cl-tf::make-pose-stamped "map" 0 
-                                               (cl-tf:make-3d-vector
-                                                (nth 0 (nth 2 *pose*))
-                                                (+ (nth 1 (nth 2 *pose*)) 0.5)
-                                                1.57)
-                                               (cl-tf::make-quaternion 0 0 0 1))
-                     (cl-tf::make-pose-stamped "map" 0 
-                                               (cl-tf:make-3d-vector
-                                                (nth 0 (nth 2 *pose*))
-                                                (- (nth 1 (nth 2 *pose*)) 0.5)
-                                                -1.57)
-                                               (cl-tf::make-quaternion 0 0 0 1))
-                     ))) ;;bracket :(
-        ?nav-pose
-      ))  ;;bracket :(
+  (let ((?nav-pose
+          (list (cl-tf::make-pose-stamped
+                 "map" 0 
+                 (cl-tf:make-3d-vector
+                  (- (nth 0 (nth 2 *pose*)) 0.5) ;;x-cordinate
+                  (nth 1 (nth 2 *pose*))  ;;y-cordinate
+                  0) 
+                 (cl-tf::make-quaternion 0 0 0 1)) 
+                (cl-tf::make-pose-stamped
+                 "map" 0 
+                 (cl-tf:make-3d-vector
+                  (+ (nth 0 (nth 2 *pose*)) 0.5) 
+                  (nth 1 (nth 2 *pose*))
+                  3.14) 
+                 (cl-tf::make-quaternion 0 0 0 1))
+                (cl-tf::make-pose-stamped
+                 "map" 0 
+                 (cl-tf:make-3d-vector
+                  (nth 0 (nth 2 *pose*))
+                  (+ (nth 1 (nth 2 *pose*)) 0.5)
+                  1.57)
+                          (cl-tf::make-quaternion 0 0 0 1))
+                (cl-tf::make-pose-stamped
+                 "map" 0 
+                 (cl-tf:make-3d-vector
+                  (nth 0 (nth 2 *pose*))
+                  (- (nth 1 (nth 2 *pose*)) 0.5)
+                  -1.57)
+                 (cl-tf::make-quaternion 0 0 0 1)))))
+    ?nav-pose))

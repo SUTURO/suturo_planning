@@ -6,22 +6,24 @@
     (comf::announce-plan-start "clean up")
     ;;(move-to-start-position)
     ;;TODO: move to start position -> move to first room
-    (setf distances-from-current-position
+    (setf surfaces-with-distances-from-current-position
           (llif::sort-surfaces-by-distance
-           (llif::prolog-room-surfaces
+           (llif::prolog-surfaces-not-visited-in-room
             (llif::prolog-current-room))))
-    (loop for surface-info in distances-from-current-position
+
+    (loop for surface-info in surfaces-with-distances-from-current-positions
           do
              (when (eq (search "Shelf" (car surface-info)) nil)
                (comf::announce-movement-to-surface "future" (car surface-info))
                (comf::move-to-surface (car surface-info) t)
                (comf::perceive-surface (car surface-info))
                (handle-found-objects))
-             (setf distances-from-current-position
+             (llif::prolog-set-surfaces-visit-state (car surface-info))
+             (setf surfaces-with-distances-from-current-position
                    (llif::sort-surfaces-by-distance
-                    (llif::prolog-room-surfaces
+                    (llif::prolog-surfaces-not-visited-in-room
                      (llif::prolog-current-room)))))
-      (poi-search-new)))
+      (poi-search)))
 
 ;;@author Torge Olliges
 (defun move-to-start-position()
@@ -53,38 +55,47 @@
         (comf::announce-place-action "future" next-object)
         (comf::place-handling next-object)))))
 
-(defun poi-search-new ()
+(defun poi-search ()
   (loop do
     (block continue
-    (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
+      (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
 
-  (if (not (comf::move-to-poi))
-      (progn 
-              (comf::move-hsr (list (llif::find-biggest-notsearched-space T)))
-             (return-from continue)))
+      (if (not (comf::move-to-poi))
+          (progn 
+            (comf::move-hsr (list (llif::find-biggest-unsearched-space T)))
+            (return-from continue)))
 
-    (comf::announce-perceive-action "future")
-    (llif::insert-knowledge-objects
-     (comf::get-confident-objects
-      (llif::call-robosherlock-object-pipeline (vector "robocup_default") t)))
-    ;;percieve -> filter -> insert into knowledge
-    (llif::call-take-pose-action 1)
+      (comf::announce-perceive-action "future")
 
-    (let ((next-object (llif::prolog-next-object)))
-          (when (eq next-object 1) (return-from continue))
-          (let ((object-goal (llif::prolog-object-goal next-object)))
-            (comf::announce-grasp-action "future" next-object)
-            (llif::call-take-pose-action 1)
+      (setf confident-objects
+            (comf::get-confident-objects
+             (llif::call-robosherlock-object-pipeline (vector "robocup_default") t)))
 
-            (comf::grasp-handling next-object)
-            (comf::announce-movement  "future")
-            (comf::move-to-surface object-goal nil)
+      (roslisp::with-fields (detectiondata)
+          confident-objects
+        (progn
+          (roslisp::ros-info (poi-search) "Number of objects detected: ~a" (length detectiondata))
+          (if (> (length detectiondata) 0)
+              (llif::insert-knowledge-objects confident-objects)
+              (return-from continue))))
 
-            ;;place object at goal surface
-            (comf::announce-place-action "present" next-object)
+      ;;percieve -> filter -> insert into knowledge
+      (llif::call-take-pose-action 1)
 
-            (comf::place-handling next-object)
-            (comf::announce-place-action "past" next-object)
+      (let ((next-object (llif::prolog-next-object)))
+        (when (eq next-object 1) (return-from continue))
+        (let ((object-goal (llif::prolog-object-goal next-object)))
+          (comf::announce-grasp-action "future" next-object)
+          (llif::call-take-pose-action 1)
+          
+          (comf::grasp-handling next-object)
+          (comf::announce-movement  "future")
+          (comf::move-to-surface object-goal nil)
+          
+          ;;place object at goal surface
+          (comf::announce-place-action "present" next-object)
+          
+          (comf::place-handling next-object)
+          (comf::announce-place-action "past" next-object)
 
-            (llif::call-take-pose-action 1)
-          )))))
+          (llif::call-take-pose-action 1))))))
