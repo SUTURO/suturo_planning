@@ -14,7 +14,7 @@
                 (perceive-table table-id)
                 (handle-found-objects)))
         (poi-search);;POI stuff missing
-        ))
+        )
 
 ;;@author Torge Olliges
 (defun move-to-start-position()
@@ -101,7 +101,7 @@
                             (if (eq (comf::reachability-check-place next-object *grasp-mode*) 1)
                                 (throw common-fail:low-level-failure "Not Reachable")
                                 (comf::place-object next-object *grasp-mode*))
-                            (comf::announce-place-action "past" next-object))))))))
+                            (comf::announce-place-action "past" next-object)))))))
 
 (defun poi-search-new ()
   (loop do
@@ -109,11 +109,11 @@
     (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
 
   (if (not (comf::move-to-poi))
-      (progn (
+      (progn 
               (exe:perform (desig:a motion
                          (type going)
                          (pose (llif::find-biggest-notsearched-space T))))
-             (return-from continue))))
+             (return-from continue)))
 
     (comf::announce-perceive-action "future")
     (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))

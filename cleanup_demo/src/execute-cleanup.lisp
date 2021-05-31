@@ -168,15 +168,7 @@
                 (comf::announce-grasp-action "past" *next-object*)
                 (if (< *grasping-retries* 3)
                     (grasp-handling)
-                    (comf::announce-grasp-action "failed" *next-object*)))))) ;;replace with NLG command
-    (comf::announce-perceive-action "future")
-    (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
-    ;;(comf:reachability-check *perception-objects*)
-    (llif::insert-knowledge-objects *perception-objects*)
-    ;;(comf:reachability-check (llif::prolog-next-graspable-objects))
-    (clean::spawn-btr-objects *perception-objects*)
-    ;;percieve -> filter -> insert into knowledge
-    (llif::call-take-pose-action 1))
+                    (comf::announce-grasp-action "failed" *next-object*)))))) ;)
 
 (defun point-of-interest-search-second-point()
     (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command

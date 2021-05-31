@@ -36,8 +36,6 @@
 (defun mark-position-visited (radius &optional position)
   "marks a specific area in the map as already searched
   `radius' the radius around the robot that should be marked as searched"
-  (print "marking position as visited")
-  (print position)
   (roslisp:with-fields
       ((datas (data))
       (resolution(resolution info))
