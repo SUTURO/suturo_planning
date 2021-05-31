@@ -60,46 +60,31 @@
 
   (if (not (comf::move-to-poi))
       (progn 
-              (exe:perform (desig:a motion
-                         (type going)
-                         (pose (llif::find-biggest-notsearched-space T))))
+              (comf::move-hsr (list (llif::find-biggest-notsearched-space T)))
              (return-from continue)))
 
     (comf::announce-perceive-action "future")
-    (setf *perception-objects* (llif::call-robosherlock-object-pipeline (vector "robocup_default") t))
-    ;;(comf:reachability-check *perception-objects*)
-    (llif::insert-knowledge-objects *perception-objects*)
-    ;;(comf:reachability-check (llif::prolog-next-graspable-objects))
-    (clean::spawn-btr-objects *perception-objects*)
+    (llif::insert-knowledge-objects
+     (comf::get-confident-objects
+      (llif::call-robosherlock-object-pipeline (vector "robocup_default") t)))
     ;;percieve -> filter -> insert into knowledge
     (llif::call-take-pose-action 1)
-    (setf *next-object* (llif::prolog-next-object))
-    (when (eq *next-object* 1) (return-from continue))
 
-    (setf *object-goal-pose* (llif::prolog-object-pose *next-object*))
+    (let ((next-object (llif::prolog-next-object)))
+          (when (eq next-object 1) (return-from continue))
+          (let ((object-goal (llif::prolog-object-goal next-object)))
+            (comf::announce-grasp-action "future" next-object)
+            (llif::call-take-pose-action 1)
 
-    (comf::announce-grasp-action "future" *next-object*)
-    (llif::call-take-pose-action 1)
+            (comf::grasp-handling next-object)
+            (comf::announce-movement  "future")
+            (comf::move-to-surface object-goal nil)
 
-    ;; turn to face the object
-    ;;(roslisp::with-fields (translation rotation)
-    ;;    (cl-tf::lookup-transform cram-tf::*transformer* "map" "base_footprint")
-    ;;    (llif::call-nav-action-ps 
-    ;;        (cl-tf::make-pose-stamped "map" 0 translation
-    ;;            (cl-tf::q* rotation
-    ;;            (cl-tf::euler->quaternion :ax 0 :ay 0 :az -1.57)))))
-    
-    ;; grasp the object from the floor
-    (hsr-failure-handling-grasp)
-    (comf::announce-movement  "future")
-    ;;move to bucket
-    (comf::move-to-bucket)
+            ;;place object at goal surface
+            (comf::announce-place-action "present" next-object)
 
-    ;;place object in bucket
-    (comf::announce-place-action "present" *next-object*)
+            (comf::place-handling next-object)
+            (comf::announce-place-action "past" next-object)
 
-    (comf::place-object *next-object* *graspmode*)
-    (comf::announce-place-action "past" *next-object*)
-    ;;back to base position
-    (llif::call-take-pose-action 1))
-  ))
+            (llif::call-take-pose-action 1)
+          )))))

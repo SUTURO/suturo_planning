@@ -87,8 +87,7 @@
 (defun find-biggest-notsearched-space (&optional debug)
   "returns the position of the bottom left corner of the bigest area not searched yet and the size"
   (print "searching empty square")
-  (roslisp:with-fields (
-                        data
+  (roslisp:with-fields (data
                         (resolution(resolution info))
                         (width (width info))
                         (x (x position origin info))
@@ -137,6 +136,7 @@
         (cl-tf::lookup-transform
           cram-tf::*transformer*
           "map" "base_footprint")))
+      (roslisp::ros-info (TTTTTTTEEEEEEEEEESSSST) "pose ~a" *position*)
       (if
        (llif::global-planner-reachable
         *position*

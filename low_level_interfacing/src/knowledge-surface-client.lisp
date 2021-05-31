@@ -193,6 +193,37 @@
                             (lambda (x) (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" x)))
                             (cdr (assoc '?Surfaces (cut:lazy-car raw-response)))))))))
 
+(defun prolog-is-pose-outside (x y z)
+  (let ((raw-response (with-safe-prolog
+                        (json-prolog:prolog-simple
+                         (concatenate 'string
+                                      "pose_is_outside(["
+                                      (write-to-string x)
+                                      ", "
+                                      (write-to-string y)
+                                      ", "
+                                      (write-to-string z)
+                                      "])")
+                         :package :llif))))
+    (if raw-response
+        T
+        nil)))
+
+(defun prolog-pose-room (x y z)
+    (let ((raw-response (with-safe-prolog
+                        (json-prolog:prolog-simple
+                         (concatenate 'string
+                                      "pose_in_room(["
+                                      (write-to-string x)
+                                      ", "
+                                      (write-to-string y)
+                                      ", "
+                                      (write-to-string z)
+                                      "], ROOM)")
+                         :package :llif))))
+      (remove-string +HSR-ROOMS-PREFIX+
+                        (string-trim "'" (cdr (assoc '?Room (cut:lazy-car raw-response)))))))
+
 (defun prolog-surface-room (surface-id)
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
