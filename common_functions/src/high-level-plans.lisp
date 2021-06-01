@@ -219,7 +219,8 @@
                    (roslisp:ros-warn (grasp-handling) "~%No more retries~%")))
               (setf *grasp-mode* 1)  ;;sets the graspmode should be replaced with the function from knowledge when that is finished
               (comf::grasp-object next-object *grasp-mode*)
-              (comf::announce-grasp-action "past" next-object)))))))
+              (comf::announce-grasp-action "past" next-object)
+              (llif::call-take-pose-action 1)))))))
 
 ;;@author Torge Olliges
 (defun place-handling (next-object)
@@ -237,15 +238,14 @@
                      (e)
                    (comf::announce-place-action "failed"  next-object)
                    (cpl:do-retry place-retries
-                     (roslisp:ros-warn (place-handling) "~%Failed to grasp the object~%")
+                     (roslisp:ros-warn (place-handling) "~%Failed to place the object~%")
                      (cpl:retry))
                    (roslisp:ros-warn (place-action) "~%No more retries~%")))
               (setf *grasp-mode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when with-hash-table-iterator is finished
-              (comf::place-object next-object *grasp-mode*)
-              (llif::call-take-pose-action 1)
               (if (eq (comf::reachability-check-place next-object *grasp-mode*) 1)
                   (throw common-fail:low-level-failure "Not Reachable")
                   (comf::place-object next-object *grasp-mode*))
+              (llif::call-take-pose-action 1)
               (comf::announce-place-action "past" next-object)))))))
 
 

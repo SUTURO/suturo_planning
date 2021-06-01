@@ -158,7 +158,7 @@
                             :package :llif))))
       (if (eq raw-response 1)
           (roslisp:ros-warn (knowledge-surface-client)
-                            "Query didn't shelf_surfaces reach any solution.")
+                            "Query didn't surfaces_not_visited reach any solution.")
           (values-list (list (mapcar
                         (lambda (x) (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" x)))
                         (cdr (assoc '?Surfaces (cut:lazy-car raw-response)))))))))
@@ -173,8 +173,10 @@
      (if (eq raw-response 1)
          (roslisp:ros-warn (knowledge-surface-client)
                            "Query didn't robot_in_room reach any solution.")
-         (remove-string +HSR-ROOMS-PREFIX+
-                        (string-trim "'" (cdr (assoc '?Room (cut:lazy-car raw-response))))))))
+         (progn
+           (roslisp::ros-info (prolog-current-room) "I am in room ~a" raw-response)
+           (remove-string +HSR-ROOMS-PREFIX+
+                        (string-trim "'" (cdr (assoc '?Room (cut:lazy-car raw-response)))))))))
 
 ;; @author Torge Olliges
 (defun prolog-room-surfaces (room)

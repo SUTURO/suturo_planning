@@ -8,10 +8,10 @@
     ;;TODO: move to start position -> move to first room
     (setf surfaces-with-distances-from-current-position
           (llif::sort-surfaces-by-distance
-           (llif::prolog-surfaces-not-visited-in-room
+           (llif::prolog-room-surfaces
             (llif::prolog-current-room))))
 
-    (loop for surface-info in surfaces-with-distances-from-current-positions
+    (loop for surface-info in surfaces-with-distances-from-current-position
           do
              (when (eq (search "Shelf" (car surface-info)) nil)
                (comf::announce-movement-to-surface "future" (car surface-info))
@@ -21,7 +21,7 @@
              (llif::prolog-set-surfaces-visit-state (car surface-info))
              (setf surfaces-with-distances-from-current-position
                    (llif::sort-surfaces-by-distance
-                    (llif::prolog-surfaces-not-visited-in-room
+                    (llif::prolog-room-surfaces
                      (llif::prolog-current-room)))))
       (poi-search)))
 
@@ -71,6 +71,18 @@
             (comf::get-confident-objects
              (llif::call-robosherlock-object-pipeline (vector "robocup_default") t)))
 
+
+      ;;percieve -> filter -> insert into knowledge
+      (llif::call-take-pose-action 1)
+
+      ;; turn to face the object
+      (roslisp::with-fields (translation rotation)
+        (cl-tf::lookup-transform cram-tf::*transformer* "map" "base_footprint")
+        (llif::call-nav-action-ps 
+            (cl-tf::make-pose-stamped "map" 0 translation
+                (cl-tf::q* rotation
+                           (cl-tf::euler->quaternion :ax 0 :ay 0 :az (- (/ pi 2)))))))
+      
       (roslisp::with-fields (detectiondata)
           confident-objects
         (progn
@@ -78,10 +90,7 @@
           (if (> (length detectiondata) 0)
               (llif::insert-knowledge-objects confident-objects)
               (return-from continue))))
-
-      ;;percieve -> filter -> insert into knowledge
-      (llif::call-take-pose-action 1)
-
+      
       (let ((next-object (llif::prolog-next-object)))
         (when (eq next-object 1) (return-from continue))
         (let ((object-goal (llif::prolog-object-goal next-object)))
