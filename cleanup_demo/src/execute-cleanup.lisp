@@ -19,10 +19,11 @@
                (comf::perceive-surface (car surface-info))
                (handle-found-objects))
              (llif::prolog-set-surfaces-visit-state (car surface-info))
-             (setf surfaces-with-distances-from-current-position
-                   (llif::sort-surfaces-by-distance
-                    (llif::prolog-room-surfaces
-                     (llif::prolog-current-room)))))
+             ;;(setf surfaces-with-distances-from-current-position
+             ;;      (llif::sort-surfaces-by-distance
+             ;;       (llif::prolog-room-surfaces
+             ;;        (llif::prolog-current-room)))))
+             )
       (poi-search)))
 
 ;;@author Torge Olliges
@@ -53,7 +54,9 @@
 
       (progn
         (comf::announce-place-action "future" next-object)
-        (comf::place-handling next-object)))))
+        (comf::place-object next-object 1))
+
+      (llif::call-take-pose-action 1))))
 
 (defun poi-search ()
   (loop do
@@ -104,7 +107,7 @@
           ;;place object at goal surface
           (comf::announce-place-action "present" next-object)
           
-          (comf::place-handling next-object)
+          (comf::place-object next-object 1)
           (comf::announce-place-action "past" next-object)
 
           (llif::call-take-pose-action 1))))))
