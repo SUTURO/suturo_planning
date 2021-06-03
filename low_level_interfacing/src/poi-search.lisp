@@ -114,13 +114,13 @@
                          (setf max-size (aref copy i))
                          (setf bl-corner i))))
             (setf (aref copy i) 0)))
-      (roslisp:publish (advertise "search_map_algo" "nav_msgs/OccupancyGrid") (roslisp:modify-message-copy *searchMap* (data) copy)))
-    (multiple-value-bind (row col) (floor *bl-corner* width) ;;floor or round
+      (roslisp:publish (advertise "search_map_algo" "nav_msgs/OccupancyGrid") (roslisp:modify-message-copy *searchMap* (data) copy))
+    (multiple-value-bind (row col) (floor bl-corner width) ;;floor or round
       (let* ((bl-coord (cl-tf:make-3d-vector
                         (+ x (* resolution col))
                         (+ y (* resolution row))
                         0))
-             (real-size (* *max-size* resolution))
+             (real-size (* max-size resolution))
              (current-position (cl-tf::transform-stamped->pose-stamped
                                (cl-tf::lookup-transform
                                 cram-tf::*transformer*
@@ -151,7 +151,7 @@
          (progn
            (mark-position-visited (/ real-size 2) square-center)
            (find-biggest-unsearched-space)
-           (when debug (sleep 0.5))))))))
+           (when debug (sleep 0.5)))))))))
 
 ;;@author Philipp Klein
 (defun publish-debug-square (pose-list)
