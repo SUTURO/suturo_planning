@@ -138,12 +138,12 @@
         ;;(roslisp::ros-info (find-biggest-unsearched-space) "Position ~a center ~a" *position* center)
 
         (if
-         (and
-          (llif::global-planner-reachable current-position square-center)
+         ;;(and
+          ;;(llif::global-planner-reachable current-position square-center)
           (not (llif::prolog-is-pose-outside
                 (cl-tf::x (cl-tf::origin square-center))
                 (cl-tf::y (cl-tf::origin square-center))
-                (cl-tf::z (cl-tf::origin square-center)))))
+                (cl-tf::z (cl-tf::origin square-center)))) ;;)
          ;;TODO maybe change it from middle to smth else
          (progn
            (roslisp::ros-info (find-biggest-unsearched-space) "Square center: ~a" square-center)
