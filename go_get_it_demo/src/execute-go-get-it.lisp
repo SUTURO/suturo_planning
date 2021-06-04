@@ -56,14 +56,14 @@
         do
            (print surface-info)
            (when (and
-                  (eq (search "Shelf" surface-info) nil)
-                  (eq (search "Kitchen" surface-info) nil)
+                  (eq (search "Shelf" (car surface-info)) nil)
+                  (eq (search "Kitchen" (car surface-info)) nil)
                   (eq (search "bucket"
-                              (llif::prolog-surface-region surface-info)) nil)
+                              (llif::prolog-surface-region (car surface-info))) nil)
                   (eq (search "chair"
-                              (llif::prolog-surface-region surface-info)) nil))
-             (comf::move-to-surface surface-info t)
-             (comf::perceive-surface surface-info)
+                              (llif::prolog-surface-region (car surface-info))) nil))
+             (comf::move-to-surface (car surface-info) t)
+             (comf::perceive-surface (car surface-info))
              (let ((object-id (llif::prolog-perceived-object->object-id perceived_object_name room-id)))
                (print "Find object in room")
                (print object-id)
@@ -71,7 +71,7 @@
                  (roslisp::ros-info (find-object-in-room) "Object ~a found as ~a" perceived_object_name object-id)
                  (return-from find-object-in-room object-id))
                (roslisp:ros-info (find-object-in-room) 
-                                 "Object ~a wasn't on surface ~a" perceived_object_name surface-info)))
+                                 "Object ~a wasn't on surface ~a" perceived_object_name (car surface-info))))
            (roslisp::ros-warn (find-object-in-room) "Object ~a wasn't found on any surface in room ~a" perceived_object_name room-id)))
 
 ;;@author Torge Olliges
