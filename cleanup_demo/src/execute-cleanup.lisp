@@ -73,7 +73,9 @@
              (comf::place-object next-object 1))
            (llif::call-take-pose-action 1)))))
 
+;;@author Philipp Klein
 (defun poi-search ()
+  "approaching the next poi and bring the found object to the basket. When no poi is found, start the poi-search and loop the behavior."
   (loop do
     (block continue
       (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
