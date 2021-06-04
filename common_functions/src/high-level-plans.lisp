@@ -222,9 +222,9 @@
                      (cpl:retry))
                    (roslisp:ros-warn (grasp-handling) "~%No more retries~%")))
               (setf *grasp-mode* 1)  ;;sets the graspmode should be replaced with the function from knowledge when that is finished
-              (comf::grasp-object next-object *grasp-mode*)
-              (comf::announce-grasp-action "past" next-object)
-              (llif::call-take-pose-action 1)))))))
+              (comf::grasp-object next-object *grasp-mode*))))))
+  (comf::announce-grasp-action "past" next-object)
+  (llif::call-take-pose-action 1))
 
 ;;@author Torge Olliges
 (defun place-handling (next-object)

@@ -87,6 +87,7 @@
 (defun find-biggest-unsearched-space (&optional debug)
   "returns the position of the bottom left corner of the bigest area not searched yet and the size"
   (roslisp::ros-info (find-biggest-unsearched-space) "Searching for empty square")
+  (sleep 10)
   (roslisp:with-fields (data
                         (resolution(resolution info))
                         (width (width info))

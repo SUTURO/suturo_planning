@@ -80,7 +80,6 @@ action server."
    Second value describes +up and -down.
    (vector 0.0 0.0) looks straight ahead."
   ;; (format t "move gripper called with pos: ~a" pos)
-  (print "test")
   (multiple-value-bind (result status)
   (actionlib:call-goal (get-place-action-client)
                        (make-place-action-goal point-x-object

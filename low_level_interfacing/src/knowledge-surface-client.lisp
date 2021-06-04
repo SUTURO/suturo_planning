@@ -163,6 +163,19 @@
                         (lambda (x) (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" x)))
                         (cdr (assoc '?Surfaces (cut:lazy-car raw-response)))))))))
 
+;;author Torge Olliges
+(defun prolog-all-rooms ()
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          "all_rooms(ROOMS)"
+                         :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-surface-client)
+                          "Query all_rooms didn't reacha any solution")
+        (values-list (list (mapcar
+                            (lambda (x) (remove-string +HSR-ROOMS-PREFIX+ (string-trim "'" x)))
+                              (cdr (assoc '?Rooms (cut:lazy-car raw-response)))))))))
+
 ;; @author Torge Olliges
 (defun prolog-current-room ()
   (let* ((raw-response (with-safe-prolog
@@ -172,7 +185,7 @@
                            :package :llif))))
      (if (eq raw-response 1)
          (roslisp:ros-warn (knowledge-surface-client)
-                           "Query didn't robot_in_room reach any solution.")
+                           "Query robot_in_room didn't reach any solution.")
          (progn
            (roslisp::ros-info (prolog-current-room) "I am in room ~a" raw-response)
            (remove-string +HSR-ROOMS-PREFIX+
@@ -195,6 +208,7 @@
                             (lambda (x) (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" x)))
                             (cdr (assoc '?Surfaces (cut:lazy-car raw-response)))))))))
 
+;;@author Torge Olliges
 (defun prolog-is-pose-outside (x y z)
   (let ((raw-response (with-safe-prolog
                         (json-prolog:prolog-simple
@@ -211,6 +225,7 @@
         T
         nil)))
 
+;;@author Torge Olliges
 (defun prolog-pose-room (x y z)
     (let ((raw-response (with-safe-prolog
                         (json-prolog:prolog-simple
@@ -226,6 +241,7 @@
       (remove-string +HSR-ROOMS-PREFIX+
                         (string-trim "'" (cdr (assoc '?Room (cut:lazy-car raw-response)))))))
 
+;;@author Torge Olliges 
 (defun prolog-surface-room (surface-id)
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
@@ -241,7 +257,7 @@
                             (lambda (x) (string-trim "'" x))
                             (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
 
-
+;;@author Torge Olliges
 (defun prolog-surface-region (surface-id)
   (let* ((knowrob-name (format nil "~a~a" +HSR-SURFACE-PREFIX+ surface-id))
          (raw-response (with-safe-prolog
@@ -257,6 +273,7 @@
         (string-trim "\""(string-trim "'" (cdr (assoc '?Region (cut:lazy-car raw-response))))))))
 
 
+;;source https://stackoverflow.com/questions/669407/common-lisp-the-remove-function-how-is-it-used
 (defun remove-string (rem-string full-string &key from-end (test #'eql)
                       test-not (start1 0) end1 (start2 0) end2 key)
   "returns full-string with rem-string removed"

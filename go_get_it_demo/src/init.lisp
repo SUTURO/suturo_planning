@@ -28,7 +28,8 @@
 
   (init-nlg)
 
-  (init-poi))
+  ;;(init-poi)
+  )
 
 (defun get-planning-node ()
   (or *planning-node*
@@ -43,11 +44,7 @@
 (defun init-knowledge()
   ;;Init action clients
   (roslisp:ros-info (init-interfaces) "init knowledge client")
-  (llif::init-knowledge-action-client)
-
-  (llif::knowledge-set-tables-source)
-  (llif::knowledge-set-ground-source)
-  (llif::knowledge-set-buckets-target))
+  (llif::init-knowledge-action-client))
 
 (defun init-manipulation()
   "Initialize only local nodes for working without the real robot."

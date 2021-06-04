@@ -3,28 +3,42 @@
 (defun execute-cleanup ()
   ;;(init-interfaces)
   (comf::with-hsr-process-modules
+    (llif::call-take-pose-action 1)
     (comf::announce-plan-start "clean up")
     ;;(move-to-start-position)
     ;;TODO: move to start position -> move to first room
-    (setf surfaces-with-distances-from-current-position
-          (llif::sort-surfaces-by-distance
-           (llif::prolog-room-surfaces
-            (llif::prolog-current-room))))
-
-    (loop for surface-info in surfaces-with-distances-from-current-position
+    ;;(setf surfaces-with-distances-from-current-position
+    ;;      (llif::sort-surfaces-by-distance
+    ;;       (llif::prolog-room-surfaces
+    ;;        (llif::prolog-current-room))))
+    (loop for room in (llif::prolog-all-rooms)
           do
-             (when (eq (search "Shelf" (car surface-info)) nil)
-               (comf::announce-movement-to-surface "future" (car surface-info))
-               (comf::move-to-surface (car surface-info) t)
-               (comf::perceive-surface (car surface-info))
-               (handle-found-objects))
-             (llif::prolog-set-surfaces-visit-state (car surface-info))
              ;;(setf surfaces-with-distances-from-current-position
              ;;      (llif::sort-surfaces-by-distance
              ;;       (llif::prolog-room-surfaces
-             ;;        (llif::prolog-current-room)))))
-             )
-      (poi-search)))
+             ;;        room)))
+             (loop for surface-info in (llif::sort-surfaces-by-distance
+                                        (llif::prolog-room-surfaces
+                                         room))
+                   do
+                      (when (and
+                             (eq (search "Shelf" (car surface-info)) nil)
+                             (eq (search "bucket"
+                                         (llif::prolog-surface-region (car surface-info))) nil)
+                             (eq (search "chair"
+                                         (llif::prolog-surface-region (car surface-info))) nil))
+                        (comf::announce-movement-to-surface "future" (car surface-info))
+                        (comf::move-to-surface (car surface-info) t)
+                        (comf::perceive-surface (car surface-info))
+                        (handle-found-objects)
+                        (llif::prolog-set-surfaces-visit-state (car surface-info)))
+                      ;;(setf surfaces-with-distances-from-current-position
+                      ;;      (llif::sort-surfaces-by-distance
+                      ;;       (llif::prolog-room-surfaces
+                      ;;        (llif::prolog-current-room)))))
+                   ))
+    ;;(poi-search)
+    ))
 
 ;;@author Torge Olliges
 (defun move-to-start-position()
@@ -32,31 +46,32 @@
 
 ;;@author Torge Olliges
 (defun handle-found-objects ()
-  (let ((next-object (llif::prolog-next-object)))
-    (when (eq next-object 1) (return-from handle-found-objects nil))
-    (let ((source-surface (llif::prolog-object-source next-object))
-          (target-surface (llif::prolog-object-goal next-object)))
-      (print source-surface)
-      
-      (progn 
-        (comf::announce-movement-to-surface "future" source-surface)
-        (comf::move-to-surface source-surface nil))
+  (loop
+    do
+       (let ((next-object (llif::prolog-next-object)))
+         (when (eq next-object 1) (return-from handle-found-objects nil))
+         (let ((source-surface (llif::prolog-object-source next-object))
+               (target-surface (llif::prolog-object-goal next-object)))
+           (print source-surface)
+           
+           (progn 
+             (comf::announce-movement-to-surface "future" source-surface)
+             (comf::move-to-surface source-surface nil))
+           
+           (comf::reachability-check-grasp next-object 1)
+           ;;TODO is the next-object still valid?
+           (progn
+             (comf::announce-grasp-action "future" next-object)
+             (comf::grasp-handling next-object))
 
-      ;;(comf::reachability-check-grasp next-object 1)
-      ;;TODO is the next-object still valid?
-      (progn
-        (comf::announce-grasp-action "future" next-object)
-        (comf::grasp-handling next-object))
-
-      (progn
-        (comf::announce-movement-to-surface "future" target-surface)
-        (comf::move-to-surface target-surface nil))
-
-      (progn
-        (comf::announce-place-action "future" next-object)
-        (comf::place-object next-object 1))
-
-      (llif::call-take-pose-action 1))))
+           (progn
+             (comf::announce-movement-to-surface "future" target-surface)
+             (comf::move-to-surface target-surface nil))
+           
+           (progn
+             (comf::announce-place-action "future" next-object)
+             (comf::place-object next-object 1))
+           (llif::call-take-pose-action 1)))))
 
 (defun poi-search ()
   (loop do
@@ -72,7 +87,8 @@
 
       (setf confident-objects
             (comf::get-confident-objects
-             (llif::call-robosherlock-object-pipeline (vector "robocup_default") t)))
+             (llif::call-robosherlock-object-pipeline (vector "robocup_default") t)
+             0.8))
 
 
       ;;percieve -> filter -> insert into knowledge
