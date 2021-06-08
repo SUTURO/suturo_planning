@@ -21,7 +21,7 @@
 ;;@author Torge Olliges
 (defun wait-for-orders()
   (llif::call-take-pose-action 1)
-    (subscribe "/fetch_request" "nlp_msgs/FetchRequest" #'handle-fetch-request))
+    (subscribe "/fetch_request" "nlp_msgs/GoAndGetIt" #'handle-fetch-request))
 
 ;;@author Torge Olliges
 (defun handle-fetch-request (fetch-request)

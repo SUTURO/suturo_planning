@@ -252,7 +252,7 @@
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-surface-client)
-                          "Query didn't surface_in_room reach any solution.")
+                          "Query surface_in_room didn't reach any solution.")
         (values-list (list (mapcar
                             (lambda (x) (string-trim "'" x))
                             (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
@@ -269,9 +269,22 @@
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-surface-client)
-                          "Query didn't surface_in_room reach any solution.")
+                          "Query surface_in_room didn't reach any solution.")
         (string-trim "\""(string-trim "'" (cdr (assoc '?Region (cut:lazy-car raw-response))))))))
 
+(defun prolog-surface-furniture (surface-id)
+  (let* ((knowrob-name (format nil "~a~a" +HSR-SURFACE-PREFIX+ surface-id))
+         (raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                                       "has_surface(Furniture,'"
+                                       knowrob-name
+                                       "')")
+                          :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-surface-client)
+                          "Query has_surface didn't reach any solution.")
+        (string-trim "\""(string-trim "'" (cdr (assoc '?Furniture (cut:lazy-car raw-response))))))))
 
 ;;source https://stackoverflow.com/questions/669407/common-lisp-the-remove-function-how-is-it-used
 (defun remove-string (rem-string full-string &key from-end (test #'eql)

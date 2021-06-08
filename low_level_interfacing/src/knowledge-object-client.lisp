@@ -250,4 +250,21 @@
                            "Query didn't objects_in_room reach any solution.")
          (values-list (list (mapcar
                        (lambda (x) (string-trim "'" x))
-                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
+                       (cdr (assoc '?Objects (cut:lazy-car raw-response)))))))))
+
+(defun prolog-furniture-objects (furniture-id)
+  (let* ((knowrob-name (format nil "~a~a" +hsr-rooms-prefix+ room-id))
+         (raw-response (with-safe-prolog
+                           (json-prolog:prolog-simple
+                           (concatenate 'string
+                                        "furniture_all_objects("
+                                        knowrob-name
+                                        ",OBJECTS)")
+                           :package :llif))))
+     (if (eq raw-response 1)
+         (roslisp:ros-warn (knowledge-surface-client)
+                           "Query didn't objects_in_room reach any solution.")
+         (values-list (list (mapcar
+                       (lambda (x) (string-trim "'" x))
+                       (cdr (assoc '?Objects (cut:lazy-car raw-response)))))))))
+
