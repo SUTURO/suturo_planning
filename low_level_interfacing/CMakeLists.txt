@@ -13,8 +13,6 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roslisp
   std_msgs
-  tmc_msgs
-  std_msgs
   move_base_msgs
   control_msgs
   #suturo_perception_msgs
