@@ -4,8 +4,8 @@
 (defparameter *dimensions* nil)
 (defparameter *pose* nil)
 (defparameter *place-list* nil)
-(defparameter *grasp-mode-hack-z* nil)
-(defparameter *hack2* nil)
+(defparameter *grasp-mode-z* nil)
+
 
 ;;@author Jan Schimpf
 ;; Gets the object-id of the object that should be place and
@@ -17,11 +17,14 @@
     ;;get the information from knowledge
     (setf *dimensions* (llif:prolog-object-dimensions object-id))
     (setf *goal* (llif:prolog-object-goal-pose object-id))
+    (if (eq 2 grasp-pose)
+      (setq *grasp-mode-z* (+ (nth 2 (nth 2 *pose*)) 0.05))
+      (setq *grasp-mode-z* (nth 2 (nth 2 *pose*))))
     ;;takes apart the messages for the needed information to consturct the place motion-designator 
     (let* (
         (?point-x-object (nth 0 (nth 0 *goal*)))
         (?point-y-object (nth 1 (nth 0 *goal*)))
-        (?point-z-object (nth 2 (nth 0 *goal*)))
+        (?point-z-object *grasp-mode-z*)
         (?quaterion-value-1 (nth 0 (nth 1 *goal*)))
         (?quaterion-value-2 (nth 1 (nth 1 *goal*)))
         (?quaterion-value-3 (nth 2 (nth 1 *goal*)))
@@ -93,14 +96,13 @@
     (setq *dimensions* (llif:prolog-object-dimensions object-id))
   (setq *pose* (llif:prolog-object-pose object-id))
   (if (eq 2 grasp-pose)
-      (setq *grasp-mode-hack-z* (+ (nth 2 (nth 2 *pose*)) 0.05))
-      (setq *grasp-mode-hack-z* (nth 2 (nth 2 *pose*))))
-    (setq *hack2* (-(nth 0 (nth 2 *pose*)) 0.02))  
+      (setq *grasp-mode-z* (+ (nth 2 (nth 2 *pose*)) 0.05))
+      (setq *grasp-mode-z* (nth 2 (nth 2 *pose*))))
     ;;takes apart the messages for the needed information to consturct the grasp motion-designator 
     (let* (
-        (?point-x-object *hack2* )
+        (?point-x-object (nth 1 (nth 2 *pose*)))
         (?point-y-object (nth 1 (nth 2 *pose*)))
-        (?point-z-object *grasp-mode-hack-z*)
+        (?point-z-object *grasp-mode-z*)
         (?quaterion-value-1 (nth 0 (nth 3 *pose*)))
         (?quaterion-value-2 (nth 1 (nth 3 *pose*)))
         (?quaterion-value-3 (nth 2 (nth 3 *pose*)))

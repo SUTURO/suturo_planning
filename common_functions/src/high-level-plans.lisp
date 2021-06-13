@@ -1,5 +1,6 @@
 (in-package :comf)
 (defparameter *poi-distance-threshold* 0.75)
+(defparameter *graspmode* nil)
 
 ;;;; Navigation ;;;;
 
@@ -159,16 +160,17 @@
       (let ((knowledge-pose-manipulation (llif::prolog-manipulating-pose-of-door door-id)))
              (comf::get-nav-pose-for-doors knowledge-pose-manipulation t)
            
-      (let ((knowledge-doorhandle-id (concatenate 'string "iai_kitchen/" (llif::prolog-knowrob-name-to-urdf-link
-                                                                          (car (cdr (llif::prolog-perceiving-pose-of-door door-id))))))
+        (let ((knowledge-doorhandle-id (concatenate 'string "iai_kitchen/"
+                                                    (llif::prolog-knowrob-name-to-urdf-link
+                                                        (car (cdr (llif::prolog-perceiving-pose-of-door door-id))))))
             (knowledge-pose-perceiving   (car (llif::prolog-perceiving-pose-of-door door-id)))
             (knowledge-open-door-angle (llif::prolog-get-angle-to-open-door door-id)))
-        (llif::call-open-action knowledge-doorhandle-id
-                                knowledge-doorhandle-id
-                                1.35)
-        (llif::prolog-update-door-state door-id "1.35")
-        (comf::get-nav-pose-for-doors knowledge-pose-manipulation t)
-        (comf::get-nav-pose-for-doors knowledge-pose-perceiving t))))))
+            (llif::call-open-action knowledge-doorhandle-id
+                                    knowledge-doorhandle-id
+                                    1.35)
+            (llif::prolog-update-door-state door-id "1.35")
+            (comf::get-nav-pose-for-doors knowledge-pose-manipulation t)
+            (comf::get-nav-pose-for-doors (list (list -1.86 5.28 0) (list 0 0 0 1)) t))))))
 
 ;;@author Jan Schimpf
 (defun open-door-on-the-path (start-room target-room)
@@ -221,7 +223,7 @@
                      (roslisp:ros-warn (grasp-handling) "~%Failed to grasp the object~%")
                      (cpl:retry))
                    (roslisp:ros-warn (grasp-handling) "~%No more retries~%")))
-              (setf *grasp-mode* 1)  ;;sets the graspmode should be replaced with the function from knowledge when that is finished
+              (dynamic-grasp next-object)  ;;sets the graspmode should be replaced with the function from knowledge when that is finished
               (comf::grasp-object next-object *grasp-mode*))))))
   (comf::announce-grasp-action "past" next-object)
   (llif::call-take-pose-action 1))
@@ -245,7 +247,7 @@
                      (roslisp:ros-warn (place-handling) "~%Failed to place the object~%")
                      (cpl:retry))
                    (roslisp:ros-warn (place-action) "~%No more retries~%")))
-              (setf *grasp-mode* 1)  ;;sets the graspmode should be replaces with the function from knowledge when with-hash-table-iterator is finished
+              (dynamic-grasp next-object)  ;;sets the graspmode should be replaces with the function from knowledge when with-hash-table-iterator is finished
               (if (eq (comf::reachability-check-place next-object *grasp-mode*) 1)
                   (throw common-fail:low-level-failure "Not Reachable")
                   (comf::place-object next-object *grasp-mode*))
@@ -256,3 +258,8 @@
 
 
 
+(defun dynamic-grasp (object-id)
+
+  (if (< 0.06 (nth 2  (llif:prolog-object-dimensions object-id)))
+      (setf *graspmode* 1)
+      (setf *graspmode* 2)))
