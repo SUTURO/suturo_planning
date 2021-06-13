@@ -1,7 +1,7 @@
 - git:
     local-name: suturo_planning
     uri:  https://github.com/SUTURO/suturo_planning.git 
-    version: master
+    version: robocup
 - git:
     local-name: iai_maps
     uri:  https://github.com/code-iai/iai_maps.git
