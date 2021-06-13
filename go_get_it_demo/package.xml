@@ -9,6 +9,7 @@
   <license>TODO</license>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <depend>nlp_msgs</depend>
   <build_depend>roslisp</build_depend>
   <build_depend>cl_tf2</build_depend>
   <build_depend>std_msgs</build_depend>
