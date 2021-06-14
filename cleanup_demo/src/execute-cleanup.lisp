@@ -1,7 +1,7 @@
 (in-package :clean)
 
 (defun execute-cleanup ()
-  ;;(init-interfaces)
+  (init-interfaces)
   (comf::with-hsr-process-modules
     (llif::call-take-pose-action 1)
     (comf::announce-plan-start "clean up")
