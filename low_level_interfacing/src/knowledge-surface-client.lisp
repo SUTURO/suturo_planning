@@ -118,7 +118,35 @@
                       (third prolog-pose-values))))
     (cl-transforms:v-dist current-pose-translation prolog-pose-vector)))
 
-;; @author Torge Ollige
+;; @author Torge Olliges
+(defun prolog-set-surface-not-visited (surface-id)
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                                       "set_surface_not_visited('"
+                                       surface-id
+                                       "')")
+                          :package :llif))))
+    (if (eq raw-response 1)
+          (roslisp:ros-warn (knowledge-surface-client)
+                            "Query didn't set_surface_visited reach any solution.")
+          (roslisp:ros-info (Knowledge-surface-client) "Visit state for  ~a set to not visited." surface-id))))
+
+;; @author Torge Olliges
+(defun prolog-set-surface-visited (surface-id)
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                                       "set_surface_visited('"
+                                       surface-id
+                                       "')")
+                          :package :llif))))
+    (if (eq raw-response 1)
+          (roslisp:ros-warn (knowledge-surface-client)
+                            "Query didn't set_surface_visited reach any solution.")
+          (roslisp:ros-info (Knowledge-surface-client) "Visit state for ~a set to visited." surface-id))))
+
+;; @author Torge Olliges
 (defun prolog-set-surfaces-visit-state (surface-id)
   (let* ((raw-response (with-safe-prolog
                           (json-prolog:prolog-simple
@@ -132,7 +160,7 @@
                             "Query didn't assign_visit_state reach any solution.")
           (roslisp:ros-info (Knowledge-surface-client) "Visit state for object ~a was updated" surface-id))))
 
-;; @author Torge Ollige
+;; @author Torge Olliges
 (defun prolog-surfaces-not-visited ()
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple

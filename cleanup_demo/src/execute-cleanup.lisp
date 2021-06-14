@@ -11,32 +11,34 @@
     ;;      (llif::sort-surfaces-by-distance
     ;;       (llif::prolog-room-surfaces
     ;;        (llif::prolog-current-room))))
-    (loop for room in (llif::prolog-all-rooms)
-          do
+    (when (not (search "Outside" (llif::prolog-current-room)) nil)
+      )
+    ;;(loop for room in (llif::prolog-all-rooms)
+    ;;      do
              ;;(setf surfaces-with-distances-from-current-position
              ;;      (llif::sort-surfaces-by-distance
              ;;       (llif::prolog-room-surfaces
              ;;        room)))
              (loop for surface-info in (llif::sort-surfaces-by-distance
-                                        (llif::prolog-room-surfaces
-                                         room))
+                                        (llif::prolog-surfaces-not-visited-in-room
+                                         (llif::prolog-current-room)))
                    do
-                      (when (and
-                             (eq (search "Shelf" (car surface-info)) nil)
-                             (eq (search "bucket"
-                                         (llif::prolog-surface-region (car surface-info))) nil)
-                             (eq (search "chair"
-                                         (llif::prolog-surface-region (car surface-info))) nil))
+                      ;;(when (and
+                      ;;       (eq (search "Shelf" (car surface-info)) nil)
+                      ;;       (eq (search "bucket"
+                      ;;                   (llif::prolog-surface-region (car surface-info))) nil)
+                      ;;       (eq (search "chair"
+                      ;;                   (llif::prolog-surface-region (car surface-info))) nil))
                         (comf::announce-movement-to-surface "future" (car surface-info))
                         (comf::move-to-surface (car surface-info) t)
                         (comf::perceive-surface (car surface-info))
                         (handle-found-objects)
-                        (llif::prolog-set-surfaces-visit-state (car surface-info)))
+                        (llif::prolog-set-surface-visited (car surface-info));;)
                       ;;(setf surfaces-with-distances-from-current-position
                       ;;      (llif::sort-surfaces-by-distance
                       ;;       (llif::prolog-room-surfaces
                       ;;        (llif::prolog-current-room)))))
-                   ))
+                   );;)
     ;;(poi-search)
     ))
 

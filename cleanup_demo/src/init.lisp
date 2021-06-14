@@ -43,7 +43,9 @@
 (defun init-knowledge()
   ;;Init action clients
   (roslisp:ros-info (init-interfaces) "init knowledge client")
-  (llif::init-knowledge-action-client))
+  (llif::init-knowledge-action-client)
+  ;;(llif::prolog-set)
+  )
 
 (defun init-manipulation()
   "Initialize only local nodes for working without the real robot."
