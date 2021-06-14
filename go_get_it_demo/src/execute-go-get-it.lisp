@@ -27,7 +27,7 @@
 (defun handle-fetch-request (fetch-request)
   (comf::with-hsr-process-modules
   ;;(print "####################################################################")
-  (roslisp::with-fields (perceived_object_name perceived_room_name)
+  (roslisp::with-fields (perceived_object_name person_left person_right)
       fetch-request
     (let ((room-id (llif::prolog-perceived-room->room-id perceived_room_name))) 
       (when (eq room-id 1) 
@@ -56,7 +56,7 @@
         do
            (print surface-info)
            (when (and
-                  (eq (search "Shelf" (car surface-info)) nil)
+                  (eq (search "Table" (car surface-info)) nil)
                   (eq (search "Kitchen" (car surface-info)) nil)
                   (eq (search "bucket"
                               (llif::prolog-surface-region (car surface-info))) nil)
@@ -64,7 +64,7 @@
                               (llif::prolog-surface-region (car surface-info))) nil))
              (comf::move-to-surface (car surface-info) t)
              (comf::perceive-surface (car surface-info))
-             (let ((object-id (llif::prolog-perceived-object->object-id perceived_object_name room-id)))
+             (let ((object-id (llif::prolog-perceived-object-in-furniture->object-id perceived_object_name room-id)))
                (print "Find object in room")
                (print object-id)
                (when object-id

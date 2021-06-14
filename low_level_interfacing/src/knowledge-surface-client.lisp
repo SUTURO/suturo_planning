@@ -286,6 +286,25 @@
                           "Query has_surface didn't reach any solution.")
         (string-trim "\""(string-trim "'" (cdr (assoc '?Furniture (cut:lazy-car raw-response))))))))
 
+(defun prolog-pose-to-perceive-surface (surface-id)
+  (let* ((knowrob-name (format nil "~a~a" +HSR-SURFACE-PREFIX+ surface-id))
+         (raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                                       "surface_pose_to_perceive_from('"
+                                       knowrob-name
+                                       "', [TRANSLATION, ROTATION])")
+                          :package :llif))))
+     (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-surface-client)
+                          "Query surface_pose_to_perceive_from didn't reach any solution.")
+        (values-list `(,(list (cdr (assoc '?translation (cut:lazy-car raw-response)))
+                              (cdr (assoc '?rotation (cut:lazy-car raw-response))))
+                       ,(string-trim "'"
+                                     (cdr
+                                      (assoc '?context
+                                             (cut:lazy-car raw-response)))))))))
+
 ;;source https://stackoverflow.com/questions/669407/common-lisp-the-remove-function-how-is-it-used
 (defun remove-string (rem-string full-string &key from-end (test #'eql)
                       test-not (start1 0) end1 (start2 0) end2 key)

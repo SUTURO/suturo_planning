@@ -80,25 +80,27 @@
 ;;@author Torge Olliges
 (defun move-to-surface (surface-id turn)
   (roslisp:ros-info (move-too-room) "Moving to surface ~a" surface-id)
-  (let* ((surface-pose (llif::prolog-surface-pose surface-id))
+  (let* ((perceive-pose (llif::prolog-pose-to-perceive-surface surface-id))
         (?goal-pose
           (cl-tf::make-pose-stamped
             "map" 0
-            (roslisp::with-fields (origin)
-                (get-nav-pose-for-surface surface-id) origin)
+            (cl-tf::make-3d-vector
+             (first (first perceive-pose))
+             (second (first perceive-pose))
+             (third (first perceive-pose)))
             (if turn
                 (cl-transforms:q* 
                  (cl-tf::make-quaternion
-                  (first (second surface-pose))
-                  (second (second surface-pose))
-                  (third (second surface-pose))
-                  (fourth (second surface-pose)))
+                  (first (second perceive-pose))
+                  (second (second perceive-pose))
+                  (third (second perceive-pose))
+                  (fourth (second perceive-pose)))
                  (cl-transforms:euler->quaternion :ax 0 :ay 0 :az (/ pi 2)))
                 (cl-tf::make-quaternion
-                 (first (second surface-pose))
-                 (second (second surface-pose))
-                 (third (second surface-pose))
-                 (fourth (second surface-pose)))))))
+                 (first (second perceive-pose))
+                 (second (second perceive-pose))
+                 (third (second perceive-pose))
+                 (fourth (second perceive-pose)))))))
     (exe::perform (desig:a motion
                            (type going)
                            (pose ?goal-pose)))))
