@@ -11,17 +11,15 @@
     ;;      (llif::sort-surfaces-by-distance
     ;;       (llif::prolog-room-surfaces
     ;;        (llif::prolog-current-room))))
-    (when (not (search "Outside" (llif::prolog-current-room)) nil)
-      )
-    ;;(loop for room in (llif::prolog-all-rooms)
-    ;;      do
+    (loop for room in (llif::prolog-all-rooms)
+          do
              ;;(setf surfaces-with-distances-from-current-position
              ;;      (llif::sort-surfaces-by-distance
              ;;       (llif::prolog-room-surfaces
              ;;        room)))
              (loop for surface-info in (llif::sort-surfaces-by-distance
                                         (llif::prolog-surfaces-not-visited-in-room
-                                         (llif::prolog-current-room)))
+                                         room))
                    do
                       ;;(when (and
                       ;;       (eq (search "Shelf" (car surface-info)) nil)
@@ -38,7 +36,7 @@
                       ;;      (llif::sort-surfaces-by-distance
                       ;;       (llif::prolog-room-surfaces
                       ;;        (llif::prolog-current-room)))))
-                   );;)
+                   ))
     ;;(poi-search)
     ))
 

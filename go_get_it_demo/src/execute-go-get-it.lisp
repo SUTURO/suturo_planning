@@ -1,7 +1,6 @@
 (in-package :go-get-it)
 
-(defparameter *starting-position* nil)
-(defparameter *starting-room* nil)
+(defparameter *deliver-pose* nil)
 
 ;;@author Torge Olliges
 (defun execute-go-get-it()
@@ -9,7 +8,7 @@
     ;;(comf::with-hsr-process-modules
 
     ;; move to predefined location
-    (move-to-start-position)
+    ;; (move-to-start-position)
     (wait-for-orders))
 
 ;;@author Torge Olliges
@@ -21,13 +20,14 @@
 ;;@author Torge Olliges
 (defun wait-for-orders()
   (llif::call-take-pose-action 1)
-    (subscribe "/fetch_request" "nlp_msgs/GoAndGetIt" #'handle-fetch-request))
+  (subscribe "/fetch_request" "nlp_msgs/GoAndGetIt" #'handle-fetch-request)
+  (subscribe "/deliver_request" "nlp_msgs/GoAndGetIt #'handle-deliver-request"))
 
 ;;@author Torge Olliges
 (defun handle-fetch-request (fetch-request)
   (comf::with-hsr-process-modules
   ;;(print "####################################################################")
-  (roslisp::with-fields (perceived_object_name person_left person_right)
+    (roslisp::with-fields (perceived_object_name person_left person_right)
       fetch-request
     (let ((room-id (llif::prolog-perceived-room->room-id perceived_room_name))) 
       (when (eq room-id 1) 
@@ -35,8 +35,6 @@
                           "No room found for perceived room name ~a" perceived_room_name)
         (return-from handle-fetch-request nil))
       (let ((object-id (llif::prolog-perceived-object->object-id perceived_object_name room-id)))
-        (print "Handle fetch request")
-        (print object-id)
         (when (eq object-id nil)
           (roslisp::ros-info (handle-fetch-request)
                              "Object ~a not yet known" perceived_object_name)
@@ -45,6 +43,24 @@
         (retrieve-object-from-room (llif::prolog-perceived-object->object-id
                                     perceived_object_name room-id)
                                    room-id))))))
+
+(defun handle-deliver-request (deliver-request)
+(comf::with-hsr-process-modules
+  (roslisp::with-fields (perceived_object_name person_left person_right)
+      fetch-request
+      (if person_left
+        (if *deliver-pose*
+          (setf *deliver-pose*
+            (comf::prolog-object-goal-pose->pose-stamped 
+             (llif::prolog-deliver-object-pose "left")))
+          (roslisp::ros-warn (handle-deliver-request) "Deliver pose already set"))
+        (if person_right
+        (setf *deliver-pose*
+            (comf::prolog-object-goal-pose->pose-stamped 
+             (llif::prolog-deliver-object-pose "left")))
+        (roslisp::ros-warn (handle-deliver-request) "No person was chosen"))))
+  (comf::move-hsr *deliver-pose*)
+  (llif::call-take-pose-action 6)))
 
 ;;@author Torge Olliges
 (defun find-object-in-room (perceived_object_name room-id)
@@ -79,8 +95,4 @@
     (or (eq (llif::prolog-current-room) room-id)
         (comf::move-to-room room-id))
     (comf::move-to-surface (llif::prolog-object-source object-id) nil)
-    (setf grasp-mode 1)  ;;sets the graspmode should be replaces with the function from knowledge when that is finished
-    (comf::grasp-handling object-id)
-    (comf::move-to-room *starting-room*)
-    (comf::move-hsr *starting-position*)
-    (llif::call-take-pose-action 6))
+    (comf::grasp-handling object-id))
