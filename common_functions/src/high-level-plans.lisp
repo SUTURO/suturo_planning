@@ -158,21 +158,20 @@
             (going-demo movement-fail)
             "~%No more retries~%")))
 
-      ;;this is here for testing purposes only / until it is replaced with the proper querry
-      (let ((knowledge-pose-manipulation (llif::prolog-manipulating-pose-of-door door-id)))
-             (comf::get-nav-pose-for-doors knowledge-pose-manipulation t)
+      (let ((knowledge-pose-manipulation (llif::prolog-manipulating-pose-of-door door-id))) ;;get position to move the robot to
+             (comf::get-motion-des-going-for-doors knowledge-pose-manipulation t) ;;execution of the move 
            
         (let ((knowledge-doorhandle-id (concatenate 'string "iai_kitchen/"
-                                                    (llif::prolog-knowrob-name-to-urdf-link
-                                                        (car (cdr (llif::prolog-perceiving-pose-of-door door-id))))))
-            (knowledge-pose-perceiving   (car (llif::prolog-perceiving-pose-of-door door-id)))
+                                                    (llif::prolog-knowrob-name-to-urdf-link ;;changes the knowrob id to the urdf link
+                                                        (car (cdr (llif::prolog-perceiving-pose-of-door door-id)))))) ;; get the knowrob id for the door handle
+            (knowledge-pose-perceiving   (car (llif::prolog-perceiving-pose-of-door door-id))) 
             (knowledge-open-door-angle (llif::prolog-get-angle-to-open-door door-id)))
             (llif::call-open-action knowledge-doorhandle-id
                                     knowledge-doorhandle-id
-                                    1.35)
-            (llif::prolog-update-door-state door-id "1.35")
-            (comf::get-nav-pose-for-doors knowledge-pose-manipulation t)
-            (comf::get-nav-pose-for-doors (list (list -1.86 5.28 0) (list 0 0 0 1)) t))))))
+                                    knowledge-open-door-angle)
+            (llif::prolog-update-door-state door-id knowledge-open-door-angle) ;; update the door state
+            (comf::get-motion-des-going-for-doors knowledge-pose-manipulation t)))))) ;; get into a position from which the robot can move through the open door
+           
 
 ;;@author Jan Schimpf
 (defun open-door-on-the-path (start-room target-room)
