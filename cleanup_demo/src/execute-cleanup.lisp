@@ -1,7 +1,7 @@
 (in-package :clean)
 
 (defun execute-cleanup ()
-  (init-interfaces)
+  ;;(init-interfaces)
   (comf::with-hsr-process-modules
     (llif::call-take-pose-action 1)
     (comf::announce-plan-start "clean up")
@@ -11,6 +11,10 @@
     ;;      (llif::sort-surfaces-by-distance
     ;;       (llif::prolog-room-surfaces
     ;;        (llif::prolog-current-room))))
+    (loop for surface in (llif::prolog-cleanup-surfaces)
+          do
+             (llif::prolog-set-surface-not-visited surface))
+    
     (loop for room in (llif::prolog-all-rooms)
           do
              ;;(setf surfaces-with-distances-from-current-position
@@ -30,8 +34,7 @@
                         (comf::announce-movement-to-surface "future" (car surface-info))
                         (comf::move-to-surface (car surface-info) t)
                         (comf::perceive-surface (car surface-info))
-                        (handle-found-objects)
-                        (llif::prolog-set-surface-visited (car surface-info));;)
+                        (handle-found-objects);;)
                       ;;(setf surfaces-with-distances-from-current-position
                       ;;      (llif::sort-surfaces-by-distance
                       ;;       (llif::prolog-room-surfaces

@@ -200,7 +200,7 @@
           (roslisp::ros-info (poi-search) "Number of objects detected: ~a" (length detectiondata))
           (when (> (length detectiondata) 0)
               (llif::insert-knowledge-objects confident-objects)))))
-  (llif::prolog-set-surfaces-visit-state surface-id)
+  (llif::prolog-set-surface-visited surface-id)
   ;;(clean::spawn-btr-objects confident-objects))
   (llif::call-take-pose-action 1))
 
