@@ -180,7 +180,7 @@
 
 ;;@author Torge Olliges
 (defun perceive-surface (surface-id)
-  (comf::announce-perceive-action-surface "present" surface-id)
+  ;;(comf::announce-perceive-action-surface "present" surface-id)
   (let ((surface-pose (first (llif::prolog-surface-pose surface-id))))
     (llif::call-take-gaze-pose-action
                                  :px (first surface-pose)
@@ -209,7 +209,7 @@
     (roslisp::with-fields (error_code)
         grasp-action-result
       (if (eq error_code 0)
-          (comf::announce-grasp-action "past" next-object)
+          ;;(comf::announce-grasp-action "past" next-object)
           (cpl:with-retry-counters ((grasp-retries 3))
             (cpl:with-failure-handling
                 (((or 
@@ -217,14 +217,14 @@
                    cl::simple-error
                    cl::simple-type-error)
                      (e)
-                   (comf::announce-grasp-action "failed"  next-object)
+                   ;;(comf::announce-grasp-action "failed"  next-object)
                    (cpl:do-retry grasp-retries
                      (roslisp:ros-warn (grasp-handling) "~%Failed to grasp the object~%")
                      (cpl:retry))
                    (roslisp:ros-warn (grasp-handling) "~%No more retries~%")))
               ;;(dynamic-grasp next-object)  ;;sets the graspmode should be replaced with the function from knowledge when that is finished
               (comf::grasp-object next-object *grasp-mode*))))))
-  (comf::announce-grasp-action "past" next-object)
+  ;;(comf::announce-grasp-action "past" next-object)
   (llif::call-take-pose-action 1))
 
 

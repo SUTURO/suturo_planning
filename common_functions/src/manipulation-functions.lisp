@@ -95,15 +95,11 @@
   ;;get the information from knowledge
   (let* ((object-dimensions (llif:prolog-object-dimensions object-id))
          (object-pose (list (third (llif:prolog-object-pose object-id))
-                           (fourth (llif:prolog-object-pose object-id))))
-         (z (if (eq 2 grasp-pose)
-                (+ (third (first object-pose)) 0.05)
-                (third (first object-pose)))))
-    (print z)
+                           (fourth (llif:prolog-object-pose object-id)))))
     ;;takes apart the messages for the needed information to consturct the grasp motion-designator 
     (let* ((?point-x-object (first (first object-pose)))
            (?point-y-object (second (first object-pose)))
-           (?point-z-object (nth 2 (nth 2 *pose*)))
+           (?point-z-object (third (first object-pose)))
            (?quaterion-value-1 (first (second object-pose)))
            (?quaterion-value-2 (second (second object-pose)))
            (?quaterion-value-3 (third (second object-pose)))

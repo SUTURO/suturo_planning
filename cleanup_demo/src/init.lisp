@@ -7,13 +7,11 @@
 (defun init-interfaces()
   "Init all interfaces from planning to other groups"
   (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
-  (roslisp:ros-info (init-interfaces) "Initialising Interfaces:")
+  (roslisp:ros-info (init-interfaces) "Initialising Interfaces...")
 
 
   ;;starts ros node
-  (get-planning-node) 
-  
-  (init-planning)
+  (get-planning-node)
 
   (init-navigation)
 
@@ -21,12 +19,11 @@
 
   (init-perception)
 
-  (init-nlg)
   (init-knowledge)
 
-  (init-tts)
+  ;;(init-tts)
 
-  (init-nlg)
+  ;;(init-nlg)
 
   (init-poi))
 
@@ -90,6 +87,7 @@
 (defun init-nlg()
   (roslisp:ros-info (init-interfaces) "init nlg action client")
   (llif::init-nlg-action-client))
+
 (defun init-poi()
   ;;init action client
   (llif::init-search-map)
