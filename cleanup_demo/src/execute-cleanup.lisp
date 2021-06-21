@@ -70,6 +70,8 @@
              (comf::announce-movement-to-surface "future" target-surface)
              (comf::move-to-surface target-surface nil))
            
+           (roslisp::ros-info (handle-found-objects) "Trying to place ~a from ~a on ~a" next-object source-surface target-surface)
+
            (progn
              (comf::announce-place-action "future" next-object)
              (comf::place-object next-object 1))

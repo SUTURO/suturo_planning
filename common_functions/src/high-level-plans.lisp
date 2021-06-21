@@ -1,6 +1,6 @@
 (in-package :comf)
 (defparameter *poi-distance-threshold* 0.75)
-(defparameter *graspmode* nil)
+(defparameter *grasp-mode* nil)
 
 ;;;; Navigation ;;;;
 
@@ -230,5 +230,5 @@
 
 (defun dynamic-grasp (object-id)
   (if (< 0.06 (nth 2  (llif:prolog-object-dimensions object-id)))
-      (setf *graspmode* 1)
-      (setf *graspmode* 2)))
+      (setf *grasp-mode* 1)
+      (setf *grasp-mode* 2)))
