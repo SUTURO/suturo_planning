@@ -24,7 +24,7 @@
     (let* (
         (?point-x-object (nth 0 (nth 0 *goal*)))
         (?point-y-object (nth 1 (nth 0 *goal*)))
-        (?point-z-object *grasp-mode-z*)
+        (?point-z-object (nth 2 (nth 2 *pose*)))
         (?quaterion-value-1 (nth 0 (nth 1 *goal*)))
         (?quaterion-value-2 (nth 1 (nth 1 *goal*)))
         (?quaterion-value-3 (nth 2 (nth 1 *goal*)))
@@ -103,7 +103,7 @@
     ;;takes apart the messages for the needed information to consturct the grasp motion-designator 
     (let* ((?point-x-object (first (first object-pose)))
            (?point-y-object (second (first object-pose)))
-           (?point-z-object z)
+           (?point-z-object (nth 2 (nth 2 *pose*)))
            (?quaterion-value-1 (first (second object-pose)))
            (?quaterion-value-2 (second (second object-pose)))
            (?quaterion-value-3 (third (second object-pose)))
