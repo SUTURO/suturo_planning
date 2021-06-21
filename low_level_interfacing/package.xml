@@ -57,14 +57,12 @@
   <build_depend>actionlib_msgs</build_depend>
   <build_depend>cl_tf</build_depend>
   <build_depend>geometry_msgs</build_depend>
-  <build_depend>tmc_msgs</build_depend>
   <build_depend>roslisp</build_depend>
   <build_depend>turtle_actionlib</build_depend>
   
    <exec_depend>actionlib</exec_depend>
   <exec_depend>cl_tf</exec_depend>
    <exec_depend>geometry_msgs</exec_depend>
-   <exec_depend>tmc_msgs</exec_depend>
    <exec_depend>roslisp</exec_depend>
    <exec_depend>actionlib_lisp</exec_depend>
    <exec_depend>actionlib_msgs</exec_depend>

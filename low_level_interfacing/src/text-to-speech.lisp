@@ -8,13 +8,7 @@
 
 (defun init-text-to-speech-action-client ()
   "Initializes the text to speech action client."
-  (setf *text-to-speech-action-client* (actionlib:make-action-client
-     "talk_request_action"
-     "tmc_msgs/TalkRequestAction"))
-  (loop until
-    (actionlib:wait-for-server *text-to-speech-action-client*))
-  (roslisp:ros-info (text-to-speech-action-client) 
-                    "Text to speech action client created."))
+  (format t "Not doing this~%"))
 
 (defun get-text-to-speech-action-client ()
   "Returns the current text to speech client. If none exists, one is created."
@@ -24,12 +18,7 @@
 
 (defun make-text-action-goal (text)
   "Create a text-to-speech action goal with the given `text'"
-  (actionlib:make-action-goal (get-text-to-speech-action-client)
-    :data (make-message "tmc_msgs/Voice"
-      :interrupting nil
-      :queueing nil
-      :language 1
-      :sentence text)))
+  (format t "Text:~%))
 
 (defun call-text-to-speech-action (text)
   "Calls the text to speech action to perform the given `text'"

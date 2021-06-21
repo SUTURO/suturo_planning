@@ -9,7 +9,7 @@
 - git:
     local-name: suturo_resources
     uri:   https://github.com/SUTURO/suturo_resources.git
-    version: master
+    version: robocup
 - git:
     local-name: snap_map_icp
     uri:  https://github.com/code-iai/snap_map_icp.git 

@@ -20,7 +20,7 @@
 - git:
     local-name: giskard_msgs
     uri: https://github.com/SemRoCo/giskard_msgs.git
-    version: 3cea851f1823e5fa58164700e06a8e34cd78a639
+    version: master
 
 ############## PR2 inverse kinematics solver #########
 - git:
@@ -43,5 +43,10 @@
 ############## HSR Description #######################
 - git:
     local-name: hsr_description
-    uri: https://github.com/Vanessa-rin/hsr_description.git
-    version: master
+    uri: https://github.com/Plexiglas/hsr_description.git
+    version: master#
+    
+- git:
+    local-name: suturo_resources
+    uri: https://github.com/SUTURO/suturo_resources.git
+    version: robocup
