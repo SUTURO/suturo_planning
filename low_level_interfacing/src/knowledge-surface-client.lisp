@@ -301,6 +301,20 @@
                             (lambda (x) (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" x)))
                             (cdr (assoc '?Surfaces (cut:lazy-car raw-response)))))))))
 
+;; this is ugly and only done due to the robocup 2021
+(defun prolog-go-get-it-surfaces ()
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                                       "gogetit_surfaces(SURFACES)")
+                          :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-surface-client)
+                          "Query didn't  reach any solution.")
+        (values-list (list (mapcar
+                            (lambda (x) (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" x)))
+                            (cdr (assoc '?Surfaces (cut:lazy-car raw-response)))))))))
+
 ;;this is also just implemented for the robocup 2021
 (defun prolog-deliver-object-pose (side)
   (let* ((raw-response (with-safe-prolog

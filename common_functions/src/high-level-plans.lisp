@@ -45,30 +45,6 @@
                     (pose ?successfull-pose)))))
 
 
-;;;; Place ;;;;
-;;@author Jan Schimpf
-;; Gets object id and the grasp-pose takes care of some of the failure-handling for place
-;; currently retries with different position in case of a failure.
-;; Still untested and not in use in any of the plans.
-(defun place-hsr (object-id grasp-pose)
-    ;;create the the list with contatains a number of place we can place if
-    ;;the first one doesn't work
-    (let ((?place-position (comf:create-place-list object-id grasp-pose)))     
-    (cpl:with-retry-counters ((place-retry 4))
-        (cpl:with-failure-handling
-            (((or common-fail:low-level-failure 
-                  cl::simple-error
-                  cl::simple-type-error)
-        (e)
-        (setf ?place-position (cdr ?place-position))
-        ;;starts iterating over the list if after a failed try        
-        (cpl:do-retry place-retry
-            (roslisp:ros-warn (place-fail) "~%Failed to grasp the object~%")
-            (cpl:retry))
-        ;;First element in the list is used to make a designator from it
-        (let ((?actual-place-position (car ?place-position)))
-        (comf::place-object-list ?actual-place-position))))))))
-
 ;;@author Torge Olliges
 (defun move-to-room (room-id)
   (roslisp::ros-info (move-to-room) "Starting movement to room ~a" room-id)
@@ -208,7 +184,7 @@
   (let ((grasp-action-result (comf::grasp-object next-object *grasp-mode*)))
     (roslisp::with-fields (error_code)
         grasp-action-result
-      (if (eq error_code 0)
+      (if (eq error_code 1)
           ;;(comf::announce-grasp-action "past" next-object)
           (cpl:with-retry-counters ((grasp-retries 3))
             (cpl:with-failure-handling
@@ -224,11 +200,11 @@
                    (roslisp:ros-warn (grasp-handling) "~%No more retries~%")))
               ;;(dynamic-grasp next-object)  ;;sets the graspmode should be replaced with the function from knowledge when that is finished
               (comf::grasp-object next-object *grasp-mode*))))))
-  ;;(comf::announce-grasp-action "past" next-object)
-  (llif::call-take-pose-action 1))
-
+  ;;(comf::announce-grasp-action "past" next-object))
+)
 
 (defun dynamic-grasp (object-id)
-  (if (< 0.06 (nth 2  (llif:prolog-object-dimensions object-id)))
+  (print (third (llif:prolog-object-dimensions object-id)))
+  (if (< 0.06 (third (llif:prolog-object-dimensions object-id)))
       (setf *grasp-mode* 1)
       (setf *grasp-mode* 2)))
