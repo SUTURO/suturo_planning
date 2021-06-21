@@ -1,24 +1,5 @@
 (in-package :llif)
 
-;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19.
-(defun prolog-table-objects ()
-  "returns the list of all objects on the table"
-  (roslisp:ros-info (knowledge-object-client) "Getting objects on the table.")
-  (let* ((raw-response
-           (with-safe-prolog
-             (json-prolog:prolog-simple
-              (concatenate 'string
-                           "all_objects_on_tables(INSTANCES),"
-                           "member(INSTANCE, INSTANCES)")
-              :package :llif)))
-         (instances (if (eq raw-response 1)
-                        NIL
-                        (cdr (assoc '?instances (cut:lazy-car raw-response))))))
-    (if instances
-        (mapcar #'knowrob-symbol->string instances)
-        (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't all_objects_on_tables reach any solution."))))
-
 
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-goal (object-name)
@@ -75,7 +56,7 @@
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't reach any solution.")
+                          "Query object_goal_pose_offset didn't reach any solution.")
         (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
                        ,(string-trim "'" (cdr (assoc '?context
                                               (cut:lazy-car raw-response)))))))))
@@ -96,7 +77,7 @@
                                                   (assoc '?object (cut:lazy-car raw-response))))))))
     (or object
         (roslisp:ros-warn (knowledge-object-client)
-                          "Query didn't next_object reach any solution."))))
+                          "Query next_object didn't reach any solution."))))
                           
 ;; @author Torge Olliges
 (defun prolog-next-graspable-objects ()

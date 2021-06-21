@@ -1,6 +1,6 @@
 (in-package :comf)
 (defparameter *poi-distance-threshold* 0.75)
-(defparameter *graspmode* nil)
+(defparameter *grasp-mode* nil)
 
 ;;;; Navigation ;;;;
 
@@ -45,30 +45,6 @@
                     (pose ?successfull-pose)))))
 
 
-;;;; Place ;;;;
-;;@author Jan Schimpf
-;; Gets object id and the grasp-pose takes care of some of the failure-handling for place
-;; currently retries with different position in case of a failure.
-;; Still untested and not in use in any of the plans.
-(defun place-hsr (object-id grasp-pose)
-    ;;create the the list with contatains a number of place we can place if
-    ;;the first one doesn't work
-    (let ((?place-position (comf:create-place-list object-id grasp-pose)))     
-    (cpl:with-retry-counters ((place-retry 4))
-        (cpl:with-failure-handling
-            (((or common-fail:low-level-failure 
-                  cl::simple-error
-                  cl::simple-type-error)
-        (e)
-        (setf ?place-position (cdr ?place-position))
-        ;;starts iterating over the list if after a failed try        
-        (cpl:do-retry place-retry
-            (roslisp:ros-warn (place-fail) "~%Failed to grasp the object~%")
-            (cpl:retry))
-        ;;First element in the list is used to make a designator from it
-        (let ((?actual-place-position (car ?place-position)))
-        (comf::place-object-list ?actual-place-position))))))))
-
 ;;@author Torge Olliges
 (defun move-to-room (room-id)
   (roslisp::ros-info (move-to-room) "Starting movement to room ~a" room-id)
@@ -81,25 +57,27 @@
 ;;@author Torge Olliges
 (defun move-to-surface (surface-id turn)
   (roslisp:ros-info (move-too-room) "Moving to surface ~a" surface-id)
-  (let* ((surface-pose (llif::prolog-surface-pose surface-id))
+  (let* ((perceive-pose (llif::prolog-pose-to-perceive-surface surface-id))
         (?goal-pose
           (cl-tf::make-pose-stamped
             "map" 0
-            (roslisp::with-fields (origin)
-                (get-nav-pose-for-surface surface-id) origin)
+            (cl-tf::make-3d-vector
+             (first (first perceive-pose))
+             (second (first perceive-pose))
+             (third (first perceive-pose)))
             (if turn
                 (cl-transforms:q* 
                  (cl-tf::make-quaternion
-                  (first (second surface-pose))
-                  (second (second surface-pose))
-                  (third (second surface-pose))
-                  (fourth (second surface-pose)))
+                  (first (second perceive-pose))
+                  (second (second perceive-pose))
+                  (third (second perceive-pose))
+                  (fourth (second perceive-pose)))
                  (cl-transforms:euler->quaternion :ax 0 :ay 0 :az (/ pi 2)))
                 (cl-tf::make-quaternion
-                 (first (second surface-pose))
-                 (second (second surface-pose))
-                 (third (second surface-pose))
-                 (fourth (second surface-pose)))))))
+                 (first (second perceive-pose))
+                 (second (second perceive-pose))
+                 (third (second perceive-pose))
+                 (fourth (second perceive-pose)))))))
     (exe::perform (desig:a motion
                            (type going)
                            (pose ?goal-pose)))))
@@ -145,44 +123,40 @@
         (((or common-fail:low-level-failure 
               cl::simple-error
               cl::simple-type-error)
-        (e)
-        (roslisp:ros-info (open-door) "Retry if opening the door failed")
-        ;;insert here failure handling new position / retry / perception retry
-        (cpl:do-retry grasping-retry
-            (roslisp:ros-warn (grasp-fail) "~%Failed to grasp the object~%")
-          (cpl:retry))
-          (comf::get-nav-pose-for-doors (llif::prolog-manipulating-pose-of-door door-id) t)
-        (roslisp:ros-warn 
-            (going-demo movement-fail)
-            "~%No more retries~%")))
-
-      ;;this is here for testing purposes only / until it is replaced with the proper querry
-      (let ((knowledge-pose-manipulation (llif::prolog-manipulating-pose-of-door door-id)))
-             (comf::get-nav-pose-for-doors knowledge-pose-manipulation t)
+             (e)
+           (roslisp:ros-info (open-door) "Retry if opening the door failed")
+           ;;insert here failure handling new position / retry / perception retry
+           (cpl:do-retry grasping-retry
+             (roslisp:ros-warn (grasp-fail) "~%Failed to grasp the object~%")
+             (cpl:retry))
+           (comf::get-nav-pose-for-doors (llif::prolog-manipulating-pose-of-door door-id) t)
+           (roslisp:ros-warn  (going-demo movement-fail) "~%No more retries~%")))
+      (let ((knowledge-pose-manipulation (llif::prolog-manipulating-pose-of-door door-id))) ;;get position to move the robot to
+        (comf::get-motion-des-going-for-doors knowledge-pose-manipulation t) ;;execution of the move   
+        (let ((knowledge-doorhandle-id
+                (concatenate 'string
+                             "iai_kitchen/"
+                             (llif::prolog-knowrob-name-to-urdf-link ;;changes the knowrob id to the urdf link
+                              (car (cdr (llif::prolog-perceiving-pose-of-door door-id)))))) ;; get the knowrob id for the door handle
+              (knowledge-pose-perceiving   (car (llif::prolog-perceiving-pose-of-door door-id))) 
+              (knowledge-open-door-angle (llif::prolog-get-angle-to-open-door door-id)))
+          (llif::call-open-action knowledge-doorhandle-id
+                                  knowledge-doorhandle-id
+                                  knowledge-open-door-angle)
+          (llif::prolog-update-door-state door-id knowledge-open-door-angle) ;; update the door state
+          (comf::get-motion-des-going-for-doors knowledge-pose-manipulation t)))))) ;; get into a position from which the robot can move through the open door
            
-        (let ((knowledge-doorhandle-id (concatenate 'string "iai_kitchen/"
-                                                    (llif::prolog-knowrob-name-to-urdf-link
-                                                        (car (cdr (llif::prolog-perceiving-pose-of-door door-id))))))
-            (knowledge-pose-perceiving   (car (llif::prolog-perceiving-pose-of-door door-id)))
-            (knowledge-open-door-angle (llif::prolog-get-angle-to-open-door door-id)))
-            (llif::call-open-action knowledge-doorhandle-id
-                                    knowledge-doorhandle-id
-                                    1.35)
-            (llif::prolog-update-door-state door-id "1.35")
-            (comf::get-nav-pose-for-doors knowledge-pose-manipulation t)
-            (comf::get-nav-pose-for-doors (list (list -1.86 5.28 0) (list 0 0 0 1)) t))))))
 
 ;;@author Jan Schimpf
-(defun open-door-on-the-path (start-room target-room)
+(defun open-door-on-path (start-room target-room)
   (loop for door-id in (llif::prolog-shortest-path-between-rooms start-room target-room)
         do
-           (comf::open-room-door door-id)
-        ))
+           (comf::open-room-door door-id)))
 
 
 ;;@author Torge Olliges
 (defun perceive-surface (surface-id)
-  (comf::announce-perceive-action-surface "present" surface-id)
+  ;;(comf::announce-perceive-action-surface "present" surface-id)
   (let ((surface-pose (first (llif::prolog-surface-pose surface-id))))
     (llif::call-take-gaze-pose-action
                                  :px (first surface-pose)
@@ -199,18 +173,19 @@
           (roslisp::ros-info (poi-search) "Number of objects detected: ~a" (length detectiondata))
           (when (> (length detectiondata) 0)
               (llif::insert-knowledge-objects confident-objects)))))
-  (llif::prolog-set-surfaces-visit-state surface-id)
+  (llif::prolog-set-surface-visited surface-id)
   ;;(clean::spawn-btr-objects confident-objects))
   (llif::call-take-pose-action 1))
 
 ;;@author Torge Olliges
 (defun grasp-handling (next-object)
+  (dynamic-grasp next-object)
   (roslisp::ros-info (grasp-handling) "Starting grasp handling for object ~a" next-object)
-  (let ((grasp-action-result (comf::grasp-object next-object 1)))
+  (let ((grasp-action-result (comf::grasp-object next-object *grasp-mode*)))
     (roslisp::with-fields (error_code)
         grasp-action-result
-      (if (eq error_code 0)
-          (comf::announce-grasp-action "past" next-object)
+      (if (eq error_code 1)
+          ;;(comf::announce-grasp-action "past" next-object)
           (cpl:with-retry-counters ((grasp-retries 3))
             (cpl:with-failure-handling
                 (((or 
@@ -218,48 +193,18 @@
                    cl::simple-error
                    cl::simple-type-error)
                      (e)
-                   (comf::announce-grasp-action "failed"  next-object)
+                   ;;(comf::announce-grasp-action "failed"  next-object)
                    (cpl:do-retry grasp-retries
                      (roslisp:ros-warn (grasp-handling) "~%Failed to grasp the object~%")
                      (cpl:retry))
                    (roslisp:ros-warn (grasp-handling) "~%No more retries~%")))
-              (dynamic-grasp next-object)  ;;sets the graspmode should be replaced with the function from knowledge when that is finished
+              ;;(dynamic-grasp next-object)  ;;sets the graspmode should be replaced with the function from knowledge when that is finished
               (comf::grasp-object next-object *grasp-mode*))))))
-  (comf::announce-grasp-action "past" next-object)
-  (llif::call-take-pose-action 1))
-
-;;@author Torge Olliges
-(defun place-handling (next-object)
-  (let ((place-action-result (comf::place-object next-object 1)))
-    (roslisp::with-fields (error_code)
-        place-action-result
-      (if (eq error_code 0)
-          (comf::announce-place-action "past" next-object)
-          (cpl:with-retry-counters ((place-retries 1))
-            (cpl:with-failure-handling
-                (((or 
-                   common-fail:low-level-failure 
-                   cl::simple-error
-                   cl::simple-type-error)
-                     (e)
-                   (comf::announce-place-action "failed"  next-object)
-                   (cpl:do-retry place-retries
-                     (roslisp:ros-warn (place-handling) "~%Failed to place the object~%")
-                     (cpl:retry))
-                   (roslisp:ros-warn (place-action) "~%No more retries~%")))
-              (dynamic-grasp next-object)  ;;sets the graspmode should be replaces with the function from knowledge when with-hash-table-iterator is finished
-              (if (eq (comf::reachability-check-place next-object *grasp-mode*) 1)
-                  (throw common-fail:low-level-failure "Not Reachable")
-                  (comf::place-object next-object *grasp-mode*))
-              (llif::call-take-pose-action 1)
-              (comf::announce-place-action "past" next-object)))))))
-
-
-
-
+  ;;(comf::announce-grasp-action "past" next-object))
+)
 
 (defun dynamic-grasp (object-id)
-
-  (if (< 0.06 (nth 2  (llif:prolog-object-dimensions object-id)))
-      (setf *graspmode* 1)
-      (setf *graspmode* 2)))
+  (print (third (llif:prolog-object-dimensions object-id)))
+  (if (< 0.06 (third (llif:prolog-object-dimensions object-id)))
+      (setf *grasp-mode* 1)
+      (setf *grasp-mode* 2)))

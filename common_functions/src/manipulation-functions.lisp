@@ -14,26 +14,23 @@
 ;; from knowledge and then uses this information to construct place motion-designator 
 
 (defun place-object (object-id grasp-pose)
-    ;;get the information from knowledge
-    (setf *dimensions* (llif:prolog-object-dimensions object-id))
-    (setf *goal* (llif:prolog-object-goal-pose object-id))
-    (if (eq 2 grasp-pose)
-      (setq *grasp-mode-z* (+ (nth 2 (nth 2 *pose*)) 0.05))
-      (setq *grasp-mode-z* (nth 2 (nth 2 *pose*))))
+  ;;get the information from knowledge
+  (let ((object-dimensions (llif:prolog-object-dimensions object-id))
+        (object-pose (list (third (llif:prolog-object-pose object-id))
+                           (fourth (llif:prolog-object-pose object-id)))))
     ;;takes apart the messages for the needed information to consturct the place motion-designator 
-    (let* (
-        (?point-x-object (nth 0 (nth 0 *goal*)))
-        (?point-y-object (nth 1 (nth 0 *goal*)))
-        (?point-z-object *grasp-mode-z*)
-        (?quaterion-value-1 (nth 0 (nth 1 *goal*)))
-        (?quaterion-value-2 (nth 1 (nth 1 *goal*)))
-        (?quaterion-value-3 (nth 2 (nth 1 *goal*)))
-        (?quaterion-value-4 (nth 3 (nth 1 *goal*)))
-        (?size-x (nth 0 *dimensions*))
-        (?size-y (nth 1 *dimensions*))       
-        (?size-z (nth 2 *dimensions*))
-        (?object-id object-id)
-        (?grasp-mode grasp-pose)
+    (let* ((?point-x-object (first (first object-pose)))
+           (?point-y-object (second (first object-pose)))
+           (?point-z-object (third (first object-pose)))
+           (?quaterion-value-1 (first (second object-pose)))
+           (?quaterion-value-2 (second (second object-pose)))
+           (?quaterion-value-3 (third (second object-pose)))
+           (?quaterion-value-4 (fourth (second object-pose)))
+           (?size-x (first object-dimensions))
+           (?size-y (second object-dimensions))       
+           (?size-z (third object-dimensions))
+           (?object-id object-id)
+           (?grasp-mode grasp-pose)
         ;; construct the motion designator      
         (place (desig:a motion
                    (:type :placing)
@@ -50,7 +47,7 @@
                    (:object-id ?object-id)
                    (:grasp-mode ?grasp-mode))))
         ;; executes the motion designator for place
-        (exe:perform place)))
+        (exe:perform place))))
 
 ;;@author Jan Schimpf
 ;; gets a list and then takes it apart and uses the information
@@ -92,44 +89,44 @@
 ;; Uses the object id to get needed information about the object
 
 (defun grasp-object (object-id grasp-pose)
-     ;;get the information from knowledge
-    (setq *dimensions* (llif:prolog-object-dimensions object-id))
-  (setq *pose* (llif:prolog-object-pose object-id))
-  (if (eq 2 grasp-pose)
-      (setq *grasp-mode-z* (+ (nth 2 (nth 2 *pose*)) 0.05))
-      (setq *grasp-mode-z* (nth 2 (nth 2 *pose*))))
+  ;;get the information from knowledge
+  (let* ((object-dimensions (llif:prolog-object-dimensions object-id))
+         (object-pose (list (third (llif:prolog-object-pose object-id))
+                            (fourth (llif:prolog-object-pose object-id))))
+         (z (if (eq grasp-pose 1) (+ (third (first object-pose)) 0.05) (third (first object-pose)))))
+    (print z)
     ;;takes apart the messages for the needed information to consturct the grasp motion-designator 
-    (let* (
-        (?point-x-object (nth 1 (nth 2 *pose*)))
-        (?point-y-object (nth 1 (nth 2 *pose*)))
-        (?point-z-object *grasp-mode-z*)
-        (?quaterion-value-1 (nth 0 (nth 3 *pose*)))
-        (?quaterion-value-2 (nth 1 (nth 3 *pose*)))
-        (?quaterion-value-3 (nth 2 (nth 3 *pose*)))
-        (?quaterion-value-4 (nth 3 (nth 3 *pose*)))
-        (?size-x (nth 0 *dimensions*))
-        (?size-y (nth 1 *dimensions*))
-        (?size-z (nth 2 *dimensions*))
-        (?object-id object-id)
-        (?grasp-mode grasp-pose)
+    (let* ((?point-x-object (first (first object-pose)))
+           (?point-y-object (second (first object-pose)))
+           (?point-z-object z)
+           (?quaterion-value-1 (first (second object-pose)))
+           (?quaterion-value-2 (second (second object-pose)))
+           (?quaterion-value-3 (third (second object-pose)))
+           (?quaterion-value-4 (fourth (second object-pose)))
+           (?size-x (first object-dimensions))
+           (?size-y (second object-dimensions))
+           (?size-z (third object-dimensions))
+           (?object-id object-id)
+           (?grasp-mode grasp-pose)
         
-        ;; construct the motion designator      
-        (grasp (desig:a motion
-                   (:type :grasping)
-                   (:point-x ?point-x-object)
-                   (:point-y ?point-y-object)
-                   (:point-z ?point-z-object)
-                   (:quaterion-value-1 ?quaterion-value-1)
-                   (:quaterion-value-2 ?quaterion-value-2)
-                   (:quaterion-value-3 ?quaterion-value-3)
-                   (:quaterion-value-4 ?quaterion-value-4)
-                   (:size-x ?size-x)
-                   (:size-y ?size-y)
-                   (:size-z ?size-z)
-                   (:object-id ?object-id)
-                   (:grasp-mode ?grasp-mode))))
-        ;; executes the motion designator for grasp
-        (exe:perform grasp)))
+           ;; construct the motion designator      
+           (grasp
+             (desig:a motion
+                      (:type :grasping)
+                      (:point-x ?point-x-object)
+                      (:point-y ?point-y-object)
+                      (:point-z ?point-z-object)
+                      (:quaterion-value-1 ?quaterion-value-1)
+                      (:quaterion-value-2 ?quaterion-value-2)
+                      (:quaterion-value-3 ?quaterion-value-3)
+                      (:quaterion-value-4 ?quaterion-value-4)
+                      (:size-x ?size-x)
+                      (:size-y ?size-y)
+                      (:size-z ?size-z)
+                      (:object-id ?object-id)
+                      (:grasp-mode ?grasp-mode))))
+      ;; executes the motion designator for grasp
+      (exe:perform grasp))))
                                           
 
 ;;@author Jan Schimpf

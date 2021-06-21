@@ -42,55 +42,6 @@
                                      (cdr
                                       (assoc '?context
                                              (cut:lazy-car raw-response)))))))))
-                                              
-
-;; @author Torge Olliges
-;; (defun prolog-shelfs ()
-;;   "returns the names of all available shelfs"
-;;   (roslisp:ros-info (knowledge-surface-client) "Getting shelfs")
-;;   (let* ((raw-response (with-safe-prolog
-;;                          (json-prolog:prolog-simple
-;;                           (concatenate 'string
-;;                                        "shelf_surfaces(POSITIONS)")
-;;                                                     :package :llif))))
-;;     (if (eq raw-response 1)
-;;         (roslisp:ros-warn (json-prolog-client)
-;;                           "Query didn't shelf_surfaces reach any solution.")
-;;         (values-list (list (mapcar
-;;                       (lambda (x) (string-trim "'" x))
-;;                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
-
-;; @author Torge Olliges
-;; (defun prolog-tables ()
-;;   "returns the names of all available tables"
-;;   (roslisp:ros-info (knowledge-surface-client) "Getting pose for tables")
-;;   (let* ((raw-response (with-safe-prolog
-;;                          (json-prolog:prolog-simple
-;;                           (concatenate 'string
-;;                                        "table_surfaces(POSITIONS)")
-;;                                                     :package :llif))))
-;;     (if (eq raw-response 1)
-;;         (roslisp:ros-warn (knowledge-surface-client)
-;;                           "Query didn't shelf_surfaces reach any solution.")
-;;         (values-list (list (mapcar
-;;                       (lambda (x) (string-trim "'" x))
-;;                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
-
-;; @author Torge Olliges
-;; (defun prolog-buckets ()
-;;   "returns the bucket names"
-;;   (roslisp:ros-info (knowledge-surface-client) "Getting bucket names")
-;;   (let* ((raw-response (with-safe-prolog
-;;                          (json-prolog:prolog-simple
-;;                           (concatenate 'string
-;;                                        "bucket_surfaces(POSITIONS)")
-;;                           :package :llif))))
-;;     (if (eq raw-response 1)
-;;         (roslisp:ros-warn (knowledge-surface-client)
-;;                           "Query didn't shelf_surfaces reach any solution.")
-;;         (values-list (list (mapcar
-;;                       (lambda (x) (string-trim "'" x))
-;;                       (cdr (assoc '?Positions (cut:lazy-car raw-response)))))))))
 
 ;; @author Torge Olliges
 (defun sort-surfaces-by-distance (surface-names)
@@ -118,21 +69,37 @@
                       (third prolog-pose-values))))
     (cl-transforms:v-dist current-pose-translation prolog-pose-vector)))
 
-;; @author Torge Ollige
-(defun prolog-set-surfaces-visit-state (surface-id)
-  (let* ((raw-response (with-safe-prolog
-                          (json-prolog:prolog-simple
-                            (concatenate 'string
-                                        "update_visit_state('"
-                                        surface-id
-                                        "')")
-                            :package :llif))))
-      (if (eq raw-response 1)
+;; @author Torge Olliges
+(defun prolog-set-surface-not-visited (surface-id)
+  (let* ((knowrob-name (format nil "~a~a" +HSR-SURFACE-PREFIX+ surface-id))
+         (raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                                       "set_surface_not_visited('"
+                                       knowrob-name
+                                       "')")
+                          :package :llif))))
+    (if (eq raw-response 1)
           (roslisp:ros-warn (knowledge-surface-client)
-                            "Query didn't assign_visit_state reach any solution.")
-          (roslisp:ros-info (Knowledge-surface-client) "Visit state for object ~a was updated" surface-id))))
+                            "Query didn't set_surface_visited reach any solution.")
+          (roslisp:ros-info (Knowledge-surface-client) "Visit state for  ~a set to not visited." surface-id))))
 
-;; @author Torge Ollige
+;; @author Torge Olliges
+(defun prolog-set-surface-visited (surface-id)
+  (let* ((knowrob-name (format nil "~a~a" +HSR-SURFACE-PREFIX+ surface-id))
+         (raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                                       "set_surface_visited('"
+                                       knowrob-name
+                                       "')")
+                          :package :llif))))
+    (if (eq raw-response 1)
+          (roslisp:ros-warn (knowledge-surface-client)
+                            "Query didn't set_surface_visited reach any solution.")
+          (roslisp:ros-info (Knowledge-surface-client) "Visit state for ~a set to visited." surface-id))))
+
+;; @author Torge Olliges
 (defun prolog-surfaces-not-visited ()
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
@@ -152,7 +119,7 @@
          (raw-response (with-safe-prolog
                           (json-prolog:prolog-simple
                             (concatenate 'string
-                                        "surfaces_not_visited('"
+                                        "surfaces_not_visited_in_room('"
                                         knowrob-name
                                         "',SURFACES)")
                             :package :llif))))
@@ -286,6 +253,25 @@
                           "Query has_surface didn't reach any solution.")
         (string-trim "\""(string-trim "'" (cdr (assoc '?Furniture (cut:lazy-car raw-response))))))))
 
+(defun prolog-pose-to-perceive-surface (surface-id)
+  (let* ((knowrob-name (format nil "~a~a" +HSR-SURFACE-PREFIX+ surface-id))
+         (raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                                       "surface_pose_to_perceive_from('"
+                                       knowrob-name
+                                       "', [TRANSLATION, ROTATION])")
+                          :package :llif))))
+     (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-surface-client)
+                          "Query surface_pose_to_perceive_from didn't reach any solution.")
+        (values-list `(,(list (cdr (assoc '?translation (cut:lazy-car raw-response)))
+                              (cdr (assoc '?rotation (cut:lazy-car raw-response))))
+                       ,(string-trim "'"
+                                     (cdr
+                                      (assoc '?context
+                                             (cut:lazy-car raw-response)))))))))
+
 ;;source https://stackoverflow.com/questions/669407/common-lisp-the-remove-function-how-is-it-used
 (defun remove-string (rem-string full-string &key from-end (test #'eql)
                       test-not (start1 0) end1 (start2 0) end2 key)
@@ -300,3 +286,50 @@
                      (subseq full-string 0 subst-point)
                      (subseq full-string (+ subst-point (length rem-string))))
         full-string)))
+
+;; this is ugly and only done due to the robocup 2021
+(defun prolog-cleanup-surfaces ()
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                                       "cleanup_surfaces(SURFACES)")
+                          :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-surface-client)
+                          "Query didn't  reach any solution.")
+        (values-list (list (mapcar
+                            (lambda (x) (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" x)))
+                            (cdr (assoc '?Surfaces (cut:lazy-car raw-response)))))))))
+
+;; this is ugly and only done due to the robocup 2021
+(defun prolog-go-get-it-surfaces ()
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                                       "gogetit_surfaces(SURFACES)")
+                          :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-surface-client)
+                          "Query didn't  reach any solution.")
+        (values-list (list (mapcar
+                            (lambda (x) (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" x)))
+                            (cdr (assoc '?Surfaces (cut:lazy-car raw-response)))))))))
+
+;;this is also just implemented for the robocup 2021
+(defun prolog-deliver-object-pose (side)
+  (let* ((raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string
+                                       "deliver_object_pose('"
+                                       side
+                                       "',[TRANSLATION, ROTATION])")
+                          :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-surface-client)
+                          "Query didn't deliver_object_pose reach any solution.")
+        (values-list `(,(list (cdr (assoc '?translation (cut:lazy-car raw-response)))
+                              (cdr (assoc '?rotation (cut:lazy-car raw-response))))
+                       ,(string-trim "'"
+                                     (cdr
+                                      (assoc '?context
+                                             (cut:lazy-car raw-response)))))))))

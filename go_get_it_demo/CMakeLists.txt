@@ -26,3 +26,6 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
+add_lisp_executable(
+execute-go-get-it go-get-it-demo clean::execute-go-get-it
+)

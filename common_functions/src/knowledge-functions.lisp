@@ -90,7 +90,7 @@
 ;;@author Jan Schimpf
 ;;gets a list to call a move designator with
 ;; ((3-d-vector)(quaternion))
-(defun get-nav-pose-for-doors (nav-pose turn)
+(defun get-motion-des-going-for-doors (nav-pose turn)
   (let ((?goal-pose
         (cl-tf2::make-pose-stamped "map" 0
             (cl-tf2::make-3d-vector 
