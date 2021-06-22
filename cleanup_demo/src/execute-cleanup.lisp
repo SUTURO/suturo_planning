@@ -11,6 +11,7 @@
     ;;      (llif::sort-surfaces-by-distance
     ;;       (llif::prolog-room-surfaces
     ;;        (llif::prolog-current-room))))
+    (robocup-floor-check)
     (loop for surface in (llif::prolog-cleanup-surfaces)
           do
              (llif::prolog-set-surface-not-visited surface))
@@ -45,7 +46,38 @@
 
 ;;@author Torge Olliges
 (defun move-to-start-position()
-    )
+  )
+
+(defun robocup-floor-check ()
+  (let ((nav-pose (cl-tf2::make-pose-stamped
+                   "map"
+                   0
+                   (cl-tf2::make-3d-vector 0.3567 0.744 0)
+                   (cl-tf2::q* (cl-tf2::make-quaternion 0 0 0 1)
+                      (cl-tf2::euler->quaternion
+                       :ax 0
+                       :ay 0
+                       :az (/ pi 1.5)))))
+        (nav-pose-grasp (cl-tf2::make-pose-stamped
+                         "map"
+                         0
+                         (cl-tf2::make-3d-vector 0.3567 0.744 0)
+                         (cl-tf2::q* (cl-tf2::make-quaternion 0 0 0 1)
+                                     (cl-tf2::euler->quaternion
+                                      :ax 0
+                                      :ay 0
+                                      :az 0.75))))
+        (look-at-pose (llif::prolog-surface-pose (first (llif::prolog-cleanup-surfaces)))))
+    (comf::move-hsr nav-pose)
+    (llif::call-take-gaze-pose-action
+     :px (first (first look-at-pose))
+     :py (second (first look-at-pose))
+     :pz 0)
+    (let ((detected-objects (llif::call-robosherlock-object-pipeline (vector "robocup_default") t)))
+      (llif::insert-knowledge-objects (comf::get-confident-objects detected-objects))
+      (comf::move-hsr nav-pose-grasp)
+      (handle-found-objects))))
+    
 
 ;;@author Torge Olliges
 (defun handle-found-objects ()
@@ -55,27 +87,44 @@
          (when (eq next-object 1) (return-from handle-found-objects nil))
          (let ((source-surface (llif::prolog-object-source next-object))
                (target-surface (llif::prolog-object-goal next-object)))
-           
+           (when (or (eq source-surface nil) (search "Floor" source-surface))
+             (comf::move-hsr
+              (cl-tf2::make-pose-stamped
+               "map"
+               0
+               (cl-tf2::make-3d-vector 0.3567 0.744 0)
+               (cl-tf2::q* (cl-tf2::make-quaternion 0 0 0 1)
+                           (cl-tf2::euler->quaternion
+                            :ax 0
+                            :ay 0
+                            :az 0.75))))
+             (deliver-object next-object target-surface)
+             (return-from handle-found-objects))
            (progn 
-             ;;(comf::announce-movement-to-surface "future" source-surface)
+           ;;(comf::announce-movement-to-surface "future" source-surface)
+             (roslisp::ros-info (handle-found-objects)
+                                "Moving to source surface of ~a namely ~a" next-object source-surface)
              (comf::move-to-surface source-surface nil))
-           
-           ;; (comf::reachability-check-grasp next-object 1)
-           ;;TODO is the next-object still valid?
-           (progn
-             ;;(comf::announce-grasp-action "future" next-object)
-             (comf::grasp-handling next-object))
+           (deliver-object next-object target-surface source-surface)))))
 
-           (progn
-             ;;(comf::announce-movement-to-surface "future" target-surface)
-             (comf::move-to-surface target-surface nil))
-           
-           (roslisp::ros-info (handle-found-objects) "Trying to place ~a from ~a on ~a" next-object source-surface target-surface)
-
-           (progn
-             ;;(comf::announce-place-action "future" next-object)
-             (comf::place-object next-object 1))
-           (llif::call-take-pose-action 1)))))
+(defun deliver-object (next-object target-surface &optional source-surface)
+  (progn
+      ;;(comf::announce-grasp-action "future" next-object)
+      (roslisp::ros-info (handle-found-objects) "Trying to grasp ~a" next-object)
+      (comf::grasp-handling next-object))
+  
+  (progn
+    ;;(comf::announce-movement-to-surface "future" target-surface)
+    (comf::ros-info (handle-found-objects)
+                    "Moving to target surface of ~a namely ~a" next-object target-surface)
+    (comf::move-to-surface target-surface nil))
+  
+  (progn
+    ;;(comf::announce-place-action "future" next-object)
+    (roslisp::ros-info (handle-found-objects)
+                       "Trying to place ~a from ~a on ~a" next-object source-surface target-surface)
+    (comf::place-object next-object 1))
+  (llif::call-take-pose-action 1))
 
 ;;@author Philipp Klein
 (defun poi-search ()

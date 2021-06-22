@@ -18,6 +18,7 @@
   (let ((object-dimensions (llif:prolog-object-dimensions object-id))
         (object-pose (list (third (llif:prolog-object-pose object-id))
                            (fourth (llif:prolog-object-pose object-id)))))
+    (roslisp::ros-info (place-object) "Placing at ~a" (car object-pose))
     ;;takes apart the messages for the needed information to consturct the place motion-designator 
     (let* ((?point-x-object (first (first object-pose)))
            (?point-y-object (second (first object-pose)))
