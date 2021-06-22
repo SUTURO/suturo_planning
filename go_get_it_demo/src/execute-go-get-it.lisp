@@ -6,7 +6,9 @@
 (defun execute-go-get-it()
     ;;(init-interfaces)
     ;;(comf::with-hsr-process-modules
-
+  (loop for surface in (llif::prolog-go-get-it-surfaces)
+        do
+           (llif::set-surface-not-visited))
     ;; move to predefined location
     ;; (move-to-start-position)
     (wait-for-orders))
