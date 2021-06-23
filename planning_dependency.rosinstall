@@ -22,3 +22,7 @@
     local-name: hsr_description
     uri:  https://github.com/Plexiglas/hsr_description.git
     version: master
+- git:
+    local-name: roslisp
+    uri: https://github.com/janschimpf/roslisp.git
+    version: master
