@@ -17,10 +17,10 @@
 action server."
   (roslisp:ros-info (grasp-action) "start")
   (setf *grasp-action-client*
-        (actionlib:make-action-client "grasp_server"
+        (actionlib:make-action-client "/grasp_server"
                                       "manipulation_msgs/GraspAction"))
-  (loop until (actionlib:wait-for-server *grasp-action-client*
-                                         *grasp-action-timeout*))
+    (loop until
+        (actionlib:wait-for-server *grasp-action-client*))
 
   (roslisp:ros-info (grasp-action) "grasp action client created"))
 

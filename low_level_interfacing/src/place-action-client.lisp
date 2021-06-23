@@ -15,8 +15,8 @@ action server."
   (setf *place-action-client*
         (actionlib:make-action-client "/place_server"
                                       "manipulation_msgs/PlaceAction"))
-  (loop until (actionlib:wait-for-server *place-action-client*
-                                         *place-action-timeout*))
+  (loop until
+        (actionlib:wait-for-server *place-action-client*))
 
   (roslisp:ros-info (gripper-action) "gripper action client created"))
 

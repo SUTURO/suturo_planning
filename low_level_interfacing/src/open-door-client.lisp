@@ -16,7 +16,7 @@
   "initializes the open-action-client and makes sure it is connected to the
 action server."
   (setf *open-door-client*
-        (actionlib:make-action-client "open_server"
+        (actionlib:make-action-client "/open_server"
                                       "manipulation_msgs/OpenAction"))
   (loop until (actionlib:wait-for-server *open-door-client*
                                          *open-door-timeout*))

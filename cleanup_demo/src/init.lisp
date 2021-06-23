@@ -48,8 +48,8 @@
   "Initialize only local nodes for working without the real robot."
   
   ;;Init action clients
-  (roslisp:ros-info (init-interfaces) "init move grippper action client")
-  (llif::init-move-gripper-action-client)
+  ;;(roslisp:ros-info (init-interfaces) "init move grippper action client")
+  ;;(llif::init-move-gripper-action-client)
 
   (roslisp:ros-info (init-interfaces) "init grasp action client")
   (llif::init-grasp-action-client)
@@ -66,8 +66,8 @@
   (roslisp:ros-info (init-interfaces) "init make plan action client")
   (llif::init-make-plan-action-client)
 
-  (roslisp:ros-info (init-interfaces) "init make open door action client")
-  (llif::init-open-door-client)
+  ;;(roslisp:ros-info (init-interfaces) "init make open door action client")
+  ;;(llif::init-open-door-client)
 
   )
 

@@ -15,10 +15,10 @@
 action server."
   (roslisp:ros-info (take-pose-action-client) "Initialising take pose action client")
   (setf *take-pose-action-client*
-        (actionlib:make-action-client "take_pose_server"
+        (actionlib:make-action-client "/take_pose_server"
                                       "manipulation_msgs/TakePoseAction"))
-  (loop until (actionlib:wait-for-server *take-pose-action-client*
-                                         *take-pose-action-timeout*))
+  (loop until
+        (actionlib:wait-for-server *take-pose-action-client*))
   (roslisp:ros-info (take-pose-action-client) "Take pose action client initialised"))
 
 (defun make-take-pose-action-goal (pose-mode head-pan
