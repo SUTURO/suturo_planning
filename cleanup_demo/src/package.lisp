@@ -7,7 +7,4 @@
    
    ;;demo.lisp
    #:demo
-
-  ;;grocery_bw.lisp
-  #:spawn-btr-objects
 ))
