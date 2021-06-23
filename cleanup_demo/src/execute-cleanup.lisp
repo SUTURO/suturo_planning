@@ -73,6 +73,7 @@
      :px (first (first look-at-pose))
      :py (second (first look-at-pose))
      :pz 0)
+    (llif::call-take-pose-action 1)
     (let ((detected-objects (llif::call-robosherlock-object-pipeline (vector "robocup_default") t)))
       (llif::insert-knowledge-objects (comf::get-confident-objects detected-objects))
       (comf::move-hsr nav-pose-grasp)
@@ -124,6 +125,8 @@
     (roslisp::ros-info (handle-found-objects)
                        "Trying to place ~a from ~a on ~a" next-object source-surface target-surface)
     (comf::place-object next-object 1))
+  ;; (sleep 2)
+  (llif::call-take-pose-action 1)
   (llif::call-take-pose-action 1))
 
 ;;@author Philipp Klein
