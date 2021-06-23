@@ -1,8 +1,8 @@
 (defsystem cleanup-demo
   :depends-on (cram-language
                roslisp
-	             cram-hsrb-pick-demo
-               cram-urdf-bringup
+	             ;;cram-hsrb-pick-demo
+               ;;cram-urdf-bringup
                common-functions
                low-level-interfacing)
   :components
