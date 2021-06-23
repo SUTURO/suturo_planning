@@ -249,3 +249,15 @@
                        (lambda (x) (string-trim "'" x))
                        (cdr (assoc '?Objects (cut:lazy-car raw-response)))))))))
 
+
+(defun prolog-set-object-handled (object-id)
+  (let* ((knowrob-name (format nil "~a~a" +HSR-OBJECTS-PREFIX+ object-id))
+        (raw-response (with-safe-prolog
+                        (json-prolog:prolog-simple
+                         (concatenate 'string
+                                      "set_object_handeled('"
+                                        knowrob-name
+                                        "')")
+                           :package :llif))))
+    (roslisp:ros-warn (knowledge-surface-client) "Query set_object_handled executed.")
+    raw-response))

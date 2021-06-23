@@ -73,9 +73,9 @@
      :px (first (first look-at-pose))
      :py (second (first look-at-pose))
      :pz 0)
-    (llif::call-take-pose-action 1)
     (let ((detected-objects (llif::call-robosherlock-object-pipeline (vector "robocup_default") t)))
       (llif::insert-knowledge-objects (comf::get-confident-objects detected-objects))
+      (llif::call-take-pose-action 1)
       (comf::move-hsr nav-pose-grasp)
       (handle-found-objects))))
     
@@ -113,7 +113,11 @@
       ;;(comf::announce-grasp-action "future" next-object)
       (roslisp::ros-info (handle-found-objects) "Trying to grasp ~a" next-object)
       (comf::grasp-handling next-object))
-  
+  (let ((objects-in-gripper (llif::prolog-object-in-gripper)))
+    (roslisp::ros-info (deliver-object) "Objects in gripper ~a" objects-in-gripper)
+    (when (eq (length objects-in-gripper) 0)
+      (llif::prolog-set-object-handled next-object)
+      (return-from deliver-object)))
   (progn
     ;;(comf::announce-movement-to-surface "future" target-surface)
     (comf::ros-info (handle-found-objects)
@@ -124,8 +128,9 @@
     ;;(comf::announce-place-action "future" next-object)
     (roslisp::ros-info (handle-found-objects)
                        "Trying to place ~a from ~a on ~a" next-object source-surface target-surface)
+    (llif::call-take-pose-action 6)
     (comf::place-object next-object 1))
-  ;; (sleep 2)
+
   (llif::call-take-pose-action 1)
   (llif::call-take-pose-action 1))
 

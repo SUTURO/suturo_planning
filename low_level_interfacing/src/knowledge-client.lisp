@@ -106,14 +106,14 @@
   (roslisp:ros-info (json-prolog-client) "Getting object in gripper.")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
-                          "gripper(Gripper)"
-                          :package :llif)))
-         (instance (if (eq raw-response 1) NIL 
-                       (cdr (assoc '?instance (cut:lazy-car raw-response))))))
-    (if instance
-        (knowrob-symbol->string instance)
-        (roslisp:ros-warn (json-prolog-client)
-                          "Query didn't reach any solution."))))
+                          "all_objects_in_gripper(OBJECTS)"
+                          :package :llif))))
+    (if (eq raw-response 1)
+         (roslisp:ros-warn (knowledge-surface-client)
+                           "Query didn't objects_in_room reach any solution.")
+         (values-list (list (mapcar
+                       (lambda (x) (string-trim "'" x))
+                       (cdr (assoc '?Objects (cut:lazy-car raw-response)))))))))
 
 ;; @author Tom-Eric Lehmkuhl
 (defun prolog-forget-table-objects ()
