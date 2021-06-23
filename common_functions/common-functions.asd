@@ -7,7 +7,7 @@
                geometry_msgs-msg
                ;;tmc_msgs-msg
                cram-prolog
-               cram-designators
+               cram-common-designators
                cram-process-modules
                cram-language-designator-support
                cram-executive
