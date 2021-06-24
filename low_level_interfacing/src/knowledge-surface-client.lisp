@@ -306,7 +306,7 @@
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
                           (concatenate 'string
-                                       "gogetit_surfaces(SURFACES)")
+                                       "goandgetit_surfaces(SURFACES)")
                           :package :llif))))
     (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-surface-client)
