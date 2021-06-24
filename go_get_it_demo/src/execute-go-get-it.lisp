@@ -7,7 +7,7 @@
     (init-interfaces)
     (comf::with-hsr-process-modules
     (llif::call-take-pose-action 7)
-    (comf::get-motion-des-going-for-doors (list (list 2.51 0.9 0) (list 0 0 0.714223615142 0.699917586272)))
+    (comf::get-motion-des-going-for-doors (list (list 2.51 0.9 0) (list 0 0 0.714223615142 0.699917586272)) nil)
   (loop for surface in (llif::prolog-go-get-it-surfaces)
         do
            (llif::set-surface-not-visited))
