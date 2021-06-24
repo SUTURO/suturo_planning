@@ -102,7 +102,7 @@
            ;;       (eq (search "chair"
            ;;                   (llif::prolog-surface-region (car surface-info))) nil))
              (comf::move-to-surface (car surface-info) t)
-             (comf::perceive-surface (car surface-info))
+             (comf::perceive-surface (vector "robocup_default"))
              (let* ((furniture-id (llif::prolog-surface-furniture (car surface-info)))
                     (object-id
                       (llif::prolog-perceived-object-in-furniture->object-id
