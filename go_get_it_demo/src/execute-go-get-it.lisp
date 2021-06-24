@@ -77,7 +77,7 @@
         (if person_right
             (setf *deliver-pose*
                   (comf::prolog-object-goal-pose->pose-stamped 
-                   (llif::prolog-deliver-object-pose "left")))
+                   (llif::prolog-deliver-object-pose "right")))
             (roslisp::ros-warn (handle-deliver-request) "Deliver pose not set to person right"))))
   (comf::move-hsr *deliver-pose*)
   (llif::call-take-pose-action 6);;)
@@ -112,8 +112,10 @@
                (when object-id
                  (roslisp::ros-info (find-object-in-room) "Object ~a found as ~a" perceived_object_name object-id)
                  (return-from find-object-in-room object-id))
+               
                (roslisp:ros-info (find-object-in-room) 
-                                 "Object ~a wasn't on surface ~a" perceived_object_name (car surface-info))))
+                                 "Object ~a wasn't on surface ~a" perceived_object_name (car surface-info))
+               (return (llif::prolog-next-object))))
   (roslisp::ros-warn (find-object-in-room) "Object ~a wasn't found on any surface in room ~a" perceived_object_name room-id))
 
 ;;@author Torge Olliges
