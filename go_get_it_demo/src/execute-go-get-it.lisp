@@ -1,6 +1,8 @@
 (in-package :go-get-it)
 
 (defparameter *deliver-pose* nil)
+(defparameter *fetch-fluent* (make-fluent :value nil))
+(defparameter *deliver-fluent* (make-fluent :value nil))
 
 ;;@author Torge Olliges
 (defun execute-go-get-it()
@@ -11,9 +13,14 @@
     (comf::with-hsr-process-modules
         (comf::get-motion-des-going-for-doors (list (list 2.51 0.9 0) (list 0 0 0.714223615142 0.699917586272)) nil)
         (llif::call-take-pose-action 7)
-        (wait-for-orders)
+      (wait-for-orders)
+      (progn
         (comf::get-motion-des-going-for-doors (list (list 1.916 3.557 0) (list 0 0 0.714223615142 0.699917586272)) nil)
-        
+        (wait-for *fetch-fluent*))
+      (handle-fetch-request *fetch-fluent*)
+      (wait-for *deliver-fluent*)
+      (handle-deliver-request *deliver-fluent*)
+      (comf::get-motion-des-going-for-doors (list (list 1.916 3.557 0) (list 0 0 0.714223615142 0.699917586272)) nil)  
     ;; move to predefined location
     ;; (move-to-start-position)
 ))
@@ -27,7 +34,16 @@
 ;;@author Torge Olliges
 (defun wait-for-orders()
   ;;(llif::call-take-pose-action 1)
-  (subscribe "/fetch_request" "nlp_msgs/GoAndGetIt" #'handle-fetch-request))
+  (subscribe "/fetch_request" "nlp_msgs/GoAndGetIt" #'set-go-get-it-fluent)
+  (subscribe "/deliver_request" "nlp_msgs/GoAndGetIt" #'set-deliver-fluent))
+
+(defun set-fetch-fluent(fetch-request)
+  (roslisp::ros-info (set-fetch-fluent) "Setting fetch fluent to ~a" fetch-request)
+  (setf (value *fetch-fluent*) fetch-request))
+
+(defun set-deliver-fluent(deliver-request)
+  (roslisp::ros-info (set-deliver-fluent) "Setting fetch fluent to ~a" deliver-request)
+  (setf (value *deliver-fluent*) deliver-request))
 
 ;;@author Torge Olliges
 (defun handle-fetch-request (fetch-request)
@@ -43,8 +59,7 @@
               (retrieve-object-from-room
                (find-object-in-room perceived_object_name room-id)
                room-id)
-              (retrieve-object-from-room object-id room-id)))));;)
-  (subscribe "/deliver_request" "nlp_msgs/GoAndGetIt" #'handle-deliver-request))
+              (retrieve-object-from-room object-id room-id))))))
 
 (defun handle-deliver-request (deliver-request)
   (roslisp::ros-info (handle-fetch-request) "Handling deliver request: ~a" deliver-request)
