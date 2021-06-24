@@ -15,11 +15,11 @@
       (llif::call-take-pose-action 7)
       (wait-for-orders)
       (comf::get-motion-des-going-for-doors (list (list 1.916 3.557 0) (list 0 0 0.714223615142 0.699917586272)) nil)
-      (whenever *fetch-fluent*
-      (handle-fetch-request *fetch-fluent*)
-      (whenever *deliver-fluent*
-      (handle-deliver-request *deliver-fluent*))
-      (comf::get-motion-des-going-for-doors (list (list 1.916 3.557 0) (list 0 0 0.714223615142 0.699917586272)) nil)) 
+      (whenever (*fetch-fluent*)
+        (handle-fetch-request *fetch-fluent*)
+      (whenever (*deliver-fluent*)
+        (handle-deliver-request *deliver-fluent*)
+        (comf::get-motion-des-going-for-doors (list (list 1.916 3.557 0) (list 0 0 0.714223615142 0.699917586272)) nil)))
     ;; move to predefined location
     ;; (move-to-start-position)
 ))
