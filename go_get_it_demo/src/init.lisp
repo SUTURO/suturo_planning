@@ -24,9 +24,7 @@
   (init-nlg)
   (init-knowledge)
 
-  (init-tts)
-
-  (init-nlg)
+  ;;(init-tts)
 
   ;;(init-poi)
   )
@@ -84,6 +82,7 @@
 (defun init-nlg()
   (roslisp:ros-info (init-interfaces) "init nlg action client")
   (llif::init-nlg-action-client))
+  
 (defun init-poi()
   ;;init action client
   (roslisp:ros-info (init-interfaces) "init point of interest scanning")
