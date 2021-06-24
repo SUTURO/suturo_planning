@@ -21,7 +21,7 @@
 
   (init-perception)
 
-  (init-nlg)
+  ;;(init-nlg)
   (init-knowledge)
 
   ;;(init-tts)

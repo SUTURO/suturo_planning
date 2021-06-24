@@ -5,15 +5,18 @@
 ;;@author Torge Olliges
 (defun execute-go-get-it()
     (init-interfaces)
+    (loop for surface in (llif::prolog-go-get-it-surfaces)
+            do
+            (llif::prolog-set-surface-not-visited surface))
     (comf::with-hsr-process-modules
-    (llif::call-take-pose-action 7)
-    (comf::get-motion-des-going-for-doors (list (list 2.51 0.9 0) (list 0 0 0.714223615142 0.699917586272)) nil)
-  (loop for surface in (llif::prolog-go-get-it-surfaces)
-        do
-           (llif::set-surface-not-visited))
+        (comf::get-motion-des-going-for-doors (list (list 2.51 0.9 0) (list 0 0 0.714223615142 0.699917586272)) nil)
+        (llif::call-take-pose-action 7)
+        (wait-for-orders)
+        (comf::get-motion-des-going-for-doors (list (list 1.916 3.557 0) (list 0 0 0.714223615142 0.699917586272)) nil)
+        
     ;; move to predefined location
     ;; (move-to-start-position)
-    (wait-for-orders)))
+))
 
 ;;@author Torge Olliges
 (defun move-to-start-position()
