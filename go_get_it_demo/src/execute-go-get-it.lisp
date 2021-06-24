@@ -34,7 +34,7 @@
 ;;@author Torge Olliges
 (defun wait-for-orders()
   ;;(llif::call-take-pose-action 1)
-  (subscribe "/fetch_request" "nlp_msgs/GoAndGetIt" #'set-go-get-it-fluent)
+  (subscribe "/fetch_request" "nlp_msgs/GoAndGetIt" #'set-fetch-fluent)
   (subscribe "/deliver_request" "nlp_msgs/GoAndGetIt" #'set-deliver-fluent))
 
 (defun set-fetch-fluent(fetch-request)
@@ -47,6 +47,7 @@
 
 ;;@author Torge Olliges
 (defun handle-fetch-request (fetch-request)
+  (setf fetch-request (value fetch-request))
   (roslisp::ros-info (handle-fetch-request) "Handling fetch request: ~a" fetch-request)
   ;;(comf::with-hsr-process-modules
     (roslisp::with-fields (perceived_object_name)
@@ -62,21 +63,22 @@
               (retrieve-object-from-room object-id room-id))))))
 
 (defun handle-deliver-request (deliver-request)
+  (setf deliver-request (value deliver-request))
   (roslisp::ros-info (handle-fetch-request) "Handling deliver request: ~a" deliver-request)
   (comf::with-hsr-process-modules
     (roslisp::with-fields (person_left person_right)
         deliver-request
       (if person_left
-          (if *deliver-pose*
+          (if person_left
               (setf *deliver-pose*
                     (comf::prolog-object-goal-pose->pose-stamped 
-             (llif::prolog-deliver-object-pose "left")))
-              (roslisp::ros-warn (handle-deliver-request) "Deliver pose already set"))
+                     (llif::prolog-deliver-object-pose "left")))
+              (roslisp::ros-warn (handle-deliver-request) "Deliver pose not set to person left"))
           (if person_right
               (setf *deliver-pose*
                     (comf::prolog-object-goal-pose->pose-stamped 
                      (llif::prolog-deliver-object-pose "left")))
-              (roslisp::ros-warn (handle-deliver-request) "No person was chosen"))))
+              (roslisp::ros-warn (handle-deliver-request) "Deliver pose not set to person right"))))
     (comf::move-hsr *deliver-pose*)
     (llif::call-take-pose-action 6)))
 
