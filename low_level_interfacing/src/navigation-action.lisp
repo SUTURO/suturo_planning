@@ -25,7 +25,7 @@
   ;;(setf *nav-client* (actionlib:make-action-client
   ;;                    "/nav_fix"
   (setf *nav-client* (actionlib:make-action-client
-                      "/move_base"
+                      "/suturo_nav"
                       "move_base_msgs/MoveBaseAction"))                      "move_base_msgs/MoveBaseAction"
   
   (roslisp:ros-info (nav-action-client) "waiting for Navigation Action server...")

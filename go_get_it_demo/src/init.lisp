@@ -6,7 +6,7 @@
 ;;Init all interface clients and start a ros node
 (defun init-interfaces()
   "Init all interfaces from planning to other groups"
-  (setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
+  ;;(setq inferior-lisp-program "sbcl --dynamic-space-size 2048")
   (roslisp:ros-info (init-interfaces) "Initialising Interfaces:")
 
 

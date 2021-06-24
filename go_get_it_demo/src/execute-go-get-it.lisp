@@ -4,14 +4,16 @@
 
 ;;@author Torge Olliges
 (defun execute-go-get-it()
-    ;;(init-interfaces)
-    ;;(comf::with-hsr-process-modules
+    (init-interfaces)
+    (comf::with-hsr-process-modules
+    (llif::call-take-pose-action 7)
+    (comf::get-motion-des-going-for-doors (list (list 2.51 0.9 0) (list 0 0 0.714223615142 0.699917586272)))
   (loop for surface in (llif::prolog-go-get-it-surfaces)
         do
            (llif::set-surface-not-visited))
     ;; move to predefined location
     ;; (move-to-start-position)
-    (wait-for-orders))
+    (wait-for-orders)))
 
 ;;@author Torge Olliges
 (defun move-to-start-position()

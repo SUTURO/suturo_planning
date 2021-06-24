@@ -27,5 +27,5 @@ include_directories(
 )
 
 add_lisp_executable(
-execute-go-get-it go-get-it-demo clean::execute-go-get-it
+execute-go-get-it go-get-it-demo go-get-it::execute-go-get-it
 )
