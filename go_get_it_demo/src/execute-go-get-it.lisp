@@ -11,16 +11,15 @@
             do
             (llif::prolog-set-surface-not-visited surface))
     (comf::with-hsr-process-modules
-        (comf::get-motion-des-going-for-doors (list (list 2.51 0.9 0) (list 0 0 0.714223615142 0.699917586272)) nil)
-        (llif::call-take-pose-action 7)
+      (comf::get-motion-des-going-for-doors (list (list 2.51 0.9 0) (list 0 0 0.714223615142 0.699917586272)) nil)
+      (llif::call-take-pose-action 7)
       (wait-for-orders)
-      (progn
-        (comf::get-motion-des-going-for-doors (list (list 1.916 3.557 0) (list 0 0 0.714223615142 0.699917586272)) nil)
-        (wait-for *fetch-fluent*))
+      (comf::get-motion-des-going-for-doors (list (list 1.916 3.557 0) (list 0 0 0.714223615142 0.699917586272)) nil)
+      (whenever *fetch-fluent*
       (handle-fetch-request *fetch-fluent*)
-      (wait-for *deliver-fluent*)
-      (handle-deliver-request *deliver-fluent*)
-      (comf::get-motion-des-going-for-doors (list (list 1.916 3.557 0) (list 0 0 0.714223615142 0.699917586272)) nil)  
+      (whenever *deliver-fluent*
+      (handle-deliver-request *deliver-fluent*))
+      (comf::get-motion-des-going-for-doors (list (list 1.916 3.557 0) (list 0 0 0.714223615142 0.699917586272)) nil)) 
     ;; move to predefined location
     ;; (move-to-start-position)
 ))
@@ -42,7 +41,7 @@
   (setf (value *fetch-fluent*) fetch-request))
 
 (defun set-deliver-fluent(deliver-request)
-  (roslisp::ros-info (set-deliver-fluent) "Setting fetch fluent to ~a" deliver-request)
+  (roslisp::ros-info (set-deliver-fluent) "Setting deliver fluent to ~a" deliver-request)
   (setf (value *deliver-fluent*) deliver-request))
 
 ;;@author Torge Olliges
@@ -50,37 +49,39 @@
   (setf fetch-request (value fetch-request))
   (roslisp::ros-info (handle-fetch-request) "Handling fetch request: ~a" fetch-request)
   ;;(comf::with-hsr-process-modules
-    (roslisp::with-fields (perceived_object_name)
-        fetch-request
-      (let ((room-id (llif::prolog-current-room))) 
-        (let ((object-id (llif::prolog-perceived-object-in-room->object-id perceived_object_name room-id)))
-          (roslisp::ros-info (handle-fetch-request)
-                             "Object ~a not yet known" perceived_object_name)
-          (if (eq object-id nil)
-              (retrieve-object-from-room
-               (find-object-in-room perceived_object_name room-id)
-               room-id)
-              (retrieve-object-from-room object-id room-id))))))
+  (roslisp::with-fields (perceived_object_name)
+      fetch-request
+    (let ((room-id (llif::prolog-current-room))) 
+      (let ((object-id (llif::prolog-perceived-object-in-room->object-id perceived_object_name room-id)))
+        (roslisp::ros-info (handle-fetch-request)
+                           "Object ~a not yet known" perceived_object_name)
+        (if (eq object-id nil)
+            (retrieve-object-from-room
+             (find-object-in-room perceived_object_name room-id)
+             room-id)
+            (retrieve-object-from-room object-id room-id)))))
+  (setf (values *fetch-fluent*) nil))
 
 (defun handle-deliver-request (deliver-request)
   (setf deliver-request (value deliver-request))
   (roslisp::ros-info (handle-fetch-request) "Handling deliver request: ~a" deliver-request)
-  (comf::with-hsr-process-modules
-    (roslisp::with-fields (person_left person_right)
-        deliver-request
-      (if person_left
-          (if person_left
-              (setf *deliver-pose*
-                    (comf::prolog-object-goal-pose->pose-stamped 
-                     (llif::prolog-deliver-object-pose "left")))
-              (roslisp::ros-warn (handle-deliver-request) "Deliver pose not set to person left"))
-          (if person_right
-              (setf *deliver-pose*
-                    (comf::prolog-object-goal-pose->pose-stamped 
-                     (llif::prolog-deliver-object-pose "left")))
-              (roslisp::ros-warn (handle-deliver-request) "Deliver pose not set to person right"))))
-    (comf::move-hsr *deliver-pose*)
-    (llif::call-take-pose-action 6)))
+  ;;(comf::with-hsr-process-modules
+  (roslisp::with-fields (person_left person_right)
+      deliver-request
+    (if person_left
+        (if person_left
+            (setf *deliver-pose*
+                  (comf::prolog-object-goal-pose->pose-stamped 
+                   (llif::prolog-deliver-object-pose "left")))
+            (roslisp::ros-warn (handle-deliver-request) "Deliver pose not set to person left"))
+        (if person_right
+            (setf *deliver-pose*
+                  (comf::prolog-object-goal-pose->pose-stamped 
+                   (llif::prolog-deliver-object-pose "left")))
+            (roslisp::ros-warn (handle-deliver-request) "Deliver pose not set to person right"))))
+  (comf::move-hsr *deliver-pose*)
+  (llif::call-take-pose-action 6);;)
+  (setf (value *deliver-fluent*) nil))
 
 ;;@author Torge Olliges
 (defun find-object-in-room (perceived_object_name room-id)
