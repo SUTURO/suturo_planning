@@ -26,13 +26,13 @@
 
 ;;@author Torge Olliges
 (defun wait-for-orders()
-  (llif::call-take-pose-action 1)
+  ;;(llif::call-take-pose-action 1)
   (subscribe "/fetch_request" "nlp_msgs/GoAndGetIt" #'handle-fetch-request))
 
 ;;@author Torge Olliges
 (defun handle-fetch-request (fetch-request)
   (roslisp::ros-info (handle-fetch-request) "Handling fetch request: ~a" fetch-request)
-  (comf::with-hsr-process-modules
+  ;;(comf::with-hsr-process-modules
     (roslisp::with-fields (perceived_object_name)
         fetch-request
       (let ((room-id (llif::prolog-current-room))) 
@@ -43,7 +43,7 @@
               (retrieve-object-from-room
                (find-object-in-room perceived_object_name room-id)
                room-id)
-              (retrieve-object-from-room object-id room-id))))))
+              (retrieve-object-from-room object-id room-id)))));;)
   (subscribe "/deliver_request" "nlp_msgs/GoAndGetIt" #'handle-deliver-request))
 
 (defun handle-deliver-request (deliver-request)
