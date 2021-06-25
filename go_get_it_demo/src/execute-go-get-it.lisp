@@ -101,26 +101,26 @@
            ;;                   (llif::prolog-surface-region (car surface-info))) nil)
            ;;       (eq (search "chair"
            ;;                   (llif::prolog-surface-region (car surface-info))) nil))
-             (comf::move-to-surface (car surface-info) t)
-             (comf::perceive-surface (car surface-info))
-             (let* ((furniture-id (llif::prolog-surface-furniture (car surface-info)))
-                    (object-id
-                      (llif::prolog-perceived-object-in-furniture->object-id
-                       perceived_object_name
-                       furniture-id)))
-               (roslisp::ros-info (find-object-in-room) "Trying to find ~a in room ~a" object-id room-id)
-               (when object-id
-                 (roslisp::ros-info (find-object-in-room) "Object ~a found as ~a" perceived_object_name object-id)
-                 (return-from find-object-in-room object-id))
-               
-               (roslisp:ros-info (find-object-in-room) 
-                                 "Object ~a wasn't on surface ~a" perceived_object_name (car surface-info))
-               (return (llif::prolog-next-object))))
-  (roslisp::ros-warn (find-object-in-room) "Object ~a wasn't found on any surface in room ~a" perceived_object_name room-id))
+           (comf::move-to-surface (car surface-info) t)
+           (comf::perceive-surface (car surface-info))
+           (let (;;(furniture-id (llif::prolog-surface-furniture (car surface-info)))
+                 (object-id
+                   (llif::prolog-perceived-object-in-room->object-id
+                    perceived_object_name
+                    (llif::prolog-current-room)))))
+           (roslisp::ros-info (find-object-in-room) "Trying to find ~a in room ~a" object-id room-id)
+           (when object-id
+             (roslisp::ros-info (find-object-in-room) "Object ~a found as ~a" perceived_object_name object-id)
+             (return-from find-object-in-room object-id))
+           
+           (roslisp:ros-info (find-object-in-room) 
+                             "Object ~a wasn't on surface ~a" perceived_object_name (car surface-info))
+           (roslisp::ros-warn (find-object-in-room) "Object ~a wasn't found on any surface in room ~a" perceived_object_name room-id)
+           (return-from find-object-in-room (llif::prolog-next-object))))
 
 ;;@author Torge Olliges
 (defun retrieve-object-from-room (object-id room-id)
-    (or (eq (llif::prolog-current-room) room-id)
-        (comf::move-to-room room-id))
+    ;;(or (eq (llif::prolog-current-room) room-id)
+        ;;(comf::move-to-room room-id))
     (comf::move-to-surface (llif::prolog-object-source object-id) nil)
     (comf::grasp-handling object-id))
