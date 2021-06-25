@@ -164,7 +164,7 @@
                                  :pz (third surface-pose)))
   (let* ((perceived-objects
            (llif::call-robosherlock-object-pipeline
-            (vector (llif::prolog-surface-region surface-id)) t))
+            (vector "robocub_default") t))
          (confident-objects (comf::get-confident-objects perceived-objects)))
 
     (roslisp::with-fields (detectiondata)
