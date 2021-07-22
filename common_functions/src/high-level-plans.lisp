@@ -133,7 +133,7 @@
            (roslisp:ros-warn  (going-demo movement-fail) "~%No more retries~%")))
       (let ((knowledge-pose-manipulation (llif::prolog-manipulating-pose-of-door door-id))) ;;get position to move the robot to
         (comf::get-motion-des-going-for-doors knowledge-pose-manipulation t) ;;execution of the move   
-        (let ((knowledge-doorhandle-id
+        (let ((knowledge-doorhandle-id 
                 (concatenate 'string
                              "iai_kitchen/"
                              (llif::prolog-knowrob-name-to-urdf-link ;;changes the knowrob id to the urdf link
@@ -148,6 +148,8 @@
            
 
 ;;@author Jan Schimpf
+;; Function that is work in progress and is intended to navigate the robot between rooms
+;; and open door to reach the goal if needed.
 (defun open-door-on-path (start-room target-room)
   (loop for door-id in (llif::prolog-shortest-path-between-rooms start-room target-room)
         do
@@ -204,8 +206,13 @@
   ;;(comf::announce-grasp-action "past" next-object))
 )
 
+
+;;Author Jan Schimpf
+;; Quick solution making use of the second Graspmode
+;; Graspmode 1 in case the Object is larger than is higher than 6 cm
+;; and Graspmode 2 in case the Object 6cm high or less 
 (defun dynamic-grasp (object-id)
-  (print (third (llif:prolog-object-dimensions object-id)))
+  (third (llif:prolog-object-dimensions object-id))
   (if (< 0.06 (third (llif:prolog-object-dimensions object-id)))
       (setf *grasp-mode* 1)
       (setf *grasp-mode* 2)))
