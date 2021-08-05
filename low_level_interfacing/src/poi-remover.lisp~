@@ -1,0 +1,12 @@
+(in-package :llif)
+
+;;@author Philipp Klein
+(defun poi-remover (point radius)
+    "notify navigation to ignore a point `point' with a radius `radius'"
+    (if (not (wait-for-service "object_finder/ignore_area" 10))
+      (roslisp::ros-warn (poi-remover) "Timed out waiting for service poi-remover")
+      (call-service "object_finder/ignore_area" 'navigation_msgs-msg:area
+                        :radius radius
+                        :center (cl-tf::to-msg point))))
+
+

@@ -21,6 +21,7 @@
                std_srvs-srv
                navfn-srv
                manipulation_msgs-msg
+               navigation_msgs-msg
                knowledge_msgs-msg
                nlg_msgs-msg
                cram-prolog
@@ -54,6 +55,7 @@
       (:file "nlp-subscriber" :depends-on ("package"))
       (:file "poi-client" :depends-on("package"))
       (:file "poi-search" :depends-on("package"))
+      (:file "poi-remover" :depends-on("package"))
       (:file "global-planner" :depends-on("package"))
       ;;(:file "text-to-speech" :depends-on("package"))
       (:file "nlg-action-client" :depends-on("package"))
