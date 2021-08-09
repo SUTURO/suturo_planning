@@ -140,8 +140,8 @@
   (loop do
     (block continue
       (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
-
-      (if (not (comf::move-to-poi))
+      (let ((poi-pos (comf::move-to-poi)))
+      (if (not poi-pos)
           (progn 
             (comf::move-hsr (list (llif::find-biggest-unsearched-space T)))
             (return-from continue)))
@@ -171,7 +171,8 @@
           (roslisp::ros-info (poi-search) "Number of objects detected: ~a" (length detectiondata))
           (if (> (length detectiondata) 0)
               (llif::insert-knowledge-objects confident-objects)
-              (return-from continue))))
+              (progn(llif::poi-remover poi-pos 0.1)
+                     (return-from continue))))))
       
       (let ((next-object (llif::prolog-next-object)))
         (when (eq next-object 1) (return-from continue))

@@ -141,8 +141,10 @@
                (print "Failed Going Designator")
                (roslisp:ros-warn (move-fail) "~%Failed to go to Point~%")
                (cpl:retry))))
-        (exe:perform ?desig))))
-  (if turn (llif::call-take-pose-action 4)))
+        (exe:perform ?desig))
+      (if turn (llif::call-take-pose-action 4))
+      ?successfull-pose)
+      ))
 
 ;;author Philipp Klein
 (defun point-in-polygon (edges-list point)
