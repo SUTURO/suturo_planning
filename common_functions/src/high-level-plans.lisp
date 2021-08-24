@@ -7,7 +7,7 @@
 ;;@author Torge Olliges, Phillip Klein
 ;;Tries a list of stamped poses in the bulletworld simulation
 ;;returns a possible pose.
-(defun try-movement-stampedList (listStamped)
+(defun try-movement-stamped-list (listStamped)
  ;;  (car listStamped))
    (let ((?nav-pose listStamped))
      (cpl:with-retry-counters ((going-retry 3))
@@ -36,7 +36,7 @@
 ;;Lets the robot move to the given position with a motion designator    
 (defun move-hsr (nav-goal-pose-stamped)
     (let* ((?successfull-pose 
-        (try-movement-stampedList 
+        (try-movement-stamped-list 
 				    (list 
              nav-goal-pose-stamped))))
       (exe:perform 

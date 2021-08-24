@@ -35,7 +35,7 @@
                         ;;(comf::announce-movement-to-surface "future" (car surface-info))
                         (comf::move-to-surface (car surface-info) t)
                         (comf::perceive-surface (car surface-info))
-                        (handle-found-objects);;)
+                        (handle-detected-objects);;)
                       ;;(setf surfaces-with-distances-from-current-position
                       ;;      (llif::sort-surfaces-by-distance
                       ;;       (llif::prolog-room-surfaces
@@ -81,7 +81,7 @@
     
 
 ;;@author Torge Olliges
-(defun handle-found-objects ()
+(defun handle-detected-objects ()
   (loop
     do
        (let ((next-object (llif::prolog-next-object)))
