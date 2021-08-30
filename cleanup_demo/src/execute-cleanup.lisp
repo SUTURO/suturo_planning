@@ -139,7 +139,7 @@
   "approaching the next poi and bring the found object to the basket. When no poi is found, start the poi-search and loop the behavior."
   (loop do
     (block continue
-      (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
+      ;;(llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
       (let ((poi-pos (comf::move-to-poi)))
       (if (not poi-pos)
           (progn 

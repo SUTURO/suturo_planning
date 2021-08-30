@@ -20,6 +20,7 @@
                cram-json-prolog
                std_srvs-srv
                navfn-srv
+               nav_msgs-msg
                manipulation_msgs-msg
                navigation_msgs-msg
                knowledge_msgs-msg
