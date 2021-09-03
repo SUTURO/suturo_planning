@@ -23,7 +23,7 @@
 
   ;;(init-tts)
 
-  ;;(init-nlg)
+  (init-nlg)
 
   (init-poi))
 

@@ -177,6 +177,9 @@
 
 ;;@author Torge Olliges
 (defun prolog-is-pose-outside (x y z)
+  (print x)
+  (print y)
+  (print z)
   (let ((raw-response (with-safe-prolog
                         (json-prolog:prolog-simple
                          (concatenate 'string

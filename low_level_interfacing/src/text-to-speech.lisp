@@ -18,7 +18,7 @@
 
 (defun make-text-action-goal (text)
   "Create a text-to-speech action goal with the given `text'"
-  (format t "Text:~%))
+  (format t "Text:~%"))
 
 (defun call-text-to-speech-action (text)
   "Calls the text to speech action to perform the given `text'"

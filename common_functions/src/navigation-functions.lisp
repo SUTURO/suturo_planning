@@ -106,16 +106,19 @@
   `point' The point from which the others are to be generated
   `amountAlternatePositions' The number of points to be generated
   `turn' whether the robot should be turned 90 degrees to the target at the end"
-  (let* ((positions
-           (flatten 
-            (mapcar 
-             (lambda (elem) (remove-if #'null elem))
+  (let* ((positions-lists
              (mapcar
               (lambda (elem) (remove-if-not #'llif::robot-in-obstacle-stamped elem)) 
               (mapcar 
                (lambda (elem) (points-around-point
                                distance elem  number-alternate-positions turn))
-                          points))))))
+               points)))
+         (poi-position (car points))
+         (positions
+           (flatten 
+            (mapcar 
+             (lambda (elem) (remove-if #'null elem)) positions-lists))))
+    
       (publish-msg 
         (advertise "poi_positions" "geometry_msgs/PoseArray")
           :header
@@ -143,7 +146,7 @@
                (cpl:retry))))
         (exe:perform ?desig))
       (if turn (llif::call-take-pose-action 4))
-      ?successfull-pose)
+      (car points))
       ))
 
 ;;author Philipp Klein
