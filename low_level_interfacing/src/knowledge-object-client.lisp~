@@ -61,13 +61,13 @@
                        ,(string-trim "'" (cdr (assoc '?context
                                               (cut:lazy-car raw-response)))))))))
                                               
-;; @author Torge Olliges
+;; @author Tom-Eric Lehmkuhl, Torge Olliges
 (defun prolog-next-object ()
  "returns the next object to grasp"
   (roslisp:ros-info (knowledge-object-client) "Getting next object to grasp.")
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple 
-                          "next_object(OBJECT,0)"
+                          "next_object(OBJECT)"
                           :package :llif)))
          (object (if (eq raw-response nil)
                      nil

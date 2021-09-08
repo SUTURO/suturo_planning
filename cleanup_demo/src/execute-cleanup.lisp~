@@ -18,10 +18,9 @@
     
     (loop for room in (llif::prolog-all-rooms)
           do
-             (loop for surface-info in (llif::sort-surfaces-by-distance (llif::prolog-room-surfaces
-                                        (llif::prolog-current-room)))
+             (loop for surface-info in (llif::prolog-room-surfaces
+                                        (llif::prolog-current-room))
                    do
-                      (print surface-info)
                       (when (and
                              (eq (search "Shelf" (car surface-info)) nil)
                              (eq (search "bucket"

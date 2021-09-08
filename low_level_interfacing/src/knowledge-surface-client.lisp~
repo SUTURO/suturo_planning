@@ -168,7 +168,6 @@
                                        knowrob-name
                                        "',SURFACES)")
                           :package :llif))))
-    (print raw-response)
     (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-surface-client)
                           "Query didn't surfaces_in_room reach any solution.")
