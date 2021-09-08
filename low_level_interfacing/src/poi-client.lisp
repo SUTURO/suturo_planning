@@ -16,15 +16,15 @@
   (cond
     ((null stampedList) nil)
     ((null (rest stampedList)) (first stampedList))
-    ((null (first stampedList)) (closestPointInList point (rest stampedList)))
+    ((null (first stampedList)) (closest-point-in-list point (rest stampedList)))
     ((< 
       (cl-tf::v-dist (cl-tf::origin point)
                      (cl-tf::origin (first stampedList))) 
       (cl-tf::v-dist (cl-tf::origin point)
                      (cl-tf::origin (second stampedList))))
-     (closestPointInList point (cons (first stampedList) 
+     (closest-point-in-list point (cons (first stampedList) 
                                      (rest (rest stampedList)))))
-    (t (closestPointInList point (rest stampedList))))) 
+    (t (closest-point-in-list point (rest stampedList))))) 
 
 ;;@author Philipp Klein
 (defun sorted-poi-by-distance (point)
@@ -68,5 +68,5 @@
     (mapcar 
      (lambda (arg) 
        (add-stamped-poi
-        (cl-tf::pose->pose-stamped "map" 0.0 (cl-tf::from-msg arg)))
-       )(coerce poses 'list))))
+        (cl-tf::pose->pose-stamped "map" 0.0 (cl-tf::from-msg arg))))
+     (coerce poses 'list))))

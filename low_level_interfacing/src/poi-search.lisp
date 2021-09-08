@@ -87,7 +87,6 @@
 (defun find-biggest-unsearched-space (&optional debug)
   "returns the position of the bottom left corner of the bigest area not searched yet and the size"
   (roslisp::ros-info (find-biggest-unsearched-space) "Searching for empty square")
-  (sleep 10)
   (roslisp:with-fields (data
                         (resolution(resolution info))
                         (width (width info))
@@ -140,19 +139,20 @@
 
         (if
          ;;(and
-          ;;(llif::global-planner-reachable current-position square-center)
-          (not (llif::prolog-is-pose-outside
-                (cl-tf::x (cl-tf::origin square-center))
-                (cl-tf::y (cl-tf::origin square-center))
-                (cl-tf::z (cl-tf::origin square-center)))) ;;)
+         ;;(llif::global-planner-reachable current-position square-center)
+         (not (llif::prolog-is-pose-outside
+                 (cl-tf::x (cl-tf::origin square-center))
+                 (cl-tf::y (cl-tf::origin square-center))
+                0)) ;;)
          ;;TODO maybe change it from middle to smth else
          (progn
            (roslisp::ros-info (find-biggest-unsearched-space) "Square center: ~a" square-center)
            square-center)
          (progn
            (mark-position-visited (/ real-size 2) square-center)
-           (find-biggest-unsearched-space)
-           (when debug (sleep 0.5)))))))))
+           (when debug (sleep 0.5))
+           (find-biggest-unsearched-space debug)
+           )))))))
 
 ;;@author Philipp Klein
 (defun publish-debug-square (pose-list)

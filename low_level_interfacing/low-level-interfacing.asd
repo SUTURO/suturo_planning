@@ -20,6 +20,7 @@
                cram-json-prolog
                std_srvs-srv
                navfn-srv
+               nav_msgs-msg
                manipulation_msgs-msg
                navigation_msgs-msg
                knowledge_msgs-msg
@@ -58,5 +59,6 @@
       (:file "poi-remover" :depends-on("package"))
       (:file "global-planner" :depends-on("package"))
       ;;(:file "text-to-speech" :depends-on("package"))
+      (:file "text-to-speech" :depends-on("package"))
       (:file "nlg-action-client" :depends-on("package"))
       (:file "make-plan-action-client" :depends-on("package"))))))

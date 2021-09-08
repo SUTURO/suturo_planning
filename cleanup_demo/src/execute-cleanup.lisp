@@ -11,10 +11,10 @@
     ;;      (llif::sort-surfaces-by-distance
     ;;       (llif::prolog-room-surfaces
     ;;        (llif::prolog-current-room))))
-    (robocup-floor-check)
-    (loop for surface in (llif::prolog-cleanup-surfaces)
-          do
-             (llif::prolog-set-surface-not-visited surface))
+    ;; (robocup-floor-check)
+    ;; (loop for surface in (llif::prolog-cleanup-surfaces)
+    ;;      do
+    ;;         (llif::prolog-set-surface-not-visited surface))
     
     (loop for room in (llif::prolog-all-rooms)
           do
@@ -136,11 +136,11 @@
   "approaching the next poi and bring the found object to the basket. When no poi is found, start the poi-search and loop the behavior."
   (loop do
     (block continue
-      (llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
+      ;;(llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
       (let ((poi-pos (comf::move-to-poi)))
       (if (not poi-pos)
           (progn 
-            (comf::move-hsr (list (llif::find-biggest-unsearched-space T)))
+            (comf::move-hsr (llif::find-biggest-unsearched-space T))
             (return-from continue)))
 
       ;;(comf::announce-perceive-action "future")
@@ -168,11 +168,13 @@
           (roslisp::ros-info (poi-search) "Number of objects detected: ~a" (length detectiondata))
           (if (> (length detectiondata) 0)
               (llif::insert-knowledge-objects confident-objects)
-              (progn(llif::poi-remover poi-pos 0.1)
-                     (return-from continue))))))
+              (progn
+                (llif::poi-remover (cl-tf::origin poi-pos) 0.1)
+                (return-from continue)))))
       
       (let ((next-object (llif::prolog-next-object)))
-        (when (eq next-object 1) (return-from continue))
+        (when (eq next-object 1)
+          (progn(llif::poi-remover (cl-tf::origin poi-pos) 0.1) (return-from continue)))
         (let ((object-goal (llif::prolog-object-goal next-object)))
           (comf::announce-grasp-action "future" next-object)
           (llif::call-take-pose-action 1)
@@ -187,4 +189,4 @@
           (comf::place-object next-object 1)
           (comf::announce-place-action "past" next-object)
 
-          (llif::call-take-pose-action 1))))))
+          (llif::call-take-pose-action 1)))))))
