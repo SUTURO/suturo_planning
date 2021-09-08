@@ -11,10 +11,10 @@
     ;;      (llif::sort-surfaces-by-distance
     ;;       (llif::prolog-room-surfaces
     ;;        (llif::prolog-current-room))))
-    (robocup-floor-check)
-    (loop for surface in (llif::prolog-cleanup-surfaces)
-          do
-             (llif::prolog-set-surface-not-visited surface))
+    ;; (robocup-floor-check)
+    ;; (loop for surface in (llif::prolog-cleanup-surfaces)
+    ;;      do
+    ;;         (llif::prolog-set-surface-not-visited surface))
     
     (loop for room in (llif::prolog-all-rooms)
           do
