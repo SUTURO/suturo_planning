@@ -53,8 +53,9 @@
 (defun grasp-object (object-id grasp-pose)
   ;;get the information from knowledge
   (let* ((object-dimensions (llif:prolog-object-dimensions object-id))
-         (object-pose (list (third (llif:prolog-object-pose object-id))
-                            (fourth (llif:prolog-object-pose object-id)))))
+         (raw-object-pose (llif:prolog-object-pose object-id))
+         (object-pose (list (third raw-object-pose)
+                            (fourth raw-object-pose))))
     (roslisp::ros-info (grasp-object) "Grasping at ~a" (car object-pose))
     ;;takes apart the messages for the needed information to consturct the grasp motion-designator 
     (let* ((?point-x-object (first (first object-pose)))

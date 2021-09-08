@@ -17,11 +17,11 @@
   *text-to-speech-action-client*)
 
 (defun make-text-action-goal (text)
-  "Create a text-to-speech action goal with the given `text'"
-  (format t "Text:~%))
+  "Create a text-to-speech action goal with the given text'"
+  (format t "Text:~%"))
 
 (defun call-text-to-speech-action (text)
-  "Calls the text to speech action to perform the given `text'"
+  "Calls the text to speech action to perform the given text"
   (when *enable-speech*
     (multiple-value-bind (result status)
         (let ((actionlib:*action-server-timeout* 10.0))

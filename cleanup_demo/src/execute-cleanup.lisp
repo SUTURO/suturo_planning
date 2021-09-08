@@ -18,29 +18,26 @@
     
     (loop for room in (llif::prolog-all-rooms)
           do
-             ;;(setf surfaces-with-distances-from-current-position
-             ;;      (llif::sort-surfaces-by-distance
-             ;;       (llif::prolog-room-surfaces
-             ;;        room)))
+             (loop for surface-info in (llif::prolog-room-surfaces
+                                        (llif::prolog-current-room))
+                   do
+                      (when (and
+                             (eq (search "Shelf" (car surface-info)) nil)
+                             (eq (search "bucket"
+                                         (llif::prolog-surface-region (car surface-info))) nil)
+                             (eq (search "Floor"
+                                         (car surface-info)) nil)
+                             (eq (search "chair"
+                                         (llif::prolog-surface-region (car surface-info))) nil))
+                        (llif::prolog-set-surface-not-visited (car surface-info))))
+             
              (loop for surface-info in (llif::sort-surfaces-by-distance
                                         (llif::prolog-surfaces-not-visited-in-room
                                          room))
                    do
-                      ;;(when (and
-                      ;;       (eq (search "Shelf" (car surface-info)) nil)
-                      ;;       (eq (search "bucket"
-                      ;;                   (llif::prolog-surface-region (car surface-info))) nil)
-                      ;;       (eq (search "chair"
-                      ;;                   (llif::prolog-surface-region (car surface-info))) nil))
-                        ;;(comf::announce-movement-to-surface "future" (car surface-info))
                         (comf::move-to-surface (car surface-info) t)
                         (comf::perceive-surface (car surface-info))
-                        (handle-detected-objects);;)
-                      ;;(setf surfaces-with-distances-from-current-position
-                      ;;      (llif::sort-surfaces-by-distance
-                      ;;       (llif::prolog-room-surfaces
-                      ;;        (llif::prolog-current-room)))))
-                   ))
+                        (handle-detected-objects)))
     ;;(poi-search)
     ))
 
@@ -77,7 +74,7 @@
       (llif::insert-knowledge-objects (comf::get-confident-objects detected-objects))
       (llif::call-take-pose-action 1)
       (comf::move-hsr nav-pose-grasp)
-      (handle-found-objects))))
+      (handle-detected-objects))))
     
 
 ;;@author Torge Olliges
@@ -85,7 +82,7 @@
   (loop
     do
        (let ((next-object (llif::prolog-next-object)))
-         (when (eq next-object 1) (return-from handle-found-objects nil))
+         (when (eq next-object 1) (return-from handle-detected-objects nil))
          (let ((source-surface (llif::prolog-object-source next-object))
                (target-surface (llif::prolog-object-goal next-object)))
            (when (or (eq source-surface nil) (search "Floor" source-surface))
@@ -100,7 +97,7 @@
                             :ay 0
                             :az 0.75))))
              (deliver-object next-object target-surface)
-             (return-from handle-found-objects))
+             (return-from handle-detected-objects))
            (progn 
            ;;(comf::announce-movement-to-surface "future" source-surface)
              (roslisp::ros-info (handle-found-objects)
