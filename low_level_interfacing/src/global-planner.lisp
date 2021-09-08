@@ -11,4 +11,14 @@
                         :goal (cl-tf::to-msg goal-pose))
         (if (eq plan_found 1) 1 Nil))))
 
+;;@author Philipp Klein
+(defun global-planner-reachable-from-current-pose (goal-pose)
+  
+  (global-planner-reachable
+         (cl-tf::transform-stamped->pose-stamped
+          (cl-tf::lookup-transform
+           cram-tf::*transformer*
+           "map" "base_footprint"))
+         goal-pose ))
+
 

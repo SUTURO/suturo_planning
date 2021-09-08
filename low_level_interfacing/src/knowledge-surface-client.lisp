@@ -175,8 +175,23 @@
                             (lambda (x) (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" x)))
                             (cdr (assoc '?Surfaces (cut:lazy-car raw-response)))))))))
 
+;;@author Philipp Klein
+(defun prolog-is-pose-outside-stamped (stamped)
+  (prolog-is-pose-outside
+   (cl-tf::x (cl-tf::origin stamped))
+   (cl-tf::y (cl-tf::origin stamped))
+   (cl-tf::z (cl-tf::origin stamped))))
+
+  
 ;;@author Torge Olliges
 (defun prolog-is-pose-outside (x y z)
+    (setf x (with-input-from-string
+              (in (format Nil "~5,f" x))(read in)))
+    (setf y (with-input-from-string
+                (in (format Nil "~5,f" y))(read in)))
+    (setf z (with-input-from-string
+           (in (format Nil "~5,f" z))(read in)))
+
   (print x)
   (print y)
   (print z)

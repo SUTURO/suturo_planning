@@ -139,12 +139,10 @@
 
         (if
          ;;(and
-          ;;(llif::global-planner-reachable current-position square-center)
+         ;;(llif::global-planner-reachable current-position square-center)
          (not (llif::prolog-is-pose-outside
-                (with-input-from-string
-                (in (format Nil "~5,f" (cl-tf::x (cl-tf::origin square-center))))(read in))
-                (with-input-from-string
-                (in (format Nil "~5,f" (cl-tf::y (cl-tf::origin square-center))))(read in))
+                 (cl-tf::x (cl-tf::origin square-center))
+                 (cl-tf::y (cl-tf::origin square-center))
                 0)) ;;)
          ;;TODO maybe change it from middle to smth else
          (progn
