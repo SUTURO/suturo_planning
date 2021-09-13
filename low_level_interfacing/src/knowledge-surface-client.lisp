@@ -192,10 +192,6 @@
                 (in (format Nil "~5,f" y))(read in)))
     (setf z (with-input-from-string
            (in (format Nil "~5,f" z))(read in)))
-
-  (print x)
-  (print y)
-  (print z)
   (let ((raw-response (with-safe-prolog
                         (json-prolog:prolog-simple
                          (concatenate 'string

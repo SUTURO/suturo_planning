@@ -106,24 +106,25 @@
   `point' The point from which the others are to be generated
   `amountAlternatePositions' The number of points to be generated
   `turn' whether the robot should be turned 90 degrees to the target at the end"
-  (let* ((positions-lists
+  (let* (
+        (positions-lists
              (mapcar
               (lambda (elem) (remove-if-not #'llif::robot-in-obstacle-stamped elem))
               (mapcar
                (lambda (elem) (remove-if #'llif::prolog-is-pose-outside-stamped elem))
-               (mapcar
-                (lambda (elem) (remove-if-not #'llif::global-planner-reachable-from-current-pose elem))
+               ;;(mapcar
+                ;;(lambda (elem) (remove-if-not #'llif::global-planner-reachable-from-current-pose elem))
               (mapcar 
                (lambda (elem) (points-around-point
                                distance elem  number-alternate-positions turn))
-               points)))))
+               points))));;)
          (poi-position (car points))
          (positions
            (flatten 
             (mapcar 
              (lambda (elem) (remove-if #'null elem)) positions-lists))))
-    
-      (publish-msg 
+    (roslisp:ros-info (poi) "points calculated, number of possible aproaches: ~a" (length positions))
+    (publish-msg 
         (advertise "poi_positions" "geometry_msgs/PoseArray")
           :header
           (roslisp:make-msg "std_msgs/Header" (frame_id) "map" (stamp) (roslisp:ros-time))
@@ -133,25 +134,11 @@
                       (mapcar #'cl-tf::to-msg
                               (mapcar #'cl-tf::pose-stamped->pose
                                       positions))))
-    (roslisp::ros-info (navigation-functions) "Started Designator with positions ~a" positions)
+    ;;(roslisp::ros-info (navigation-functions) "Started Designator with positions ~a" positions)
     (when (not positions) (return-from pose-with-distance-to-points Nil))
-    ;;(comf::move-hsr (rotate-to-point (cl-tf::origin (try-movement-stampedList positions))))
-    (let* ((?successfull-pose (try-movement-stamped-list positions))
-           (?desig (desig:a motion
-                            (type going) 
-                            (pose ?successfull-pose))))
-      (cpl:with-failure-handling
-          (((or common-fail:low-level-failure 
-                cl::simple-error
-                cl::simple-type-error)
-               (e)
-             (setf ?successfull-pose (try-movement-stamped-list positions))
-             (print "executed")
-             (cpl:do-retry going-retry
-               (print "Failed Going Designator")
-               (roslisp:ros-warn (move-fail) "~%Failed to go to Point~%")
-               (cpl:retry))))
-        (exe:perform ?desig))
+    ;;(comf::move-hsr (rotate-to-point (cl-tf::origin (try-movement-stamped-list positions))))
+    (roslisp:ros-info (poi) "point selected: ~a" (try-movement-stamped-list positions))
+
       (if turn (llif::call-take-pose-action 4))
       (car points))
     ))
@@ -159,17 +146,19 @@
 ;;author Philipp Klein
 (defun rotate-to-point (3dvec)
     (setf *curorigin*
-        (cl-tf::origin
-         (cl-tf::transform-stamped->pose-stamped
-          (cl-tf::lookup-transform
-           cram-tf::*transformer*
-           "map" "base_footprint"))))
+       (roslisp::with-fields (translation)
+                            (cl-tf::lookup-transform
+                            cram-tf::*transformer*
+                            "map"
+                            "base_footprint")
+                        translation))
    (setf *currot*
-         (cl-tf::orientation
-         (cl-tf::transform-stamped->pose-stamped
-          (cl-tf::lookup-transform
-           cram-tf::*transformer*
-           "map" "base_footprint"))))
+         (roslisp::with-fields (rotation)
+                            (cl-tf::lookup-transform
+                            cram-tf::*transformer*
+                            "map"
+                            "base_footprint")
+                        rotation))
   (setf *crossp* (cl-tf::cross-product *curorigin* 3dvec))
   (print *crossp*)
   (cl-tf::make-pose-stamped "map" 0 *curorigin*

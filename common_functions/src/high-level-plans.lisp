@@ -96,7 +96,7 @@
     (when 
         (not poi-list) 
       (return-from move-to-poi Nil))
-    (roslisp:ros-info (move-to-poi) "Poi with positions called ~a" poi-list)
+    ;;(roslisp:ros-info (move-to-poi) "Poi with positions called ~a" poi-list)
     (pose-with-distance-to-points *poi-distance-threshold* poi-list 10 t)))
 
 ;;@author Philipp Klein

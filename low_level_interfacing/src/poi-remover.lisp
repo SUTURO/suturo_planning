@@ -8,6 +8,6 @@
    (roslisp:make-msg 'navigation_msgs-msg:area
                         :radius radius
                         :center (cl-tf::to-msg point)))
-  (sleep 1))
+  (sleep 2))
 
 

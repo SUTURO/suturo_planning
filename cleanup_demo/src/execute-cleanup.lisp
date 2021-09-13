@@ -140,7 +140,7 @@
       ;;(llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
       (let ((poi-pos (comf::move-to-poi)))
       (if (not poi-pos)
-          (progn 
+          (progn
             (comf::move-hsr (llif::find-biggest-unsearched-space T))
             (return-from continue)))
 
@@ -153,8 +153,23 @@
 
 
       ;;percieve -> filter -> insert into knowledge
-      (llif::call-take-pose-action 1)
+        (llif::call-take-pose-action 1)
 
+        (roslisp::with-fields (detectiondata)
+          confident-objects
+        (progn
+          (roslisp::ros-info (poi-search) "Number of objects detected: ~a" (length detectiondata))
+          (if (> (length detectiondata) 0)
+              (llif::insert-knowledge-objects confident-objects)
+              (progn
+                (llif::poi-remover (cl-tf::origin poi-pos) 0.4)
+                (return-from continue)))))
+
+
+        (let ((next-object (llif::prolog-next-object)))
+          (when (eq next-object 1)
+            (progn(llif::poi-remover (cl-tf::origin poi-pos) 0.4) (return-from continue)))
+          
       ;; turn to face the object
       (roslisp::with-fields (translation rotation)
         (cl-tf::lookup-transform cram-tf::*transformer* "map" "base_footprint")
@@ -163,19 +178,6 @@
                 (cl-tf::q* rotation
                            (cl-tf::euler->quaternion :ax 0 :ay 0 :az (- (/ pi 2)))))))
       
-      (roslisp::with-fields (detectiondata)
-          confident-objects
-        (progn
-          (roslisp::ros-info (poi-search) "Number of objects detected: ~a" (length detectiondata))
-          (if (> (length detectiondata) 0)
-              (llif::insert-knowledge-objects confident-objects)
-              (progn
-                (llif::poi-remover (cl-tf::origin poi-pos) 0.1)
-                (return-from continue)))))
-      
-      (let ((next-object (llif::prolog-next-object)))
-        (when (eq next-object 1)
-          (progn(llif::poi-remover (cl-tf::origin poi-pos) 0.1) (return-from continue)))
         (let ((object-goal (llif::prolog-object-goal next-object)))
           (comf::announce-grasp-action "future" next-object)
           (llif::call-take-pose-action 1)

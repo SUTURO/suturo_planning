@@ -131,6 +131,7 @@
                                                 (/ real-size 2)
                                                 (/ real-size 2) 0))
                              (cl-tf::make-quaternion 0 0 0 1))))
+        (when (< real-size 0.4) (error "Plan ended, no further searchable regions"))
         (publish-debug-square (list bl-coord
                                     (cl-tf:v- bl-coord (cl-tf:make-3d-vector 0 real-size 0))
                                     (cl-tf:v- bl-coord (cl-tf:make-3d-vector real-size real-size 0))
@@ -138,12 +139,12 @@
         ;;(roslisp::ros-info (find-biggest-unsearched-space) "Position ~a center ~a" *position* center)
 
         (if
-         ;;(and
-         ;;(llif::global-planner-reachable current-position square-center)
+         (and
+         (llif::global-planner-reachable current-position square-center)
          (not (llif::prolog-is-pose-outside
                  (cl-tf::x (cl-tf::origin square-center))
                  (cl-tf::y (cl-tf::origin square-center))
-                0)) ;;)
+                0)))
          ;;TODO maybe change it from middle to smth else
          (progn
            (roslisp::ros-info (find-biggest-unsearched-space) "Square center: ~a" square-center)
