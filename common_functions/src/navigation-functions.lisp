@@ -140,7 +140,7 @@
     (roslisp:ros-info (poi) "point selected: ~a" (try-movement-stamped-list positions))
 
       (if turn (llif::call-take-pose-action 4))
-      (car points))
+      (car points)
     ))
 
 ;;author Philipp Klein
