@@ -130,7 +130,7 @@
                                                (cl-tf:make-3d-vector
                                                 (/ real-size 2)
                                                 (/ real-size 2) 0))
-                             (cl-tf::make-quaternion 0 0 0 1))))
+                             (cl-tf::make-quaternion 1 0 0 0))))
         (when (< real-size 0.4) (error "Plan ended, no further searchable regions"))
         (publish-debug-square (list bl-coord
                                     (cl-tf:v- bl-coord (cl-tf:make-3d-vector 0 real-size 0))

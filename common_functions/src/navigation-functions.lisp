@@ -162,7 +162,9 @@
   (setf *crossp* (cl-tf::cross-product *curorigin* 3dvec))
   (print *crossp*)
   (cl-tf::make-pose-stamped "map" 0 *curorigin*
-                            (handler-case (cl-tf::normalize
+                            ;;(handler-case
+                            ;;
+                            (cl-tf::normalize
                              (cl-tf::make-quaternion
                               (cl-tf::x *crossp*)
                               (cl-tf::y *crossp*)
@@ -173,8 +175,9 @@
                              (expt (cl-tf2::v-norm *curorigin*) 2)
                              (expt (cl-tf::v-norm 3dvec) 2)))
                            (cl-tf::dot-product *curorigin* 3dvec))))
-                              (error (c)
-                                (values *currot*)))))
+                              ;;(error (c)
+  ;;  (values *currot*))))
+  ))
 
 
 ;;author Philipp Klein
