@@ -18,7 +18,7 @@
     
     (loop for room in (llif::prolog-all-rooms)
           do
-             (loop for surface-info in (llif::sort-surfaces-by-distance (llif::prolog-room-surfaces
+             (loop for surface-info in (comf::sort-surfaces-by-distance (llif::prolog-room-surfaces
                                         (llif::prolog-current-room)))
                    do
                       (print surface-info)
@@ -32,7 +32,7 @@
                                          (llif::prolog-surface-region (car surface-info))) nil))
                         (llif::prolog-set-surface-not-visited (car surface-info))))
              
-             (loop for surface-info in (llif::sort-surfaces-by-distance
+             (loop for surface-info in (comf::sort-surfaces-by-distance
                                         (llif::prolog-surfaces-not-visited-in-room
                                          room))
                    do
