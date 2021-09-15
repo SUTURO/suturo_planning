@@ -114,7 +114,7 @@
         (mapcar 'knowrob-symbol->string objects))))
 
 ;; @author Torge Olliges
-(defun set-object-not-graspable (object-name reason)
+(defun prolog-set-object-not-graspable (object-name reason)
  "returns a list of non graspable objects on a given surface"
   (roslisp:ros-info (knowledge-object-client) "setting objects not graspable")
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
@@ -141,7 +141,7 @@
 ;;   4 to high in a shelf (Knowledge)
 
 ;; @author Torge Olliges
-(defun get-reason-for-object-goal-pose (object-name)
+(defun prolog-get-reason-for-object-goal-pose (object-name)
  ""
   (roslisp:ros-info (knowledge-object-client) "")
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))

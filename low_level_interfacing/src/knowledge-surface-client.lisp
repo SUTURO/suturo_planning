@@ -44,32 +44,6 @@
                                              (cut:lazy-car raw-response)))))))))
 
 ;; @author Torge Olliges
-(defun sort-surfaces-by-distance (surface-names)
-  (sort
-   (mapcar
-    (lambda (surface-name) (list
-                            surface-name
-                            (current-pose-prolog-pose->distance
-                             (first (prolog-surface-pose surface-name)))))
-    surface-names)
-   #'tuple-compare))
-
-;; @author Torge Olliges
-(defun tuple-compare (l r)
-  (< (nth 1 l) (nth 1 r)))
-
-;; @author Torge Olliges                             
-(defun current-pose-prolog-pose->distance (prolog-pose-values)
-  (let ((current-pose-translation
-          (cl-transforms::translation
-           (cl-tf::lookup-transform cram-tf::*transformer* "map" "base_footprint")))
-        (prolog-pose-vector (cl-tf2::make-3d-vector
-                      (first prolog-pose-values)
-                      (second prolog-pose-values)
-                      (third prolog-pose-values))))
-    (cl-transforms:v-dist current-pose-translation prolog-pose-vector)))
-
-;; @author Torge Olliges
 (defun prolog-set-surface-not-visited (surface-id)
   (let* ((knowrob-name (format nil "~a~a" +HSR-SURFACE-PREFIX+ surface-id))
          (raw-response (with-safe-prolog
@@ -254,6 +228,7 @@
                           "Query surface_in_room didn't reach any solution.")
         (string-trim "\""(string-trim "'" (cdr (assoc '?Region (cut:lazy-car raw-response))))))))
 
+;;@author Torge Olliges
 (defun prolog-surface-furniture (surface-id)
   (let* ((knowrob-name (format nil "~a~a" +HSR-SURFACE-PREFIX+ surface-id))
          (raw-response (with-safe-prolog
@@ -268,6 +243,7 @@
                           "Query has_surface didn't reach any solution.")
         (string-trim "\""(string-trim "'" (cdr (assoc '?Furniture (cut:lazy-car raw-response))))))))
 
+;;@author Torge Olliges
 (defun prolog-pose-to-perceive-surface (surface-id)
   (let* ((knowrob-name (format nil "~a~a" +HSR-SURFACE-PREFIX+ surface-id))
          (raw-response (with-safe-prolog
