@@ -183,7 +183,12 @@
 (defun grasp-handling (next-object)
   (dynamic-grasp next-object)
   (roslisp::ros-info (grasp-handling) "Starting grasp handling for object ~a" next-object)
+  ;;(setf clean::*last-inner-timestamp* (get-universal-time))
   (let ((grasp-action-result (comf::grasp-object next-object *grasp-mode*)))
+    ;;(setf clean::*total-manipulation-time*
+    ;;      (+
+    ;;       (- (get-universal-time) clean::*last-inner-timestamp*)
+    ;;       clean::*total-manipulation-time*))
     (roslisp::with-fields (error_code)
         grasp-action-result
       (if (eq error_code 1)
@@ -201,7 +206,13 @@
                      (cpl:retry))
                    (roslisp:ros-warn (grasp-handling) "~%No more retries~%")))
               ;;(dynamic-grasp next-object)  ;;sets the graspmode should be replaced with the function from knowledge when that is finished
-              (comf::grasp-object next-object *grasp-mode*))))))
+              ;;(setf clean::*last-inner-timestamp* (get-universal-time))
+              (comf::grasp-object next-object *grasp-mode*)
+              ;;(setf clean::*total-manipulation-time*
+              ;;      (+
+              ;;       (- (get-universal-time) clean::*last-inner-timestamp*)
+              ;;clean::*total-manipulation-time*))
+              )))))
   (llif::call-take-pose-action 1)
   ;;(comf::announce-grasp-action "past" next-object))
 )

@@ -69,7 +69,8 @@
                          (json-prolog:prolog-simple 
                           "next_object(OBJECT,0)"
                           :package :llif)))
-         (object (if (eq raw-response nil)
+         (object (if (or (eq raw-response nil)
+                         (eq raw-response 1))
                      nil
                      (remove-string +HSR-OBJECTS-PREFIX+
                                     (string-trim "'"

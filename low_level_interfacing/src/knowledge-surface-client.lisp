@@ -128,7 +128,8 @@
          (roslisp:ros-warn (knowledge-surface-client)
                            "Query robot_in_room didn't reach any solution.")
          (progn
-           (roslisp::ros-info (prolog-current-room) "I am in room ~a" raw-response)
+           (roslisp::ros-info (prolog-current-room) "I am in room ~a"
+                              (string-trim "'" (cdr (assoc '?Room (cut:lazy-car raw-response)))))
            (remove-string +HSR-ROOMS-PREFIX+
                         (string-trim "'" (cdr (assoc '?Room (cut:lazy-car raw-response)))))))))
 
@@ -142,7 +143,6 @@
                                        knowrob-name
                                        "',SURFACES)")
                           :package :llif))))
-    (print raw-response)
     (if (eq raw-response 1)
         (roslisp:ros-warn (knowledge-surface-client)
                           "Query didn't surfaces_in_room reach any solution.")
@@ -277,20 +277,6 @@
                      (subseq full-string 0 subst-point)
                      (subseq full-string (+ subst-point (length rem-string))))
         full-string)))
-
-;; this is ugly and only done due to the robocup 2021
-(defun prolog-cleanup-surfaces ()
-  (let* ((raw-response (with-safe-prolog
-                         (json-prolog:prolog-simple
-                          (concatenate 'string
-                                       "cleanup_surfaces(SURFACES)")
-                          :package :llif))))
-    (if (eq raw-response 1)
-        (roslisp:ros-warn (knowledge-surface-client)
-                          "Query didn't  reach any solution.")
-        (values-list (list (mapcar
-                            (lambda (x) (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" x)))
-                            (cdr (assoc '?Surfaces (cut:lazy-car raw-response)))))))))
 
 ;; this is ugly and only done due to the robocup 2021
 (defun prolog-go-get-it-surfaces ()
