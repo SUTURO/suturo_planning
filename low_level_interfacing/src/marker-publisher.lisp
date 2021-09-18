@@ -2,17 +2,17 @@
 
 (defparameter *perceived-data* nil)
 (defparameter *perception-subscriber* nil)
+(defparameter *marker-publisher* nil)
+
 
 (defun init-marker-publisher()
   (setf *marker-publisher*
           (roslisp:advertise "~location_marker" "visualization_msgs/Marker")))
 
-(defparameter *marker-publisher* nil)
 (defun get-marker-publisher ()
   (unless *marker-publisher*
     (init-marker-publisher))
   *marker-publisher*)
-
 
 (defun publish-marker-pose (pose &key (parent "map") id (g 0.0))
   "gets a cl-tf:pose and places a visualization marker at the given pose"
@@ -47,8 +47,3 @@
                                            (g color) g
                                            (b color) 0.0
                                            (a color) 1.0))))
-
-;(roslisp-utilities:register-ros-init-function init-perception-subscriber)
-;(roslisp-utilities:register-ros-init-function get-marker-publisher)
-
-                                        ;(roslisp-utilities:register-ros-cleanup-function cleanup-perception-subscriber)

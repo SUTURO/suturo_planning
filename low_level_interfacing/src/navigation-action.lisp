@@ -4,29 +4,13 @@
 
 (defvar *nav-client* nil)
 
-;; (defun init-nav-client ()
-;;   "Initialize the navigation client"
-;;   (unless (eq roslisp::*node-status* :running)
-;;     (roslisp:start-ros-node "nav-action-client"))
-;;   (setf *nav-client* (actionlib:make-action-client
-;;                       "/move_base/move"
-;;                       "move_base_msgs/MoveBaseAction"))
-  
-;;   (roslisp:ros-info (nav-action-client) "waiting for Navigation Action server...")
-
-;;   (loop until
-;;         (actionlib:wait-for-server *nav-client*))
-;;   (roslisp:ros-info (nav-action-client) "Navigation action client created."))
-
 (defun init-nav-client ()
   "Initialize the navigation client"
   (unless (eq roslisp::*node-status* :running)
     (roslisp:start-ros-node "nav-action-client"))
-  ;;(setf *nav-client* (actionlib:make-action-client
-  ;;                    "/nav_fix"
   (setf *nav-client* (actionlib:make-action-client
                       "/move_base/move"
-                      "move_base_msgs/MoveBaseAction"))                      "move_base_msgs/MoveBaseAction"
+                      "move_base_msgs/MoveBaseAction"))                      
   
   (roslisp:ros-info (nav-action-client) "waiting for Navigation Action server...")
 
@@ -50,8 +34,7 @@
   (actionlib:make-action-goal (get-nav-action-client)
     target_pose pose-stamped-goal))
 
-(defun call-nav-action 
-    (x y euler-z &optional (frame-id "map"))
+(defun call-nav-action (x y euler-z &optional (frame-id "map"))
   "Calls the navigation action. Expected: x y coordinates within map, and
 euler-z gives the rotation around the z axis."
   (print "Nav action processed")

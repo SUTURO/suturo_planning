@@ -32,6 +32,7 @@
   (make-array (length list) :initial-contents list))
 
 ;;@autho Torge Olliges
+;; Takes an key value pair inform of an nlg-msg and calls the nlg server with it.
 (defun call-nlg-action (key-value-pairs)
 ""
     (multiple-value-bind (result status)
@@ -41,6 +42,7 @@
     (values result status)))
 
 ;;@autho Torge Olliges
+;;Gets a list of tuple and turns, turns them into nlg msgs and then calls nlg with the result. 
 (defun call-nlg-action-with-list (key-value-pair-lists-list)
     (call-nlg-action (mapcar 
         (lambda (key-value-list) 
