@@ -6,13 +6,14 @@
 (defparameter *grasp-action-timeout* 30.0 "in seconds")
 (defparameter *grasp-action-client* NIL)
 
-@author Jan Schimpf
+;;@author Jan Schimpf
 (defun get-grasp-action-client ()
   "returns the currently used grasp-action client. If none yet exists,
    creates one."
   (or *grasp-action-client*
       (init-grasp-action-client)))
 
+;;@author Jan Schimpf
 (defun init-grasp-action-client ()
   "initializes the grasp-action-client and makes sure it is connected to the
 action server."
@@ -25,7 +26,7 @@ action server."
 
   (roslisp:ros-info (grasp-action) "grasp action client created"))
 
-@author Jan Schimpf
+;;@author Jan Schimpf
 ;; NOTE most of these params have to be (vector ...)s 
 ;;Makes and returns an action client goal. It turns the point-x, point-y,
 ;;point-z and the quaternions into an \textbf{stamped pose} and size-x, size-y 
@@ -62,7 +63,7 @@ action server."
                   :z size-z)
     ))
 
-@author Jan Schimpf                                                 
+;;@author Jan Schimpf                                                 
 (defun ensure-grasp-goal-reached (status
                                   point-x-object
                                   point-y-object
@@ -81,7 +82,7 @@ action server."
   size-x size-y size-z
   T)
 
-@author Jan Schimpf
+;;@author Jan Schimpf
 ;;Takes the x, y, z coordinates where the object currently is, quaternion values which show how the object is oriented,
 ;;the x, y, z sizes of the object, the object-id of the object that should be grasped and the grasp mode. 
 (defun call-grasp-action (point-x-object

@@ -1,6 +1,6 @@
 (in-package :comf)
 
-
+;;@author Torge Olliges
 (defun announce-movement-to-surface (time surface)
   (llif::call-text-to-speech-action
      (llif::get-string-from-nlg-result
@@ -12,6 +12,7 @@
 
 (defun announce-movement-to-room (time room))
 
+;;@author Torge Olliges
 (defun announce-movement (time)
   (llif::call-text-to-speech-action
      (llif::get-string-from-nlg-result
@@ -20,6 +21,7 @@
         (list "time" time)
         (list "action" "move"))))))
 
+;;@author Torge Olliges
 (defun announce-grasp-action (time object)
   (llif::call-text-to-speech-action
      (llif::get-string-from-nlg-result
@@ -29,6 +31,7 @@
         (list "action" "grasp")
         (list "object_id" object))))))
 
+;;@author Torge Olliges
 (defun announce-place-action (time object)
   (llif::call-text-to-speech-action
      (llif::get-string-from-nlg-result
@@ -39,10 +42,12 @@
         (list "object_id" object)
         (list "goal_surface_id" (llif::prolog-object-goal object)))))))
 
+;;@author Torge Olliges
 (defun announce-plan-start (plan)
   (llif::call-text-to-speech-action
    (llif::call-nlg-action-simple "starting" plan)))
 
+;;@author Torge Olliges
 (defun announce-perceive-action-surface (time surface)
   (llif::call-text-to-speech-action
      (llif::get-string-from-nlg-result
@@ -52,6 +57,7 @@
         (list "action" "perceive")
         (list "goal_surface_id" surface))))))
 
+;;@author Torge Olliges
 (defun announce-perceive-action (time)
   (llif::call-text-to-speech-action
      (llif::get-string-from-nlg-result

@@ -3,7 +3,7 @@
 (defparameter *take-pose-action-timeout* 30.0 "in seconds")
 (defparameter *take-pose-action-client* NIL)
 
-@author Jan Schimpf
+;;@author Jan Schimpf
 (defun get-take-pose-action-client ()
   "returns the currently used take-pose-action client. If none yet exists,
    creates one." 
@@ -11,7 +11,7 @@
   (or *take-pose-action-client*
       (init-take-pose-action-client)))
 
-@author Jan Schimpf
+;;@author Jan Schimpf
 (defun init-take-pose-action-client ()
   "initializes the take_pose-action-client and makes sure it is connected to the
 action server."
@@ -23,7 +23,7 @@ action server."
         (actionlib:wait-for-server *take-pose-action-client*))
   (roslisp:ros-info (take-pose-action-client) "Take pose action client initialised"))
 
-@author Jan Schimpf
+;;@author Jan Schimpf
 ;;Makes and returns an action client goal. It turns the size-x, size-y and size-z into avector3.
 (defun make-take-pose-action-goal (pose-mode head-pan
                                    head-tilt arm-lift
@@ -48,7 +48,7 @@ action server."
                   :y py
                   :z pz)))
 
-@author Jan Schimpf
+;;@author Jan Schimpf
 (defun ensure-take-pose-goal-reached (status mode head-pan
                                       head-tilt arm-lift
                                       arm-flex arm-roll
@@ -69,7 +69,7 @@ action server."
   pz
   T)
 
-@author Jan Schimpf
+;;@author Jan Schimpf
 ;;This function takes an integer for a set pose or for a custom pose than needs ten more float values to set the joints.
 (defun call-take-pose-action (pose-mode &optional
                                           (head-pan 0.0) (head-tilt 0.0)
@@ -96,7 +96,7 @@ action server."
       (values result status)))
 
 
-@author Torge Olliges
+;;@author Torge Olliges
 ;;Gets the degree in which the head should be tilted and the x,y and z of the point that should be looked at.
 (defun call-take-gaze-pose-action (&key
                                      ((:head-tilt head-tilt) 0)

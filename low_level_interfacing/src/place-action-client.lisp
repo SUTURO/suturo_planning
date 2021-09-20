@@ -3,14 +3,14 @@
 (defparameter *place-action-timeout* 30.0 "in seconds")
 (defparameter *place-action-client* NIL)
 
-@author Jan schimpf
+;;@author Jan schimpf
 (defun get-place-action-client ()
   "returns the currently used move gripper client. If none yet exists,
    creates one."
  (or *place-action-client*
       (init-place-action-client)))
 
-@author Jan schimpf
+;;@author Jan schimpf
 (defun init-place-action-client ()
   "initializes the place-action-client and makes sure it is connected to the
 action server."
@@ -24,7 +24,7 @@ action server."
 
 ;; NOTE most of these params have to be (vector ...)s
 
-@author Jan schimpf
+;;@author Jan schimpf
 ;;Makes and returns an action client goal. It turns the point-x, point-y, point-z 
 ;;and the quaternions into a \textbf{stamped pos 
 (defun make-place-action-goal (point-x-object 
@@ -53,7 +53,7 @@ action server."
                                                           quaterion-value-3
                                                           quaterion-value-4)))))
 
-@author Jan schimpf                                                
+;;@author Jan schimpf                                                
 (defun ensure-place-action-goal-reached (status
                                          point-x-object 
                                          point-y-object 
@@ -71,7 +71,7 @@ action server."
   object-id grasp-mode
   T)
 
-@author Jan schimpf
+;;@author Jan schimpf
 ;;Takes the x, y, z coordinates where the object should be placed, quaternion values which show 
 ;;how the object is oriented and the object-id of the object that is placed and the grasp mode.
 (defun call-place-action (point-x-object 
