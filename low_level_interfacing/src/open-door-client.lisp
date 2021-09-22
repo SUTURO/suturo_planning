@@ -23,7 +23,7 @@ action server."
 
   (roslisp:ros-info (open-action) "open door client created"))
 
-@author Jan Schimpf
+;;@author Jan Schimpf
 ;;Makes and returns and action goal using the door id, door handle name 
 ;;from the tf tree and an angle. 
 (defun make-open-door-goal (door-id-name
@@ -48,7 +48,7 @@ action server."
   angle
   T)
 
-@author Jan Schimpf
+;;@author Jan Schimpf
 ;;Calls the server using the door id, door handle name and 
 ;;the angle to which degree the door should be open. 
 (defun call-open-action (door-id-name
