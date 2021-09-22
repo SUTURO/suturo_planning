@@ -24,7 +24,6 @@
           (+ *total-manipulation-time* (- (get-universal-time) *last-timestamp*)))
     (comf::announce-plan-start "clean up")
     
-    ;;(poi-search)
     
     (loop for room in (llif::prolog-all-rooms)
           do
@@ -65,7 +64,9 @@
                                *total-movement-time*))
                         
                         (comf::perceive-surface (car surface-info))
-                        (handle-detected-objects))))
+                        (handle-detected-objects)))
+  (poi-search))
+
   (roslisp::ros-info (execute-cleanup) "Plan execution took ~a seconds"
                      (- (get-universal-time) *start-time*))
   (roslisp::ros-info (execute-cleanup) "Of that ~a seconds were used for initialisation, ~a seconds were used for detection ~a seconds for movement and ~a seconds for manipulation actions the remaining ~a seconds were used for querying for information from the database"
