@@ -195,6 +195,7 @@
 ;;@author Philipp Klein
 (defun poi-search ()
   "approaching the next poi and bring the found object to the basket. When no poi is found, start the poi-search and loop the behavior."
+  (comf::move-hsr (cl-tf::make-pose-stamped "map" 0 (cl-tf::make-3d-vector 1 0.5 0) (cl-tf::make-quaternion 0 0 0 1)))
   (loop do
     (block continue
       ;;(llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
