@@ -6,17 +6,24 @@
 
 ;;@author Torge Olliges
 (defun execute-go-get-it()
-    (init-interfaces)
-    (loop for surface in (llif::prolog-go-get-it-surfaces)
-            do
-            (llif::prolog-set-surface-not-visited surface))
-    (comf::with-hsr-process-modules
-      (comf::get-motion-des-going-for-doors (list (list 2.51 0.9 0) (list 0 0 0.714223615142 0.699917586272)) nil)
-      (llif::call-take-pose-action 7)
-      (wait-for-orders)
-      (comf::get-motion-des-going-for-doors (list (list 1.916 3.557 0) (list 0 0 0.714223615142 0.699917586272)) nil)
-      (whenever (*fetch-fluent*)
-        (handle-fetch-request *fetch-fluent*)
+  (init-interfaces)
+  
+  (comf::with-hsr-process-modules
+    (loop for room in (llif::prolog-all-rooms)
+          do
+             (loop for surface in (llif::prolog-room-surfaces room)
+                   do
+                        (when
+                            (not
+                             (eq
+                              (search "Shelf" surface) nil))
+                          (llif::prolog-set-surface-not-visited surface))))
+    
+    (llif::call-take-pose-action 7)
+    (wait-for-orders)
+      
+    (whenever (*fetch-fluent*)
+      (handle-fetch-request *fetch-fluent*)
       (whenever (*deliver-fluent*)
         (handle-deliver-request *deliver-fluent*)
         (comf::get-motion-des-going-for-doors (list (list 1.916 3.557 0) (list 0 0 0.714223615142 0.699917586272)) nil)))
@@ -52,7 +59,8 @@
   (roslisp::with-fields (perceived_object_name)
       fetch-request
     (let ((room-id (llif::prolog-current-room))) 
-      (let ((object-id (llif::prolog-perceived-object-in-room->object-id perceived_object_name room-id)))
+      (let ((object-id
+              (llif::prolog-perceived-object-in-room->object-id perceived_object_name room-id)))
         (roslisp::ros-info (handle-fetch-request)
                            "Object ~a not yet known" perceived_object_name)
         (if (eq object-id nil)
@@ -90,7 +98,7 @@
   ;;(loop for surface-info in (llif::sort-surfaces-by-distance
   ;;                           (llif::prolog-room-surfaces (llif::prolog-current-room)))
   ;;                            (llif::prolog-surfaces-not-visited-in-room room-id))
-  (loop for surface-info in (llif::sort-surfaces-by-distance
+  (loop for surface-info in (comf::sort-surfaces-by-distance
                                         (llif::prolog-surfaces-not-visited-in-room
                                          room-id))
         do
@@ -115,7 +123,8 @@
            
            (roslisp:ros-info (find-object-in-room) 
                              "Object ~a wasn't on surface ~a" perceived_object_name (car surface-info))
-           (roslisp::ros-warn (find-object-in-room) "Object ~a wasn't found on any surface in room ~a" perceived_object_name room-id)
+           (roslisp::ros-warn (find-object-in-room)
+                              "Object ~a wasn't found on any surface in room ~a" perceived_object_name room-id)
            (return-from find-object-in-room (llif::prolog-next-object))))
 
 ;;@author Torge Olliges

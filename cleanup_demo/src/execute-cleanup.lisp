@@ -35,7 +35,7 @@
                              (surface-region-name (llif::prolog-surface-region surface)))
                         (when (and
                                (eq (search "Shelf"
-                                           surface-region-name) nil)
+                                           surface) nil)
                                (eq (search "bin"
                                            surface-region-name) nil)
                                (eq (search "tray"
