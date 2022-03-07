@@ -1,6 +1,7 @@
 (in-package :comf)
 (defparameter *poi-distance-threshold* 0.75)
 (defparameter *grasp-mode* nil)
+(defparameter *object-list* nil)
 
 ;;;; Navigation ;;;;
 
@@ -160,15 +161,20 @@
 (defun perceive-surface (surface-id)
   ;;(comf::announce-perceive-action-surface "present" surface-id)
   (let ((surface-pose (first (llif::prolog-surface-pose surface-id))))
-    (llif::call-take-gaze-pose-action
-                                 :px (first surface-pose)
-                                 :py (second surface-pose)
-                                 :pz (third surface-pose)))
-  (let* ((perceived-objects
+    ;;(llif::call-take-gaze-pose-action
+    ;;                             :px (first surface-pose)
+    ;;                             :py (second surface-pose)
+    ;;                             :pz (third surface-pose))
+    (llif::call-take-pose-action 2))
+  
+  (let* ((surface-region (llif::prolog-surface-region surface-id))
+         (perceived-objects
            (llif::call-robosherlock-object-pipeline
-            (vector "robocub_default") t))
+            (vector surface-region) t))
          (confident-objects (comf::get-confident-objects perceived-objects)))
-
+    ;;(print perceived-objects)
+    (print confident-objects)
+    (setf *object-list* confident-objects)
     (roslisp::with-fields (detectiondata)
           confident-objects
         (progn
@@ -189,6 +195,7 @@
     ;;      (+
     ;;       (- (get-universal-time) clean::*last-inner-timestamp*)
     ;;       clean::*total-manipulation-time*))
+    (print grasp-action-result)
     (roslisp::with-fields (error_code)
         grasp-action-result
       (if (eq error_code 1)

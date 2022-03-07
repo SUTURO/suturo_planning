@@ -62,10 +62,10 @@
                               (+
                                (- (get-universal-time) *last-timestamp*)
                                *total-movement-time*))
-                        
                         (comf::perceive-surface (car surface-info))
                         (handle-detected-objects)))
-  (poi-search))
+    ;;(poi-search)
+    )
 
   (roslisp::ros-info (execute-cleanup) "Plan execution took ~a seconds"
                      (- (get-universal-time) *start-time*))
@@ -120,8 +120,13 @@
        (let ((next-object (llif::prolog-next-object)))
          (when (or (eq next-object nil)
                    (eq next-object 1)) (return))
+         (print next-object)
          (let ((source-surface (llif::prolog-object-source next-object))
                (target-surface (llif::prolog-object-goal next-object)))
+           (print "Source-surface:")
+           (print source-surface)
+           (print "Target-surface:")
+           (print target-surface)
            (when (or (eq source-surface nil) (search "Floor" source-surface))
              (setf *last-inner-timestamp* (get-universal-time))
              (comf::move-hsr
@@ -150,6 +155,7 @@
                             (+
                              (- (get-universal-time) *last-inner-timestamp*)
                              *total-movement-time*)))
+        
            (deliver-object next-object target-surface source-surface)))))
 
 (defun deliver-object (next-object target-surface &optional source-surface)
@@ -206,11 +212,11 @@
             (return-from continue)))
 
       ;;(comf::announce-perceive-action "future")
-
-      (setf confident-objects
+        
+      (let ((confident-objects
             (comf::get-confident-objects
              (llif::call-robosherlock-object-pipeline (vector "robocup_default") t)
-             0.8))
+             0.8)))
 
 
       ;;percieve -> filter -> insert into knowledge
@@ -253,8 +259,9 @@
           (comf::place-object next-object 1)
           (comf::announce-place-action "past" next-object)
 
-          (llif::call-take-pose-action 1)))))))
+          (llif::call-take-pose-action 1))))))))
 
+;; used in cleanup
 (defun reset-timestamps ()
   (setf *start-time* 0)
   (setf *last-timestamp* 0)

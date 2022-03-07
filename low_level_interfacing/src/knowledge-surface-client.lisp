@@ -310,3 +310,18 @@
                                      (cdr
                                       (assoc '?context
                                              (cut:lazy-car raw-response)))))))))
+
+(defun prolog-surface-from-urdf (urdf-name)
+  (let ((raw-response (with-safe-prolog
+                        (json-prolog:prolog-simple
+                         (concatenate 'string
+                                      "has_urdf_name(OBJECT,'"
+                                      urdf-name
+                                      "')")
+                         :package :llif))))
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-surface-client)
+                          "Query didn't deliver_object_pose reach any solution.")
+        (remove-string +HSR-SURFACE-PREFIX+
+                       (string-trim "'"
+                                    (cdr (assoc '?object (cut:lazy-car raw-response))))))))

@@ -85,6 +85,7 @@
    #:prolog-object-goal
    #:prolog-object-supporting-surface
    #:prolog-object-goal-pose
+   #:prolog-temporary-storage-pose
    #:prolog-next-object
    #:prolog-object-dimensions
    #:prolog-object-pose
@@ -113,6 +114,7 @@
    #:prolog-set-surfaces-visit-state
    #:prolog-surfaces-not-visited
    #:prolog-surfaces-not-visited-in-room
+   #:prolog-surface-from-urdf
     
    ;;knowledge-tts-client
    #:prolog-perceived-object->object-id

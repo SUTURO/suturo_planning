@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>extended_cleanup_demo</name>
+  <version>0.0.0</version>
+  <description>The cleanup_demo package</description>
+
+  <maintainer email="tolliges@uni-bremen.de">Torge Olliges</maintainer>
+
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roslisp</build_depend>
+  <build_depend>cl_tf2</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_export_depend>roslisp</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <exec_depend>roslisp</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+
+
+
+  <export>
+
+  </export>
+</package>

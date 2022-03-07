@@ -1,7 +1,7 @@
 (in-package :comf)
 
 ;;@author Torge Olliges, Tom-Eric Lehmkuhl
-(defun get-confident-objects(perception-msg &optional (threshold 0.5))
+(defun get-confident-objects(perception-msg &optional (threshold 0.0))
   (roslisp::with-fields (detectiondata) perception-msg
     (roslisp::make-msg
      "SUTURO_PERCEPTION_MSGS/EXTRACTOBJECTINFORESULT"

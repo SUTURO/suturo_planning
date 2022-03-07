@@ -8,7 +8,7 @@
                     "Getting goal surface for object ~a." object-name)
   (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
          (raw-response (with-safe-prolog  
-                         (json-prolog:prolog-simple 
+                         (json-prolog:prolog-simple
                           (concatenate 'string 
                                        "object_goal_surface('"
                                        knowrob-name
@@ -17,9 +17,31 @@
          (surface (if (eq raw-response 1)
                       NIL
                       (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" (cdr (assoc '?surface (cut:lazy-car raw-response))))))))
+    ;;(print "raw-respose")
+    ;;(print raw-response)
     (or surface
         (roslisp:ros-warn (json-prolog-client)
                           "Query didn't object_goal_surface reach any solution."))))
+
+
+
+;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
+;;
+(defun prolog-temporary-storage-surface ()
+  "retruns the temporary storage location - currently the long_table"
+  (roslisp:ros-info (knowledge-object-client)
+                    "Getting temporary_storage_surface.")
+  (let* ((raw-response (with-safe-prolog  
+                         (json-prolog:prolog-simple "temporary_storage_surface(SURFACE)" :package :llif)))
+         (surface (if (eq raw-response 1)
+                      NIL
+                      (remove-string +HSR-SURFACE-PREFIX+ (string-trim "'" (cdr (assoc '?surface (cut:lazy-car raw-response))))))))
+    ;;(print "raw-respose")
+    ;;(print raw-response)
+    (or surface
+        (roslisp:ros-warn (json-prolog-client)
+                          "Query temporary_storage_surface didn't reach any solution."))))
+
 
 ;; @author Torge Olliges
 (defun prolog-object-source (object-name)
@@ -59,7 +81,27 @@
                           "Query object_goal_pose_offset didn't reach any solution.")
         (values-list `(,(cdr (assoc '?pose (cut:lazy-car raw-response)))
                        ,(string-trim "'" (cdr (assoc '?context
-                                              (cut:lazy-car raw-response)))))))))
+                                                     (cut:lazy-car raw-response)))))))))
+
+
+;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
+(defun prolog-temporary-storage-pose (object-name)
+  "returns the goal pose for an object name"
+  (roslisp:ros-info (knowledge-object-client)
+                    "Getting goal pose for object ~a." object-name)
+  (let* ((knowrob-name (format nil "~a~a" +hsr-objects-prefix+ object-name))
+         (raw-response (with-safe-prolog
+                         (json-prolog:prolog-simple
+                          (concatenate 'string "temporary_storage_pose('"
+                                       knowrob-name"', POSE).")
+                          :package :llif))))
+    (roslisp:ros-info (knowledge-object-client)
+                      "Goal pose for object ~a is ~a." object-name raw-response)
+     (print "1.1")
+    (if (eq raw-response 1)
+        (roslisp:ros-warn (knowledge-object-client)
+                          "Query object_goal_pose_offset didn't reach any solution.")
+        (cdr (assoc '?pose (cut:lazy-car raw-response))))))
                                               
 ;; @author Torge Olliges
 (defun prolog-next-object ()

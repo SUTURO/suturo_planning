@@ -6,11 +6,16 @@
 ;; Uses the object id to get needed information about the object
 ;; from knowledge and then uses this information to construct place motion-designator 
 
-(defun place-object (object-id grasp-pose)
+(defun place-object (object-id grasp-pose &optional (mode :cleanup))
   ;;get the information from knowledge
-  (let ((object-dimensions (llif:prolog-object-dimensions object-id))
-        (object-pose (list (first (llif:prolog-object-goal-pose object-id))
-                           (second (llif:prolog-object-goal-pose object-id)))))
+  
+  (let* ((object-dimensions (llif:prolog-object-dimensions object-id))
+         (prolog-goal-pose (if (equalp mode :cleanup)
+                               (llif:prolog-object-goal-pose object-id)
+                               (llif:prolog-temporary-storage-pose object-id)))
+         (object-pose (list (first prolog-goal-pose)
+                            (second prolog-goal-pose))))
+     (print "2")
     (roslisp::ros-info (place-object) "Placing at ~a" (car object-pose))
     ;;takes apart the messages for the needed information to consturct the place motion-designator 
     (let* ((?point-x-object (first (first object-pose)))
@@ -25,7 +30,7 @@
            (?size-z (third object-dimensions))
            (?object-id object-id)
            (?grasp-mode grasp-pose)
-        ;; construct the motion designator      
+        ;; construct the motion designator
         (place (desig:a motion
                    (:type :placing)
                    (:point-x ?point-x-object)
@@ -40,8 +45,15 @@
                    (:size-z ?size-z)
                    (:object-id ?object-id)
                    (:grasp-mode ?grasp-mode))))
-        ;; executes the motion designator for place
-        (exe:perform place))))
+      (ros-info (place-object) "Placing with ~a" place)
+      (print place)
+      
+      ;; executes the motion designator for place
+      (exe:perform place))))
+
+
+
+
 
 
 

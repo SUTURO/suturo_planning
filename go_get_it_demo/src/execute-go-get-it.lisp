@@ -18,14 +18,20 @@
                              (eq
                               (search "Shelf" surface) nil))
                           (llif::prolog-set-surface-not-visited surface))))
-    
+
+    (print "Test")
     (llif::call-take-pose-action 7)
+    (print "Changed pose.")
     (wait-for-orders)
-      
+    (print "Waiting for orders.")
     (whenever (*fetch-fluent*)
+      (print "Fetch request recieved.")
       (handle-fetch-request *fetch-fluent*)
+      (print "Fetch request handled.")
       (whenever (*deliver-fluent*)
+        (print "Deliver request recieved.")
         (handle-deliver-request *deliver-fluent*)
+	(print "Deliver request handled.")
         (comf::get-motion-des-going-for-doors (list (list 1.916 3.557 0) (list 0 0 0.714223615142 0.699917586272)) nil)))
     ;; move to predefined location
     ;; (move-to-start-position)
@@ -39,7 +45,7 @@
 
 ;;@author Torge Olliges
 (defun wait-for-orders()
-  ;;(llif::call-take-pose-action 1)
+  (llif::call-take-pose-action 1)
   (subscribe "/fetch_request" "nlp_msgs/GoAndGetIt" #'set-fetch-fluent)
   (subscribe "/deliver_request" "nlp_msgs/GoAndGetIt" #'set-deliver-fluent))
 
@@ -115,7 +121,7 @@
                  (object-id
                    (llif::prolog-perceived-object-in-room->object-id
                     perceived_object_name
-                    (llif::prolog-current-room)))))
+                    (llif::prolog-current-room))))
            (roslisp::ros-info (find-object-in-room) "Trying to find ~a in room ~a" object-id room-id)
            (when object-id
              (roslisp::ros-info (find-object-in-room) "Object ~a found as ~a" perceived_object_name object-id)
@@ -125,7 +131,7 @@
                              "Object ~a wasn't on surface ~a" perceived_object_name (car surface-info))
            (roslisp::ros-warn (find-object-in-room)
                               "Object ~a wasn't found on any surface in room ~a" perceived_object_name room-id)
-           (return-from find-object-in-room (llif::prolog-next-object))))
+           (return-from find-object-in-room (llif::prolog-next-object)))))
 
 ;;@author Torge Olliges
 (defun retrieve-object-from-room (object-id room-id)

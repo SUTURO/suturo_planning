@@ -1,9 +1,8 @@
-(in-package :clean)
+(in-package :eclean)
 
 (defparameter *tf-listener* nil)
 (defparameter *planning-node* nil)
 
-;; used in cleanup
 ;;Init all interface clients and start a ros node
 (defun init-interfaces()
   "Init all interfaces from planning to other groups"
