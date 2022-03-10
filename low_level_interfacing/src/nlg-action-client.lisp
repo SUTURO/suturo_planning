@@ -9,6 +9,7 @@
     (or *nlg-action-client*
         (init-nlg-action-client)))
 
+;; used in cleanup
 ;;@autho Torge Olliges
 (defun init-nlg-action-client ()
 "initializes the nlg-action-client and makes sure it is connected to the action server."
@@ -19,6 +20,7 @@
                                            *nlg-action-timeout*))
     (roslisp:ros-info (nlg-action-client) "nlg action client created"))
 
+;; used in cleanup
 ;;@autho Torge Olliges
 (defun make-nlg-action-goal (key-value-pairs)
     "Creates the make-plan-action-goal."  
@@ -27,10 +29,12 @@
         :key_value_pairs (make-array (length key-value-pairs)
         :initial-contents key-value-pairs)))
 
+;; used in cleanup
 ;;@autho Torge Olliges
 (defun key-value-list->key-value-array (list)
   (make-array (length list) :initial-contents list))
 
+;; used in cleanup
 ;;@autho Torge Olliges
 ;; Takes an key value pair inform of an nlg-msg and calls the nlg server with it.
 (defun call-nlg-action (key-value-pairs)
@@ -41,20 +45,12 @@
     (roslisp:ros-info (nlg-action-client) "language generation action finished")
     (values result status)))
 
-;;@autho Torge Olliges
-;;Gets a list of tuple and turns, turns them into nlg msgs and then calls nlg with the result. 
-(defun call-nlg-action-with-list (key-value-pair-lists-list)
-    (call-nlg-action (mapcar 
-        (lambda (key-value-list) 
-            (make-key-value-msg 
-                (nth 0 key-value-list) 
-                (nth 1 key-value-list))) 
-        key-value-pair-lists-list)))
-
+;; used in cleanup
 ;;@autho Torge Olliges
 (defun make-key-value-msg (key value)
     (roslisp:make-msg "nlg_msgs/KeyValuePair" :key key :value value))
 
+;; used in cleanup
 ;;@autho Torge Olliges
 (defun get-string-from-nlg-result (nlg-result)
     (roslisp:with-fields 
@@ -65,6 +61,7 @@
             generated_sentence)
         data))
 
+;; used in cleanup
 ;;@autho Torge Olliges
 (defun call-nlg-action-simple (key value)
     (get-string-from-nlg-result

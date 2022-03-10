@@ -28,16 +28,19 @@
 
   (init-poi))
 
+;; used in cleanup
 (defun get-planning-node ()
   (or *planning-node*
       (init-planning)))
 
+;; used in cleanup
 (defun init-navigation()
  "Initialize only local nodes for working without the real robot."
   ;;Init action clients
   (roslisp:ros-info (init-interfaces) "init navigation action client")
   (llif::init-nav-client))
 
+;; used in cleanup
 (defun init-knowledge()
   ;;Init action clients
   (roslisp:ros-info (init-interfaces) "init knowledge client")
@@ -45,6 +48,7 @@
   ;;(llif::prolog-set)
   )
 
+;; used in cleanup
 (defun init-manipulation()
   "Initialize only local nodes for working without the real robot."
   
@@ -72,6 +76,7 @@
 
   )
 
+;; used in cleanup
 (defun init-perception()
  "Initialize only local nodes for working without the real robot."
 
@@ -81,14 +86,16 @@
   ;;(roslisp:ros-info (init-clients) "init robosherlock plane action client")
   ;;(llif::init-robosherlock-plane-action-client))
 
-(defun init-tts()
-  ;;init action client
-  (llif::init-text-to-speech-action-client))
+;; (defun init-tts()
+;;   ;;init action client
+;;   (llif::init-text-to-speech-action-client))
 
+;; used in cleanup
 (defun init-nlg()
   (roslisp:ros-info (init-interfaces) "init nlg action client")
   (llif::init-nlg-action-client))
 
+;; used in cleanup
 (defun init-poi()
   ;;init action client
   (llif::init-search-map)
@@ -96,7 +103,7 @@
   (llif::point-listener)
   (llif::obstacle-map-listener))
 
-
+;; used in cleanup
 (defun init-planning()
   "Initialize only local nodes for working without the real robot."  
   ;;start rosnode named planning_node

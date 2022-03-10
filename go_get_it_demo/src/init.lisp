@@ -22,6 +22,7 @@
   (init-perception)
 
   ;;(init-nlg)
+  
   (init-knowledge)
 
   ;;(init-tts)
@@ -29,21 +30,25 @@
   ;;(init-poi)
   )
 
+;;used in go-get-it
 (defun get-planning-node ()
   (or *planning-node*
       (init-planning)))
 
+;;used in go-get-it
 (defun init-navigation()
  "Initialize only local nodes for working without the real robot."
   ;;Init action clients
   (roslisp:ros-info (init-interfaces) "init navigation action client")
   (llif::init-nav-client))
 
+;;used in go-get-it
 (defun init-knowledge()
   ;;Init action clients
   (roslisp:ros-info (init-interfaces) "init knowledge client")
   (llif::init-knowledge-action-client))
 
+;;used in go-get-it
 (defun init-manipulation()
   "Initialize only local nodes for working without the real robot."
   
@@ -66,6 +71,7 @@
   (roslisp:ros-info (init-interfaces) "init make plan action client")
   (llif::init-make-plan-action-client))
 
+;;used in go-get-it
 (defun init-perception()
  "Initialize only local nodes for working without the real robot."
 
@@ -82,14 +88,14 @@
 (defun init-nlg()
   (roslisp:ros-info (init-interfaces) "init nlg action client")
   (llif::init-nlg-action-client))
-  
+
 (defun init-poi()
   ;;init action client
   (roslisp:ros-info (init-interfaces) "init point of interest scanning")
   (llif::point-listener)
   (llif::obstacle-map-listener))
 
-
+;;used in go-get-it
 (defun init-planning()
   "Initialize only local nodes for working without the real robot."  
   ;;start rosnode named planning_node

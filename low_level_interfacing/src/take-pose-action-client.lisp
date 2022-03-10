@@ -3,6 +3,7 @@
 (defparameter *take-pose-action-timeout* 30.0 "in seconds")
 (defparameter *take-pose-action-client* NIL)
 
+;; used in cleanup
 ;;@author Jan Schimpf
 (defun get-take-pose-action-client ()
   "returns the currently used take-pose-action client. If none yet exists,
@@ -11,6 +12,7 @@
   (or *take-pose-action-client*
       (init-take-pose-action-client)))
 
+;; used in cleanup
 ;;@author Jan Schimpf
 (defun init-take-pose-action-client ()
   "initializes the take_pose-action-client and makes sure it is connected to the
@@ -23,6 +25,7 @@ action server."
         (actionlib:wait-for-server *take-pose-action-client*))
   (roslisp:ros-info (take-pose-action-client) "Take pose action client initialised"))
 
+;; used in cleanup
 ;;@author Jan Schimpf
 ;;Makes and returns an action client goal. It turns the size-x, size-y and size-z into avector3.
 (defun make-take-pose-action-goal (pose-mode head-pan
@@ -48,6 +51,7 @@ action server."
                   :y py
                   :z pz)))
 
+;; used in cleanup
 ;;@author Jan Schimpf
 (defun ensure-take-pose-goal-reached (status mode head-pan
                                       head-tilt arm-lift
@@ -69,6 +73,7 @@ action server."
   pz
   T)
 
+;; used in cleanup
 ;;@author Jan Schimpf
 ;;This function takes an integer for a set pose or for a custom pose than needs ten more float values to set the joints.
 (defun call-take-pose-action (pose-mode &optional
@@ -95,7 +100,7 @@ action server."
                                    py pz)
       (values result status)))
 
-
+;; used in cleanup
 ;;@author Torge Olliges
 ;;Gets the degree in which the head should be tilted and the x,y and z of the point that should be looked at.
 (defun call-take-gaze-pose-action (&key

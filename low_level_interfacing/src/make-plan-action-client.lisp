@@ -9,6 +9,7 @@
   (or *make-plan-client*
       (init-make-plan-action-client)))
 
+;; used in cleanup
 (defun init-make-plan-action-client ()
   "initializes the make-plan-action-client and makes sure it is connected to the
 action server."

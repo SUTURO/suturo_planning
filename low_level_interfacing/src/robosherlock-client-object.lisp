@@ -5,6 +5,7 @@
 (defparameter *robosherlock-action-timeout* 30.0 "in seconds")
 (defparameter *robosherlock-door-client* NIL)
 
+;; used in cleanup
 (defun init-robosherlock-object-action-client ()
     "initializes the RoboSherlock client"
     (roslisp:ros-info 
@@ -23,6 +24,7 @@
         (init-robosherlock-client)
         "Robosherlock action client for ~a created." "'extract_object_infos'"))
 
+;; used in cleanup
 (defun get-robosherlock-client ()
     "returns a RoboSherlock client if one already exists. Creates one otherwise."
     (unless *robosherlock-object-action-client*
@@ -33,9 +35,10 @@
 (defun make-action-goal (in-regions in-visualize)
     (actionlib::make-action-goal 
         (get-robosherlock-client)
-        :regions in-regions
-        :visualize in-visualize))
+      :regions in-regions
+      :visualize in-visualize))
 
+;; used in cleanup
 ;;@author Torge Olliges
 (defun call-robosherlock-object-pipeline (regions-value  viz-value)
     "Calls the RoboSherlock pipeline. Triggers perception to perceive.

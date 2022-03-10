@@ -4,6 +4,7 @@
 
 (defvar *nav-client* nil)
 
+;; used in cleanup
 (defun init-nav-client ()
   "Initialize the navigation client"
   (unless (eq roslisp::*node-status* :running)

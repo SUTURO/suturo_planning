@@ -20,6 +20,7 @@
   "Create a text-to-speech action goal with the given text"
   (format t "Text:~%"))
 
+;; used in cleanup
 (defun call-text-to-speech-action (text)
   "Calls the text to speech action to perform the given text"
   (when *enable-speech*

@@ -7,7 +7,7 @@
 (defparameter *total-detection-time* 0)
 (defparameter *total-manipulation-time* 0)
 
-
+;; used in cleanup
 (defun execute-cleanup ()
   (reset-timestamps)
   (setf *start-time* (get-universal-time))
@@ -81,38 +81,9 @@
                         *total-init-time*)))
 
 
-;;(defun robocup-floor-check ()
-;;  (let ((nav-pose (cl-tf2::make-pose-stamped
-;;                   "map"
-;;                   0
-;;                   (cl-tf2::make-3d-vector 0.3567 0.744 0)
-;;                   (cl-tf2::q* (cl-tf2::make-quaternion 0 0 0 1)
-;;                      (cl-tf2::euler->quaternion
-;;                       :ax 0
-;;                       :ay 0
-;;                       :az (/ pi 1.5)))))
-;;        (nav-pose-grasp (cl-tf2::make-pose-stamped
-;;                         "map"
-;;                         0
-;;                         (cl-tf2::make-3d-vector 0.3567 0.744 0)
-;;                         (cl-tf2::q* (cl-tf2::make-quaternion 0 0 0 1)
-;;                                     (cl-tf2::euler->quaternion
-;;                                      :ax 0
-;;                                      :ay 0
-;;                                      :az 0.75))))
-;;        (look-at-pose (llif::prolog-surface-pose (first (llif::prolog-cleanup-surfaces)))))
-;;    (comf::move-hsr nav-pose)
-;;    (llif::call-take-gaze-pose-action
-;;     :px (first (first look-at-pose))
-;;     :py (second (first look-at-pose))
-;;     :pz 0)
-;;    (let ((detected-objects (llif::call-robosherlock-object-pipeline (vector "robocup_default") t)))
-;;      (llif::insert-knowledge-objects (comf::get-confident-objects detected-objects))
-;;      (llif::call-take-pose-action 1)
-;;      (comf::move-hsr nav-pose-grasp)
-;;      (handle-detected-objects))))
-    
 
+    
+;; used in cleanup
 ;;@author Torge Olliges
 (defun handle-detected-objects ()
   (loop
@@ -158,6 +129,7 @@
         
            (deliver-object next-object target-surface source-surface)))))
 
+;; used in cleanup
 (defun deliver-object (next-object target-surface &optional source-surface)
   (progn
       ;;(comf::announce-grasp-action "future" next-object)
@@ -198,68 +170,7 @@
            (- (get-universal-time) *last-inner-timestamp*)
            *total-manipulation-time*)))
 
-;;@author Philipp Klein
-(defun poi-search ()
-  "approaching the next poi and bring the found object to the basket. When no poi is found, start the poi-search and loop the behavior."
-  (comf::move-hsr (cl-tf::make-pose-stamped "map" 0 (cl-tf::make-3d-vector 1 0.5 0) (cl-tf::make-quaternion 0 0 0 1)))
-  (loop do
-    (block continue
-      ;;(llif::call-text-to-speech-action "I have found a point of interest to search.") ;;replace with NLG command
-      (let ((poi-pos (comf::move-to-poi)))
-      (if (not poi-pos)
-          (progn
-            (comf::move-hsr (llif::find-biggest-unsearched-space T))
-            (return-from continue)))
 
-      ;;(comf::announce-perceive-action "future")
-        
-      (let ((confident-objects
-            (comf::get-confident-objects
-             (llif::call-robosherlock-object-pipeline (vector "robocup_default") t)
-             0.8)))
-
-
-      ;;percieve -> filter -> insert into knowledge
-        (llif::call-take-pose-action 1)
-
-        (roslisp::with-fields (detectiondata)
-          confident-objects
-        (progn
-          (roslisp::ros-info (poi-search) "Number of objects detected: ~a" (length detectiondata))
-          (if (> (length detectiondata) 0)
-              (llif::insert-knowledge-objects confident-objects)
-              (progn
-                (llif::poi-remover (cl-tf::origin poi-pos) 0.4)
-                (return-from continue)))))
-
-
-        (let ((next-object (llif::prolog-next-object)))
-          (when (eq next-object 1)
-            (progn(llif::poi-remover (cl-tf::origin poi-pos) 0.4) (return-from continue)))
-          
-      ;; turn to face the object
-      (roslisp::with-fields (translation rotation)
-        (cl-tf::lookup-transform cram-tf::*transformer* "map" "base_footprint")
-        (llif::call-nav-action-ps 
-            (cl-tf::make-pose-stamped "map" 0 translation
-                (cl-tf::q* rotation
-                           (cl-tf::euler->quaternion :ax 0 :ay 0 :az (- (/ pi 2)))))))
-      
-        (let ((object-goal (llif::prolog-object-goal next-object)))
-          (comf::announce-grasp-action "future" next-object)
-          (llif::call-take-pose-action 1)
-          
-          (comf::grasp-handling next-object)
-          (comf::announce-movement  "future")
-          (comf::move-to-surface object-goal nil)
-          
-          ;;place object at goal surface
-          (comf::announce-place-action "present" next-object)
-          
-          (comf::place-object next-object 1)
-          (comf::announce-place-action "past" next-object)
-
-          (llif::call-take-pose-action 1))))))))
 
 ;; used in cleanup
 (defun reset-timestamps ()

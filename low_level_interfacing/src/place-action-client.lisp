@@ -8,8 +8,9 @@
   "returns the currently used move gripper client. If none yet exists,
    creates one."
  (or *place-action-client*
-      (init-place-action-client)))
+     (init-place-action-client)))
 
+;; used in cleanup
 ;;@author Jan schimpf
 (defun init-place-action-client ()
   "initializes the place-action-client and makes sure it is connected to the

@@ -27,5 +27,6 @@ include_directories(
 
 
 add_lisp_executable(
-execute-cleanup cleanup-demo clean::execute-cleanup
+  execute-cleanup cleanup-demo clean::execute-cleanup
+  new-execute-cleanup cleanup-demo clean::new-execute-cleanup
 )

@@ -13,6 +13,7 @@
   (or *grasp-action-client*
       (init-grasp-action-client)))
 
+;; used in cleanup
 ;;@author Jan Schimpf
 (defun init-grasp-action-client ()
   "initializes the grasp-action-client and makes sure it is connected to the

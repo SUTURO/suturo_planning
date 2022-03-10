@@ -1,5 +1,6 @@
 (in-package :comf)
 
+;; used in cleanup
 ;;@author Torge Olliges, Tom-Eric Lehmkuhl
 (defun get-confident-objects(perception-msg &optional (threshold 0.0))
   (roslisp::with-fields (detectiondata) perception-msg

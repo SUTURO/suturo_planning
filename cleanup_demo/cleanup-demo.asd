@@ -11,6 +11,7 @@
             ((:file "package")
              (:file "init" :depends-on ("package"))
              ;;execute cleanup depends on init
-             (:file "execute-cleanup" :depends-on ("package"))
+             ;;(:file "execute-cleanup" :depends-on ("package"))
+             (:file "new-execute-cleanup" :depends-on ("package"))
              ;;(:file "cleanup-bw" :depends-on ("package"))
              ))))

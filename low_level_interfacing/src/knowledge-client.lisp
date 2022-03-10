@@ -100,6 +100,7 @@
         (roslisp:ros-warn (json-prolog-client)
                           "Query didn't reach any solution."))))
 
+;; used in cleanup
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-in-gripper ()
   "returns the object in the gripper"
@@ -126,19 +127,6 @@
                'string "get_surface_id_by_name (table_2_center, TABLE),"
                "forget_objects_on_surface(TABLE).")
               :package :llif))))))
-
-;; @author Jan Schimpf
-;; ask knowledge for how the object should be grasped 
-;; 1 for grasping from front and 2 for grasping from the top
-;;(defun prolog-object-grasp-mode (object-id))
-;;    "Asking knowledge what graspmode to use"
-;;    (roslisp:ros-info (json-prolog-client) "Asking knowledge what graspmode to use")
-;;    (let* ((raw-response
-;;           (with-safe-prolog
-;;             (json-prolog:prolog-simple 
-;;               
-;;              :package :llif))))))  
-
 
 ;;; former planning_communication/json-prolog.lisp
 #+deprecated

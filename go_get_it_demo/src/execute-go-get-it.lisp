@@ -4,6 +4,7 @@
 (defparameter *fetch-fluent* (make-fluent :value nil))
 (defparameter *deliver-fluent* (make-fluent :value nil))
 
+;;used in go-get-it
 ;;@author Torge Olliges
 (defun execute-go-get-it()
   (init-interfaces)
@@ -37,26 +38,24 @@
     ;; (move-to-start-position)
 ))
 
-;;@author Torge Olliges
-(defun move-to-start-position()
-  (setf *starting-position* (cl-tf2::transform-stamped->pose-stamped
-                             (cl-tf2::lookup-transform cram-tf:*transformer* "map" "base_footprint")))
-  (setf *starting-room* (llif::prolog-current-room)))
-
+;;used in go-get-it
 ;;@author Torge Olliges
 (defun wait-for-orders()
   (llif::call-take-pose-action 1)
   (subscribe "/fetch_request" "nlp_msgs/GoAndGetIt" #'set-fetch-fluent)
   (subscribe "/deliver_request" "nlp_msgs/GoAndGetIt" #'set-deliver-fluent))
 
+;;used in go-get-it
 (defun set-fetch-fluent(fetch-request)
   (roslisp::ros-info (set-fetch-fluent) "Setting fetch fluent to ~a" fetch-request)
   (setf (value *fetch-fluent*) fetch-request))
 
+;;used in go-get-it
 (defun set-deliver-fluent(deliver-request)
   (roslisp::ros-info (set-deliver-fluent) "Setting deliver fluent to ~a" deliver-request)
   (setf (value *deliver-fluent*) deliver-request))
 
+;;used in go-get-it
 ;;@author Torge Olliges
 (defun handle-fetch-request (fetch-request)
   (setf fetch-request (value fetch-request))
@@ -76,6 +75,7 @@
             (retrieve-object-from-room object-id room-id)))))
   (setf (values *fetch-fluent*) nil))
 
+;;used in go-get-it
 (defun handle-deliver-request (deliver-request)
   (setf deliver-request (value deliver-request))
   (roslisp::ros-info (handle-fetch-request) "Handling deliver request: ~a" deliver-request)
@@ -94,9 +94,10 @@
                    (llif::prolog-deliver-object-pose "right")))
             (roslisp::ros-warn (handle-deliver-request) "Deliver pose not set to person right"))))
   (comf::move-hsr *deliver-pose*)
-  (llif::call-take-pose-action 6);;)
+  (llif::call-take-pose-action 6)
   (setf (value *deliver-fluent*) nil))
 
+;;used in go-get-it
 ;;@author Torge Olliges
 (defun find-object-in-room (perceived_object_name room-id)
   (print "find object in room")
@@ -133,6 +134,7 @@
                               "Object ~a wasn't found on any surface in room ~a" perceived_object_name room-id)
            (return-from find-object-in-room (llif::prolog-next-object)))))
 
+;;used in go-get-it
 ;;@author Torge Olliges
 (defun retrieve-object-from-room (object-id room-id)
     ;;(or (eq (llif::prolog-current-room) room-id)

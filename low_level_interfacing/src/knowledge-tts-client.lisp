@@ -1,5 +1,6 @@
 (in-package :llif)
 
+;;used in go-get-it
 ;; @author Torge Olliges
 (defun prolog-perceived-object-in-room->object-id (perceived-object room-id)
   (roslisp:ros-info (knowledge-tts-client)

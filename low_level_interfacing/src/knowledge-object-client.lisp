@@ -24,9 +24,8 @@
                           "Query didn't object_goal_surface reach any solution."))))
 
 
-
+;; used in tableclean
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
-;;
 (defun prolog-temporary-storage-surface ()
   "retruns the temporary storage location - currently the long_table"
   (roslisp:ros-info (knowledge-object-client)
@@ -42,7 +41,7 @@
         (roslisp:ros-warn (json-prolog-client)
                           "Query temporary_storage_surface didn't reach any solution."))))
 
-
+;; used in cleanup
 ;; @author Torge Olliges
 (defun prolog-object-source (object-name)
   "returns the supporting surface of an object"
@@ -65,6 +64,7 @@
         (roslisp:ros-warn (knowledge-object-client)
                           "Query didn't find_supporting_surface reach any solution."))))
 
+;; used in cleanup
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-goal-pose (object-name)
   "returns the goal pose for an object name"
@@ -84,6 +84,7 @@
                                                      (cut:lazy-car raw-response)))))))))
 
 
+;; used in cleanup
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-temporary-storage-pose (object-name)
   "returns the goal pose for an object name"
@@ -102,7 +103,8 @@
         (roslisp:ros-warn (knowledge-object-client)
                           "Query object_goal_pose_offset didn't reach any solution.")
         (cdr (assoc '?pose (cut:lazy-car raw-response))))))
-                                              
+
+;; used in cleanup
 ;; @author Torge Olliges
 (defun prolog-next-object ()
  "returns the next object to grasp"
@@ -200,6 +202,7 @@
                           "Query object_reason_goal_pose didn't next_object reach any solution.")
         answer)))
 
+;; used in cleanup
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-dimensions (object-name)
   "returns the dimensions of an object as list with '(depth width height)"
@@ -222,6 +225,7 @@
         (roslisp:ros-warn (knowledge-object-client)
                           "Query object_dimensions didn't reach any solution."))))
 
+;; used in cleanup
 ;; @author Tom-Eric Lehmkuhl, based on the code from suturo18/19
 (defun prolog-object-pose (object-name)
   "returns the pose of an object"
@@ -292,7 +296,7 @@
                        (lambda (x) (string-trim "'" x))
                        (cdr (assoc '?Objects (cut:lazy-car raw-response)))))))))
 
-
+;; used in cleanup
 (defun prolog-set-object-handled (object-id)
   (let* ((knowrob-name (format nil "~a~a" +HSR-OBJECTS-PREFIX+ object-id))
         (raw-response (with-safe-prolog

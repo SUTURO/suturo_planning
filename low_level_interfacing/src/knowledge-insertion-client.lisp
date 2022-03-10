@@ -4,6 +4,7 @@
 (defvar *knowledge-action-client* NIL)
 (defparameter *knowledge-action-timeout* 30.0 "in seconds")
 
+;; used in cleanup
 (defun init-knowledge-action-client ()
   "initializes the Knowledge insertion client"
   (roslisp:ros-info (knowledge-client)
@@ -23,7 +24,7 @@
     (init-knowledge-action-client))
   *knowledge-action-client*)
 
-
+;; used in cleanup
 (defun insert-knowledge-objects (detected-objects)
   "Expects The ObjectDetectionData Msg as Input and insert the Objects to the Knowledge Database"
   (roslisp:ros-info (knowledge-client) "Sending object detection msg to knowledge.")

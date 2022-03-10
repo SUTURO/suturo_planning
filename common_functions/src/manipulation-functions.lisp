@@ -1,11 +1,11 @@
 (in-package :comf)
 
+;; used in cleanup
 ;;@author Jan Schimpf
 ;; Gets the object-id of the object that should be place and
 ;; the grasp pose for how the object was grasped.
 ;; Uses the object id to get needed information about the object
 ;; from knowledge and then uses this information to construct place motion-designator 
-
 (defun place-object (object-id grasp-pose &optional (mode :cleanup))
   ;;get the information from knowledge
   
@@ -56,12 +56,11 @@
 
 
 
-
+;; used in cleanup
 ;;@author Jan Schimpf
 ;; Gets the object-id of the object that should be grasped and
 ;; the grasp pose for how the object should be grasped
 ;; Uses the object id to get needed information about the object
-
 (defun grasp-object (object-id grasp-pose)
   ;;get the information from knowledge
   (let* ((object-dimensions (llif:prolog-object-dimensions object-id))
