@@ -21,8 +21,7 @@
   ;; move robot up and down
   (cram-prolog:<- (desig:motion-grounding ?designator (move-torso ?height))
     (desig:desig-prop ?designator (:type :moving-torso))
-    (desig:desig-prop ?designator (:height ?height))
-    )
+    (desig:desig-prop ?designator (:height ?height)))
   
   ;;;;;;;;;;;;;;;;;;;; NECK ;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -113,6 +112,45 @@
     (desig:desig-prop ?designator (:object-id ?object-id))
     (desig:desig-prop ?designator (:grasp-mode ?grasp-mode)))
 
+   ;;@author Felix Krause
+   (cram-prolog:<- (desig:motion-grounding ?designator (wiping ?point-x
+                                                               ?point-y ?point-z
+                                                               ?quaternion-value-1
+                                                               ?quaternion-value-2
+                                                               ?quaternion-value-3
+                                                               ?quaternion-value-4))
+      (desig:desig-prop ?designator (:type :wiping))
+      (desig:desig-prop ?designator (:point-x ?point-x))
+      (desig:desig-prop ?designator (:point-y ?point-y))
+      (desig:desig-prop ?designator (:point-z ?point-z))
+      (desig:desig-prop ?designator (:quaterion-value-1 ?quaternion-value-1))
+      (desig:desig-prop ?designator (:quaterion-value-2 ?quaternion-value-2))
+      (desig:desig-prop ?designator (:quaterion-value-3 ?quaternion-value-3))
+      (desig:desig-prop ?designator (:quaterion-value-4 ?quaternion-value-4)))
+
+
+  ;;@author Felix Krause
+  (cram-prolog:<- (desig:motion-grounding ?designator (openclose ?point-x
+                                                            ?point-y ?point-z
+                                                            ?quaternion-value-1
+                                                            ?quaternion-value-2
+                                                            ?quaternion-value-3
+                                                            ?quaternion-value-4
+      							    ?mode
+							    ?name))
+    (desig:desig-prop ?designator (:type :openclose))
+    (desig:desig-prop ?designator (:point-x ?point-x))
+    (desig:desig-prop ?designator (:point-y ?point-y))
+    (desig:desig-prop ?designator (:point-z ?point-z))
+    (desig:desig-prop ?designator (:quaternion-value-1 ?quaternion-value-1))
+    (desig:desig-prop ?designator (:quaternion-value-2 ?quaternion-value-2))
+    (desig:desig-prop ?designator (:quaternion-value-3 ?quaternion-value-3))
+    (desig:desig-prop ?designator (:quaternion-value-4 ?quaternion-value-4))
+    (desig:desig-prop ?designator (:mode ?mode))
+    (desig:desig-prop ?designator (:name ?name)))
+
+
+  
   (cram-prolog:<- (desig:motion-grounding ?designator (perceiving ?pose ?weight
                                                                  ?width ?height
                                                                  ?depth ?modus))
@@ -157,5 +195,4 @@
   ;;;;;;;;;;;;;;;;;;;; PERCEPTION ;;;;;;;;;;;;;;;;;;;;;;;;
   (cram-prolog:<- (desig:motion-grounding ?designator (perceive ?surface-name))
     (desig:desig-prop ?designator (:type :perceive))
-    (desig:desig-prop ?designator (:surface ?surface-name)))
-)
+    (desig:desig-prop ?designator (:surface ?surface-name))))

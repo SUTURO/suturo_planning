@@ -17,12 +17,12 @@
   *text-to-speech-action-client*)
 
 (defun make-text-action-goal (text)
-  "Create a text-to-speech action goal with the given text"
+  "Receives a text `text'. Create a text-to-speech action goal with `text'."
   (format t "Text:~%"))
 
 ;; used in cleanup
 (defun call-text-to-speech-action (text)
-  "Calls the text to speech action to perform the given text"
+  "Receives a text `text'. Calls the text to speech action to perform  `text'."
   (when *enable-speech*
     (multiple-value-bind (result status)
         (let ((actionlib:*action-server-timeout* 10.0))
@@ -35,4 +35,6 @@
       result))
   ;; print text on terminal, if speech is disabled (in simulator)
   (unless *enable-speech*
-    (roslisp:ros-info (text-to-speech-action-client) "~A" text)))
+    (roslisp:ros-info (text-to-speech-action-client)
+                      "~A"
+                      text)))

@@ -4,15 +4,12 @@
 
 ;;@author Philipp Klein
 (defun closest-poi (point)
-  "returns the closest poi in relation to the given point
-  `point' the point which is taken as source for the distance measurement"
+  "Receives point `point'. Returns the closest poi in relation to the given `point'."
   (closest-point-in-list point *poi*))
 
 ;;@author Philipp Klein
 (defun closest-point-in-list (point stampedList)
-	"returns the closest point in relation of the given point
-  `point' the point which is taken as source for the distance measurement
-  `stampedList' the list of points to be sorted"
+  "Receives point `point' and list `stampedList'. Returns the closest point in `stampedList' in relation of `point'."
   (cond
     ((null stampedList) nil)
     ((null (rest stampedList)) (first stampedList))
@@ -23,44 +20,40 @@
       (cl-tf::v-dist (cl-tf::origin point)
                      (cl-tf::origin (second stampedList))))
      (closest-point-in-list point (cons (first stampedList) 
-                                     (rest (rest stampedList)))))
+                                        (rest (rest stampedList)))))
     (t (closest-point-in-list point (rest stampedList))))) 
 
 ;;@author Philipp Klein
 (defun sorted-poi-by-distance (point)
-  "sort the poi list by the distance to the given point
-  `point' the point which is taken as source for the distance measurement"
+  "Receives point `point'. Sort the poi list by the distance to `point'."
   (sorted-stamped-by-distance point *poi*))
 
 ;;@author Philipp Klein
 (defun sorted-stamped-by-distance (point list)
-  "sort a list stamped poses by the distance to the given point
-  `point' the point which is taken as source for the distance measurement
-  `list' the list of points to be sorted"
+  "Receives point `point' and list `list'. Sort `list' by the distance to `point'."
   (sort (copy-list (remove-if #'null list))
         (lambda (ers zwei) 
           (< 
            (cl-tf::v-dist point
                           (cl-tf::origin ers)) 
            (cl-tf::v-dist point
-                          (cl-tf::origin zwei))) )))
+                          (cl-tf::origin zwei))))))
 
 ;;@author Philipp Klein
 (defun add-stamped-poi (stamped)
-  "add a stamped pose to the list of pois
-  `stamped' the point to be added"
-	(defparameter *poi* (append *poi* (list stamped))))
+  "Receives stamped pose `stamped'. Add `stamped' to the list of pois."
+  (defparameter *poi* (append *poi* (list stamped))))
 
 ;;@author Philipp Klein
 (defun point-listener ()
-  "subscribe to bject_finder and call the callback function add-poi-from-topic"
+ "Subscribe to object\_finder and call the callback function add-poi-from-topic."
   (subscribe "/object_finder/object_finder" "geometry_msgs/PoseArray" #'add-poi-from-topic)
-  (roslisp:ros-info (poi-subscriber) "POI Subscriber started"))
+  (roslisp:ros-info (poi-subscriber)
+                    "POI Subscriber started"))
 
 ;;@author Philipp Klein
 (defun add-poi-from-topic (poseArrayMsg)
-  "save the given points to the parameter poi
-  `poseArrayMsg' the message to be saved"
+  "Receives message  `poseArrayMsg'. Save `poseArrayMsg' to the parameter poi."
   (llif::mark-position-visited 0.7)
   (llif::publish-debug-search-map)
   (defparameter *poi* (list()))
@@ -68,5 +61,7 @@
     (mapcar 
      (lambda (arg) 
        (add-stamped-poi
-        (cl-tf::pose->pose-stamped "map" 0.0 (cl-tf::from-msg arg))))
+        (cl-tf::pose->pose-stamped
+         "map" 0.0
+         (cl-tf::from-msg arg))))
      (coerce poses 'list))))

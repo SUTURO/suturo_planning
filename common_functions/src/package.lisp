@@ -12,6 +12,10 @@
    #:move-to-shelf
    #:move-to-bucket
 
+   ;;time-measurement
+   #:measure-time
+   #:announce-final-time
+
    ;;perception-functions
    #:get-confident-objects
    #:looking

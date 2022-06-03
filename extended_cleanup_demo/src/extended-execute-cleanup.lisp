@@ -2,6 +2,8 @@
 
 (defparameter *surface-to-clean* "tall_table:table:table_center")
 
+
+;;; @author Felix Krause
 (defun extended-execute-cleanup ()
   (init-interfaces)
   
@@ -53,6 +55,9 @@
         
            (deliver-object next-object target-surface source-surface)))))
 
+
+
+
 (defun deliver-object (next-object target-surface &optional source-surface)
   (progn
       ;;(comf::announce-grasp-action "future" next-object)
@@ -83,3 +88,9 @@
 
 
 
+
+
+
+
+
+                

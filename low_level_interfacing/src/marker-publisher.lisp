@@ -6,16 +6,18 @@
 
 
 (defun init-marker-publisher()
+  "Initializes marker-publisher."
   (setf *marker-publisher*
-          (roslisp:advertise "~location_marker" "visualization_msgs/Marker")))
+        (roslisp:advertise "~location_marker" "visualization_msgs/Marker")))
 
 (defun get-marker-publisher ()
+  "Returns the current marker-publisher. If none exists, one is created."
   (unless *marker-publisher*
     (init-marker-publisher))
   *marker-publisher*)
 
 (defun publish-marker-pose (pose &key (parent "map") id (g 0.0))
-  "gets a cl-tf:pose and places a visualization marker at the given pose"
+  "Receives pose `pose'. Places a visualization marker at `pose'."
   (let ((point (cl-transforms:origin pose))
         (rot (cl-transforms:orientation pose))
         (current-index 0))

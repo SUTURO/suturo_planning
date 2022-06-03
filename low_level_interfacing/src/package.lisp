@@ -115,7 +115,7 @@
    #:prolog-surfaces-not-visited
    #:prolog-surfaces-not-visited-in-room
    #:prolog-surface-from-urdf
-    
+   
    ;;knowledge-tts-client
    #:prolog-perceived-object->object-id
    #:prolog-perceived-room->room-id
@@ -140,7 +140,7 @@
    #:make-action-goal-door
    #:call-robosherlock-door-pipeline
 
-  ;;process-module
+   ;;process-module
 
 
-))
+   ))

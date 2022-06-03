@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(cleanup_demo)
+project(wipe_demo)
 
 find_package(catkin REQUIRED COMPONENTS
   roslisp
@@ -27,8 +27,5 @@ include_directories(
 
 
 add_lisp_executable(
-  execute-cleanup cleanup-demo clean::execute-cleanup
-)
-add_lisp_executable(
-  new-execute-cleanup cleanup-demo clean::new-execute-cleanup
+execute-wipe wipe-demo wipe::execute-wipe
 )

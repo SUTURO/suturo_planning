@@ -9,11 +9,11 @@
 
 ;; @author Tom-Eric Lehmkuhl
 (defun dynamic-command-listener ()
-    (subscribe "/clock" "rosgraph_msgs/Clock" #'print))
+  (subscribe "/clock" "rosgraph_msgs/Clock" #'print))
 
 ;; @author Tom-Eric Lehmkuhl
 (defun set-state-fluent (msg)
-  "Callback for static-commands, called by static-command-listener."
+  "Receives message `msg'. Callback for static-commands, called by static-command-listener."
   ;;(print "Get message")
   (roslisp::with-fields (command) msg 
     (if (eq command 1)

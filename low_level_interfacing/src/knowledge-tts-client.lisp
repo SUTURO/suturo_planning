@@ -3,8 +3,11 @@
 ;;used in go-get-it
 ;; @author Torge Olliges
 (defun prolog-perceived-object-in-room->object-id (perceived-object room-id)
+  "Receives perceived object `perceived-object' and room ID `room-id'. Asks Knowledge for the object ID of `perceived-object'."
   (roslisp:ros-info (knowledge-tts-client)
-                    "Getting object id for perceived object ~a in room ~a" perceived-object room-id)
+                    "Getting object id for perceived object ~a in room ~a"
+                    perceived-object
+                    room-id)
   (let* ((room-knowrob-name (format nil "~a~a" +HSR-ROOMS-PREFIX+ room-id))
          (raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
@@ -21,12 +24,14 @@
                           "Query didn't surface_in_room reach any solution.")
         (return-from prolog-perceived-object-in-room->object-id nil))
       (remove-string +HSR-OBJECTS-PREFIX+ 
-                     (string-trim "'" (cdr (assoc '?Object (cut:lazy-car raw-response))))))
-    ))
+                     (string-trim "'" (cdr (assoc '?Object (cut:lazy-car raw-response))))))))
 
 ;; @author Torge Olliges
 (defun prolog-perceived-room->room-id (perceived-room)
-  (roslisp:ros-info (knowledge-tts-client) "Getting room id for perceived room ~a" perceived-room)
+  "Receives perceived room `perceived-room'. Asks Knowledge for the room ID of `perceived-room'"
+  (roslisp:ros-info (knowledge-tts-client)
+                    "Getting room id for perceived room ~a"
+                    perceived-room)
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog-simple
                           (concatenate 'string
@@ -41,8 +46,11 @@
 
 ;;@author Torge Olliges
 (defun prolog-perceived-object-in-furniture->object-id (perceived-object furniture-id)
+  "Receives perceived object `perceived-object' and furniture ID `furniture-id'. Asks Knowledge for the object ID of `perceived-object'"
   (roslisp:ros-info (knowledge-tts-client)
-                    "Getting object id for perceived object ~a in furniture ~a" perceived-object furniture-id)
+                    "Getting object id for perceived object ~a in furniture ~a"
+                    perceived-object
+                    furniture-id)
   (let* ((furniture-knowrob-name (format nil "~a~a" +HSR-ROOMS-PREFIX+ furniture-id))
          (raw-response (with-safe-prolog
                          (json-prolog:prolog-simple

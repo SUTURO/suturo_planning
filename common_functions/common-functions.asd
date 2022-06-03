@@ -11,7 +11,19 @@
                cram-process-modules
                cram-language-designator-support
                cram-executive
-               low-level-interfacing)
+               low-level-interfacing
+               trajectory_msgs-msg
+               actionlib_msgs-msg
+               control_msgs-msg
+               controller_manager_msgs-msg
+               sensor_msgs-msg
+               nav_msgs-msg
+               manipulation_msgs-msg
+               navigation_msgs-msg
+               geometry_msgs-msg
+               std_msgs-msg
+               move_base_msgs-msg
+               )
   :components
   ((:module "src"
             :components
@@ -26,6 +38,7 @@
              (:file "select-process-modules" :depends-on("package"))
 	     (:file "process-modules" :depends-on("package"))
              ;;high level plans depends on every other file in here
-             (:file "high-level-plans" :depends-on("package"))
+             (:file "high-level-plans" :depends-on("package" "time-measurement"))
+	     (:file "time-measurement" :depends-on("package"))
 	     (:file "safety-check" :depends-on("package"))
 	     (:file "tts-functions" :depends-on("package"))))))
