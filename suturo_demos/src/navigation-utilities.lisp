@@ -1,6 +1,7 @@
 (in-package :su-demos)
 
-;;used in go-get-it
+(defvar *nav-client* nil)
+
 ;;@author Torge Olliges, Phillip Klein
 (defun try-movement-stamped-list (listStamped)
   "Receives a list of stamped poses `listStamped'. Tries out all poses in the bulletworld simulation and returns a possible pose."
@@ -29,10 +30,6 @@
           ?actual-nav-pose)))))
 
 
-;;Navigation client, move this later
-(defvar *nav-client* nil)
-
-;; used in cleanup
 (defun init-nav-client ()
   "Initialize the navigation client"
   (unless (eq roslisp::*node-status* :running)

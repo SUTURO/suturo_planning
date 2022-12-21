@@ -2,6 +2,7 @@
 
 ;; roslaunch sutuuro_demos ....launch
 ;; Add all necessary init functions for suturo here, starting with the startup function
+;; Not ready for proper usage yet
 (defun init-projection ()
   ;; (setf cram-tf:*transformer* (make-instance 'cl-tf2:buffer-client))
   (setf cram-tf:*tf-default-timeout* 0.5) ; projection tf is very fast
@@ -14,5 +15,4 @@
 
 
 
-(roslisp-utilities:register-ros-init-function init-projection)
-)
+  (roslisp-utilities:register-ros-init-function init-projection))

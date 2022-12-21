@@ -26,8 +26,7 @@
 
   (cram-prolog:<- (cpm:available-process-module hsr-navigation))
   
-  (cram-prolog:<- 
-      (cpm:matching-process-module ?desig  hsr-navigation)
+  (cram-prolog:<- (cpm:matching-process-module ?desig  hsr-navigation)
     (desig:desig-prop ?desig (:type :going))))
 
 
@@ -42,8 +41,7 @@
     (desig:desig-prop ?designator (:type :going))
     (desig:desig-prop ?designator (:x ?x))
     (desig:desig-prop ?designator (:y ?y))
-    (desig:desig-prop ?designator (:angle ?angle)))
-  )
+    (desig:desig-prop ?designator (:angle ?angle))))
 
 ;; ------
 (prolog:def-fact-group giskard-pm (cpm:matching-process-module
@@ -60,8 +58,7 @@
         (desig:desig-prop ?motion-designator (:type :moving-custom))
         (desig:desig-prop ?motion-designator (:type :looking))
         (desig:desig-prop ?motion-designator (:type :closing-gripper))
-        (desig:desig-prop ?motion-designator (:type :opening-gripper))
-        ))
+        (desig:desig-prop ?motion-designator (:type :opening-gripper))))
 
   (prolog:<- (cpm:available-process-module giskard:giskard-pm)
     (prolog:not (cpm:projection-running ?_))))

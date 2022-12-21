@@ -2,8 +2,17 @@
 
 ;; @author Luca Krohm
 ;; If called with mode "nav" it will only test the navigation part of the demo
-;; If called with mode "perc" it will only test the perception+manipulation part of the demo
+;; If called with mode "perc" it will only test the first perception part of the demo
+;; If called with mode "mani" it will only test the first manipulation part of the demo, using fake perception poses
+;; If called with mode "perc2" it will only test the second perception part of the demo
+;; If called with mode "mani2" it will only test the second manipulation part of the demo, using fake perception poses
 ;; If called with mode "all" it will test the whole demo
+;;
+;; IMPORTANT:
+;; This parameterization is working, but its WIP. Thinking of writing a macro for it or using another alternative
+;; So far it worked in speeding up our testing, since we dont constantly have to add and remove stuff from the
+;; code to test specific parts, although this also has its limits, for example we currently cant test perception
+;; and manipulation with just one call, without using 'all', which obviously also triggers navigation
 (defun set-the-table-demo(mode)
   (with-hsr-process-modules
     (unwind-protect
@@ -37,10 +46,7 @@
                     (?source-perceived-object-desig
                       (exe:perform (desig:an action
                                              (type detecting)
-                                             (object ?source-object-desig))))
-                    (?grasp-type 0)
-                    (?open-drawer 1))
-                  ;; (?pose (perceive-handle-closed)))
+                                             (object ?source-object-desig)))))
               
                ;;Extracts pose from the return value of the detecting Designator.
                (roslisp:with-fields 
@@ -48,53 +54,68 @@
                      (cram-designators::pose cram-designators:data))) 
                    ?source-perceived-object-desig
 
-                 ;;Moves the gripper to the cereal box, implicitly opens the gripper beforehand.
-                 (exe:perform (desig:a motion
-                                       (type :moving-tcp)
-                                       (box-pose ?pose)
-                                       (grasp-type ?grasp-type)
-                                       (collision-mode :allow-all)))
+                 (when (or (string-equal mode "all")
+                           (string-equal mode "mani"))
+                 
+                   ;;Moves the gripper to the cereal box, implicitly opens the gripper beforehand.
+                   (let* ((?grasp-type 0)
+                          (?open-drawer 1)
+                          (?pose (cond ((string-equal mode "mani") (perceive-handle-closed))
+                                         (t ?pose))))
+                     (exe:perform (desig:a motion
+                                           (type :moving-tcp)
+                                           (box-pose ?pose)
+                                           (grasp-type ?grasp-type)
+                                           (collision-mode :allow-all)))
 
-                 ;;Function call that closes/opens the gripper. We are aware that this should not stay this way. We ran
-                 ;;into unexpected error messages when calling the designator opening-gripper/closing-gripper,
-                 ;;so we decided to keep this custom call the way it was as there is no point to creating a
-                 ;; redundand gripper designator
-                 (giskard::call-custom-gripper-action :open-gripper 0)
+                     ;;Function call that closes/opens the gripper. We are aware that this should not stay this way. We ran
+                     ;;into unexpected error messages when calling the designator opening-gripper/closing-gripper,
+                     ;;so we decided to keep this custom call the way it was as there is no point to creating a
+                     ;; redundand gripper designator
+                     (giskard::call-custom-gripper-action :open-gripper 0)
 
-                 ;;Here we only open the gripper for demo/test purposes, as long as the drawer gets stuck
-                 ;;when trying to open it. As soon as that is fixed we can just remove this line
-                 (giskard::call-custom-gripper-action :open-gripper 1)
+                     ;;Here we only open the gripper for demo/test purposes, as long as the drawer gets stuck
+                     ;;when trying to open it. As soon as that is fixed we can just remove this line
+                     (giskard::call-custom-gripper-action :open-gripper 1)
 
-                 ;; Opens the drawer by driving backwards and retracting the arm a little bit
-                 (exe:perform (desig:a motion
-                                       (type :moving-tcp)
-                                       (knob-pose ?pose)
-                                       (open-drawer ?open-drawer)
-                                       (collision-mode :allow-all))))
+                     ;; Opens the drawer by driving backwards and retracting the arm a little bit
+                     (exe:perform (desig:a motion
+                                           (type :moving-tcp)
+                                           (knob-pose ?pose)
+                                           (open-drawer ?open-drawer)
+                                           (collision-mode :allow-all))))))))
 
-               ;; Detects the drawer handle, the drawer handle is defined as "cup" for testing purposes,
-               ;; will be changed in the future. Calls detecting Designator.
-               (let* ((?source-object-desig
-                        (desig:an object
-                                  (type :cup)))
-                      (?source-perceived-object-desig
-                        (exe:perform (desig:an action
-                                               (type detecting)
-                                               (object ?source-object-desig))))  
-                      (?open-drawer 1))
-                   ;;(?pose (perceive-handle-opened)))
+           (when (or (string-equal mode "all")
+                     (string-equal mode "perc2"))
+
+             ;; Detects the drawer handle, the drawer handle is defined as "cup" for testing purposes,
+             ;; will be changed in the future. Calls detecting Designator.
+             (let* ((?source-object-desig
+                      (desig:an object
+                                (type :cup)))
+                    (?source-perceived-object-desig
+                      (exe:perform (desig:an action
+                                             (type detecting)
+                                             (object ?source-object-desig)))))
               
-                 ;;Extracts pose from the return value of the detecting Designator.
-                 (roslisp:with-fields 
-                     ((?pose
-                       (cram-designators::pose cram-designators:data))) 
-                     ?source-perceived-object-desig
+               ;;Extracts pose from the return value of the detecting Designator.
+               (roslisp:with-fields 
+                   ((?pose
+                     (cram-designators::pose cram-designators:data))) 
+                   ?source-perceived-object-desig
 
+                   (when (or (string-equal mode "all")
+                             (string-equal mode "perc2")
+                             (string-equal mode "mani2"))
+                   
                    ;; Opens the drawer by driving forwards and extending the arm a little bit
-                   (exe:perform (desig:a motion
-                                         (type :moving-tcp)
-                                         (knob-pose ?pose)
-                                         (open-drawer ?open-drawer)
-                                         (collision-mode :allow-all))))))))
+                     (let* ((?open-drawer 1)
+                            (?pose (cond ((string-equal mode "mani2") (perceive-handle-opened))
+                                         (t ?pose))))
+                       (exe:perform (desig:a motion
+                                             (type :moving-tcp)
+                                             (knob-pose ?pose)
+                                             (open-drawer ?open-drawer)
+                                             (collision-mode :allow-all)))))))))
       (roslisp-utilities:shutdown-ros))))
          
