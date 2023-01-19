@@ -9,7 +9,7 @@
 - git:
     local-name: suturo_resources
     uri:   https://github.com/SUTURO/suturo_resources.git
-    version: master
+    version: robocup
 - git:
     local-name: snap_map_icp
     uri:  https://github.com/code-iai/snap_map_icp.git 
@@ -21,4 +21,8 @@
 - git:
     local-name: hsr_description
     uri:  https://github.com/Plexiglas/hsr_description.git
+    version: master
+- git:
+    local-name: roslisp
+    uri: https://github.com/janschimpf/roslisp.git
     version: master

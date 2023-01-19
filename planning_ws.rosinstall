@@ -1,7 +1,7 @@
 - git:
     local-name: suturo_planning
     uri:  https://github.com/SUTURO/suturo_planning.git 
-    version: master
+    version: wipe
 - git:
     local-name: iai_maps
     uri:  https://github.com/code-iai/iai_maps.git
@@ -9,7 +9,7 @@
 - git:
     local-name: cram
     uri:  https://github.com/Plexiglas/cram
-    version: boxy-melodic
+    version: noetic
 - git:
     local-name: genlisp
     uri:  https://github.com/ros/genlisp.git
