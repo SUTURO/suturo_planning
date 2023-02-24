@@ -1,7 +1,7 @@
 (in-package :su-demos)
 
-;;@author Felix Krause, Tim Rienits
-(defun cleanup-demo ()
+;;@author Tim Rienits, Felix Krause
+(defun clean-the-table-demo ()
   (roslisp-utilities:startup-ros)
   (with-hsr-process-modules
     (unwind-protect
@@ -54,3 +54,49 @@
                                      (open-drawer ?open-drawer)
                                      (collision-mode :allow-all))))))
                (roslisp-utilities:shutdown-ros))))
+
+
+;;@author Tim Rienits
+(defun clean-the-table-demo-bw ()
+  
+  (roslisp-utilities:startup-ros)
+   (urdf-proj:with-simulated-robot
+           (unwind-protect
+                (progn
+                  ;;(init-interfaces)
+                  (terpri)
+                  (format T "!PLAN WIRD GESTARTET!")
+                  (terpri)
+                  (spawn-pringles-on-table)
+                  (move-in-front-of-pringles)
+                  (pick-up-the-pringles)
+                  ))))
+
+(defun spawn-pringles-on-table ()
+  "Spawn primitive cylinder as :pringles item."
+    (btr:add-object btr:*current-bullet-world* :cylinder-item 'cylinder-1
+                    '((1.6 -1.4 0.787) (0 0 1 1))
+                    :mass 0.2 :size (cl-transforms:make-3d-vector 0.03 0.03 0.08)
+                    :item-type :pringles))
+
+(defun move-in-front-of-pringles ()
+  "Move in front of les pringles."
+  (let* ((vector  (cl-tf2::make-3d-vector 1.0d0 -1.4d0 0d0))
+         (rotation (cl-tf2::make-quaternion 0.0 0.0 0.0 1.0)))
+    
+    (move-hsr (cl-tf2::make-pose-stamped "map" 0 vector rotation))
+    ))
+
+(defun pick-up-the-pringles ()
+  "Detect and pick up les pringles."
+  (let*((?pringles-desig
+                    (desig:an object
+                              (type :pringles)))
+       (?perceived-object-desig
+                    (exe:perform (desig:an action
+                                           (type detecting)
+                                           (object ?pringles-desig)))))
+    
+    (exe-perform-type :picking-up :arm :left :object ?perceived-object-desig)))
+
+  

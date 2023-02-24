@@ -1,11 +1,12 @@
-(in-package :su-demos)
+(in-package :su-real)
 
 ;;All of the following is Designator/PM stuff.
 (defmacro with-hsr-process-modules (&body body)
   "Receives a body of lisp code `body'. Runs the code contained in `body' with all the necessary process modules"
   `(cram-process-modules:with-process-modules-running
        (hsr-navigation
-        giskard::giskard-pm common-desig:wait-pm
+        ;;giskard::giskard-pm
+        common-desig:wait-pm
         rk:robokudo-perception-pm)
      (cpl-impl::named-top-level (:name :top-level),@body)))
 

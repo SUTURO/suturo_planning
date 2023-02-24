@@ -1,5 +1,37 @@
 (in-package :su-demos)
 
+(defun bullet-test()
+  (roslisp:start-ros-node "bullet_world")
+  (cram-occupancy-grid-costmap::init-occupancy-grid-costmap)
+  (cram-bullet-reasoning-belief-state::ros-time-init)
+  (cram-location-costmap::location-costmap-vis-init)
+  (cram-tf::init-tf)
+  (let ((robot-urdf
+          (cl-urdf:parse-urdf
+           (roslisp:get-param "robot_description"))))
+    (prolog:prolog
+     `(and (btr:bullet-world ?world)
+           (btr:debug-window ?world)
+           (cram-robot-interfaces:robot ?robot)
+           (assert (btr:object ?world :urdf ?robot ((0 0 0) (0 0 0 1)) :urdf ,robot-urdf))
+           ;; (-> (rob-int:robot-joint-states ?robot :arm :left :park ?left-joint-states)
+           ;;     (assert (btr:joint-state ?world ?robot ?left-joint-states))
+           ;;     (true))
+           )))
+  (let ((kitchen-urdf 
+          (cl-urdf:parse-urdf 
+           (roslisp:get-param "kitchen_description"))))
+    (prolog:prolog
+     `(and (btr:bullet-world ?world)
+           (assert (btr:object ?world :urdf :kitchen ((0 0 0) (0 0 0 1))
+                                            :urdf ,kitchen-urdf
+                                            :collision-group :static-filter
+                                            :collision-mask (:default-filter :character-filter)
+                                            :compound T)))))
+
+  
+  )
+
 ;; @author Luca Krohm
 ;; If called with mode "nav" it will only test the navigation part of the demo
 ;; If called with mode "perc" it will only test the first perception part of the demo
@@ -72,11 +104,11 @@
                      ;;into unexpected error messages when calling the designator opening-gripper/closing-gripper,
                      ;;so we decided to keep this custom call the way it was as there is no point to creating a
                      ;; redundand gripper designator
-                     (giskard::call-custom-gripper-action :open-gripper 0)
+                     ;;(giskard::call-custom-gripper-action :open-gripper 0)
 
                      ;;Here we only open the gripper for demo/test purposes, as long as the drawer gets stuck
                      ;;when trying to open it. As soon as that is fixed we can just remove this line
-                     (giskard::call-custom-gripper-action :open-gripper 1)
+                     ;;(giskard::call-custom-gripper-action :open-gripper 1)
 
                      ;; Opens the drawer by driving backwards and retracting the arm a little bit
                      (exe:perform (desig:a motion

@@ -23,17 +23,22 @@ action server."
   (setf *take-pose-action-client*
         (actionlib:make-action-client "/take_pose_server"
                                       "manipulation_msgs/TakePoseAction"))
+  ;; (setf *take-pose-action-client*
+  ;;       (actionlib:make-action-client "/milestone0_server"
+  ;;                                     "manipulation_msgs/TakePoseAction"))
   (loop until
         (actionlib:wait-for-server *take-pose-action-client*))
   (roslisp:ros-info (take-pose-action-client)
                     "Take pose action client initialised"))
 
+;;(roslisp-utilities:register-ros-init-function init-take-pose-action-client)
 
-(defun make-giskard-action-client ()
-  (actionlib-client:make-simple-action-client
-   'takepose-action
-   "/take_pose_server" "manipulation_msgs/TakePoseAction"
-   120))
+;; (defun make-giskard-action-client ()
+;;   (actionlib-client:make-simple-action-client
+;;    'takepose-action
+;;    "/take_pose_server" "manipulation_msgs/TakePoseAction" 
+;;    ;; "/milestone0_server" "manipulation_msgs/TakePoseAction"
+;;    120))
 
 ;; (roslisp-utilities:register-ros-init-function make-giskard-action-client)
 
@@ -148,3 +153,8 @@ uses the optional values to create a custom pose."
                       head-tilt)
     (ensure-take-pose-goal-reached status 5 0 0 0 0 0 0 0 px py pz)
     (values result status)))
+
+
+
+(defun take-default ()
+  (call-take-pose-action 1))

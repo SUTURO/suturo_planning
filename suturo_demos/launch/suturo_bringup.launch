@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="publish_environment" default="true" />
+  <arg name="env_model_yaml" default="rw_lab_master_2022.yaml" />
+  <arg name="upload_hsrb" default="false" /> <!-- Set true if robot has publishes faulty robot_description -->
+  <arg name="publish_joint_state" default="false" />
+  <arg name="upload_map" default="true" />
+  <arg name="run_snap_map" default="true" />
+  <arg name="use_rviz" default="false"/>
+
+  
+ 
+   <!-- URDF OF THE ENVIORNMENT -->
+  <group if="$(eval arg('publish_environment') == true)">
+    <include file="$(find suturo_resources)/urdf/launch/urdf.launch" pass_all_args="true" >
+      <arg name="world_urdf_yaml" value="$(arg env_model_yaml)"/>
+    </include>
+  </group>
+
+  <!-- occupancy map -->
+  <group if="$(eval arg('upload_map') == true)">
+    <node name="map_server" pkg="map_server" type="map_server" args="/home/suturo/maps/map3-door-open-cleaned.yaml" />
+  </group>  
+  
+  <!-- kitchen URDF 
+  <param name="kitchen_description"
+         command="$(find xacro)/xacro '$(find iai_kitchen)/urdf_obj/iai_kitchen_python.urdf.xacro'"/>
+  <node pkg="joint_state_publisher" type="joint_state_publisher"
+        name="kitchen_joint_state_publisher" output="screen">
+    <remap from="robot_description" to="kitchen_description"/>
+    <param name="rate" value="25"/>
+    <param name="use_gui" value="False"/>
+    <remap from="joint_states" to="kitchen/joint_states" />
+  </node>
+  <node pkg="tf" type="static_transform_publisher" name="kitchen_link_broadcaster"
+        args="0 0 0 0 0 0 /map /iai_kitchen/world 25">
+  </node>
+  <node pkg="robot_state_publisher" type="robot_state_publisher"
+    name="kitchen_state_publisher" output="screen">
+    <param name="tf_prefix" value="iai_kitchen"/>
+    <param name="publish_frequency" value="25"/>
+    <remap from="robot_description" to="kitchen_description" />
+    <remap from="joint_states" to="kitchen/joint_states" />
+  </node>-->
+
+  <!-- HSRB URDF -->
+  <group if="$(arg upload_hsrb)">
+    <param name="robot_description"
+           command="$(find xacro)/xacro
+                    '$(find hsr_description)/robots/hsrb4s.urdf.xacro'"/>
+  </group>
+
+  <group if="$(arg publish_joint_state)">
+    <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_base_footprint_broadcaster" args="0 0 0 0 0 0 map base_footprint"/>
+    <node pkg="joint_state_publisher" type="joint_state_publisher"
+          name="robot_joint_state_publisher" output="screen">
+      <param name="rate" value="25"/>
+      <param name="use_gui" value="False"/>
+    </node>
+    <node pkg="robot_state_publisher" type="robot_state_publisher"
+          name="robot_state_publisher" output="screen">
+      <param name="publish_frequency" value="25"/>
+    </node>
+  </group>
+
+  <group if="$(eval arg('use_rviz') == true)">
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find suturo_resources)/rviz_configs/suturo.rviz" />
+  </group>
+ 
+
+  <!-- TF buffer server -->
+  <node pkg="tf2_ros" type="buffer_server" name="tf_server" output="screen" />
+
+  <!-- IK solver --> 
+  <include file="$(find kdl_ik_service)/launch/kdl_ik.launch" />
+
+  <group if="$(eval arg('run_snap_map') == true)">
+    <node pkg="snap_map_icp" type="snap_map_icp" name="snap_map_icp" output="screen">
+      <!-- remap topics for map and laser scans -->
+      <remap from="~base_scan" to="/hsrb/base_scan_unlimited"/>
+      <remap from="~map" to="/static_obstacle_map_ref"/>
+
+      <!-- relevant scan frames -->
+      <param name="odom_frame" value="/odom"/>
+      <param name="base_laser_frame" value="/base_range_sensor_link"/>
+
+      <!-- defines minimum fitness for candidates for pose publishing -->
+      <param name="icp_fitness_threshold" value="10"/>
+   
+      <!-- accept only scans one second old or younger -->
+      <param name="age_threshold" value="20"/>
+      <param name="update_age_threshold" value="1"/>
+
+      <!-- thresholds over distance btw amcl icp pose to trigger pose publishing -->
+      <!-- translation -->
+      <param name="dist_threshold" value="0.01"/>
+      <!-- rotation -->
+      <param name="angle_threshold" value="0.01"/>
+      <param name="angle_upper_threshold" value="1"/>
+
+      <!-- various icp parameters -->
+      <!-- consult with icp algorithm from pcl for details -->
+      <param name="icp_inlier_threshold" value="0.1"/>
+      <param name="icp_inlier_dist" value="0.1"/>
+      <param name="icp_num_iter" value="500"/>
+
+      <!-- who knows??? -->
+      <param name="pose_covariance_trans" value="0.5"/>
+
+      <!-- rate at which scans are taken -->
+      <param name="scan_rate" value="4"/>
+    </node>
+  </group>
+</launch>

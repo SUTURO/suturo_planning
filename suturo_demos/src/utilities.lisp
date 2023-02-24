@@ -70,3 +70,53 @@
     "map" 0
     (cl-tf2::make-3d-vector 0.18888034742219937d0 0.10079838556398194d0 0.2854991327720375d0)
     (cl-tf2::make-quaternion 0.0 0.0 0.0 1.0)))
+
+
+;;;;;;;;;;;;;;;;;;
+;; Fake-Designator
+
+(defun check-arm-for-object ()
+  (let ((link
+        (cut:var-value
+          '?link
+          (car
+           (prolog:prolog
+            `(and (rob-int:robot ?rob)
+                  (rob-int:end-effector-link ?rob :left ?link)))))))
+    (car
+     (btr:link-attached-object-names
+     (btr:get-robot-object)
+     link))))
+
+(defgeneric exe-perform-type (action-type &key &allow-other-keys))
+
+(defmethod exe-perform-type ((action-type (eql :picking-up)) &key (arm :left) object)
+  (let*((gripper-pose
+            (cl-tf::lookup-transform cram-tf:*transformer* "map" "/hand_gripper_tool_frame"))
+          (obj-name (desig:desig-prop-value object :name)))
+      (roslisp:with-fields (translation rotation)
+          gripper-pose
+        (btr-utils:move-object
+         obj-name
+         (cl-tf:make-pose-stamped
+          "map" 0.0
+          translation
+          (cl-tf:make-quaternion 0 0 0 1))))
+      (cram-occasions-events:on-event
+       (make-instance 'cpoe:object-attached-robot
+                      :arm arm
+                      :object-name obj-name
+                      :object-designator object
+                      :grasp :front))))
+
+(defmethod exe-perform-type ((action-type (eql :placing)) &key (arm :left) pose)
+  (let*((obj-name (check-arm-for-object)))
+      (btr-utils:move-object
+         obj-name
+         pose)
+      (cram-occasions-events:on-event
+       (make-instance 'cpoe:object-detached-robot
+                      :arm (list arm)
+                      :object-name obj-name))))
+
+
