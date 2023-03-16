@@ -46,10 +46,10 @@
   (let* ((raw-response (with-safe-prolog
                          (json-prolog:prolog
                           (alexandria:flatten (list query result param-list))))))
-    ;; (roslisp:ros-info (knowledge-object-client)
-    ;;                   "Goal pose for object ~a is ~a."
-    ;;                   object-name
-    ;;                   raw-response)
+    (roslisp:ros-info (knowledge-object-client)
+                      "Raw Response for object is ~a."
+                      ;;object-name
+                      raw-response)
     (cond
       ((eq raw-response 1) (roslisp:ros-warn (knowledge-object-client)
                                              "Query ~a didn't reach any solution."
@@ -118,5 +118,3 @@
        (make-instance 'cpoe:object-detached-robot
                       :arm (list arm)
                       :object-name obj-name))))
-
-

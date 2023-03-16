@@ -12,6 +12,8 @@
  
    <!-- URDF OF THE ENVIORNMENT -->
   <group if="$(eval arg('publish_environment') == true)">
+    <!-- Knowledge needs this param to know where the urdf should be loaded from. -->
+    <param name="/suturo_room_viz/urdf_param" value="iai_kitchen"/>
     <include file="$(find suturo_resources)/urdf/launch/urdf.launch" pass_all_args="true" >
       <arg name="world_urdf_yaml" value="$(arg env_model_yaml)"/>
     </include>
@@ -76,39 +78,38 @@
 
   <group if="$(eval arg('run_snap_map') == true)">
     <node pkg="snap_map_icp" type="snap_map_icp" name="snap_map_icp" output="screen">
-      <!-- remap topics for map and laser scans -->
-      <remap from="~base_scan" to="/hsrb/base_scan_unlimited"/>
-      <remap from="~map" to="/static_obstacle_map_ref"/>
-
+      <remap from="/snap_map_icp/base_scan" to="/hsrb/base_scan"/>
+      <remap from="/snap_map_icp/map" to="map"/>
       <!-- relevant scan frames -->
-      <param name="odom_frame" value="/odom"/>
-      <param name="base_laser_frame" value="/base_range_sensor_link"/>
-
+      <param name="odom_frame" value="odom"/>
+      <param name="base_laser_frame" value="base_range_sensor_link"/>
+      <remap from="/snap_map_icp/initialpose" to="laser_2d_correct_pose"/>
+      
       <!-- defines minimum fitness for candidates for pose publishing -->
-      <param name="icp_fitness_threshold" value="10"/>
-   
+      <param name="icp_fitness_threshold" value="100"/>
+      
       <!-- accept only scans one second old or younger -->
-      <param name="age_threshold" value="20"/>
+      <param name="age_threshold" value="1"/>
       <param name="update_age_threshold" value="1"/>
-
+      
       <!-- thresholds over distance btw amcl icp pose to trigger pose publishing -->
       <!-- translation -->
-      <param name="dist_threshold" value="0.01"/>
+      <param name="dist_threshold" value="0.025"/>
       <!-- rotation -->
-      <param name="angle_threshold" value="0.01"/>
-      <param name="angle_upper_threshold" value="1"/>
-
+      <param name="angle_threshold" value="0.025"/>
+      <param name="angle_upper_threshold" value="0.5"/>
+      
       <!-- various icp parameters -->
       <!-- consult with icp algorithm from pcl for details -->
-      <param name="icp_inlier_threshold" value="0.1"/>
+      <param name="icp_inlier_threshold" value="0.60"/>
       <param name="icp_inlier_dist" value="0.1"/>
-      <param name="icp_num_iter" value="500"/>
-
+      <param name="icp_num_iter" value="250"/>
+      
       <!-- who knows??? -->
       <param name="pose_covariance_trans" value="0.5"/>
-
+      
       <!-- rate at which scans are taken -->
-      <param name="scan_rate" value="4"/>
+      <param name="scan_rate" value="2"/>
     </node>
   </group>
 </launch>

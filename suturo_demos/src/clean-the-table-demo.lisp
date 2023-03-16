@@ -3,7 +3,7 @@
 ;;@author Tim Rienits, Felix Krause
 (defun clean-the-table-demo ()
   (roslisp-utilities:startup-ros)
-  (with-hsr-process-modules
+  ;;(with-hsr-process-modules
     (unwind-protect
          (progn
            (init-interfaces)
@@ -53,7 +53,61 @@
                                      (knob-pose ?pose)
                                      (open-drawer ?open-drawer)
                                      (collision-mode :allow-all))))))
-               (roslisp-utilities:shutdown-ros))))
+      (roslisp-utilities:shutdown-ros)))
+
+(defun clean-the-table-demo2()
+  ;;(with-hsr-process-modules
+  ;;(urdf-proj:with-simulated-robot
+    ;; (unwind-protect
+    ;;      (progn
+  ;;        (roslisp-utilities:startup-ros)
+
+  (park-robot)
+
+  (move-hsr (create-pose (call-knowledge "hsr_pose_dinner_table" :result 'pose)))
+
+  (park-robot)
+  
+  (let* ((?source-object-desig
+           (desig:an object
+                     (type :muesli)))
+         (?object-desig
+           (exe:perform (desig:an action
+                                  (type detecting)
+                                  (object ?source-object-desig))))
+         (?target-pose (create-pose (call-knowledge "object_dest_pose_3" :result 'pose))))
+    (exe:perform (desig:an action
+                                  (type detecting)
+                                  (object ?source-object-desig)))
+    ;; Extracts pose from the return value of the detecting Designator.
+    (roslisp:with-fields 
+        ((?pose
+          (cram-designators::pose cram-designators:data))) 
+        ?object-desig
+
+      ;;Moves the gripper to the cereal box, implicitly opens the gripper beforehand.
+      (let ((?object-size
+              (cl-tf2::make-3d-vector 0.04 0.1 0.2)))
+        (exe:perform (desig:an action
+                               (type picking-up)
+                               (object-pose ?pose)
+                               (object-size ?object-size)
+                               (collision-mode :allow-all)))))
+
+    (park-robot)
+    
+    (move-hsr (create-pose (call-knowledge "hsr_pose_other_table" :result 'pose)))
+
+    (let ((?object-height 0.28d0))    
+      (exe:perform (desig:an action
+                             (type :placing)
+                             (target-pose ?target-pose)
+                             (object-height ?object-height)
+                             (collision-mode :allow-all))))
+    
+    (park-robot)
+    ;; (roslisp-utilities:shutdown-ros))
+))
 
 
 ;;@author Tim Rienits
@@ -68,8 +122,18 @@
                   (format T "!PLAN WIRD GESTARTET!")
                   (terpri)
                   (spawn-pringles-on-table)
+                  (sleep 3)
                   (move-in-front-of-pringles)
+                  (sleep 3)
                   (pick-up-the-pringles)
+                  (sleep 3)
+
+                  (let*((?first-pose (knowledge-get-drawer-pose)))
+                    (exe:perform
+                     (desig:an action
+                               (type going)
+                               (target (desig:a location (pose ?first-pose))))))
+                  
                   ))))
 
 (defun spawn-pringles-on-table ()

@@ -3,7 +3,7 @@
 ;;@author Felix Krause, Tim Rienits
 (defun cleanup-demo ()
   (roslisp-utilities:startup-ros)
-  (with-hsr-process-modules
+  ;;(with-hsr-process-modules
     (unwind-protect
          (progn
            (init-interfaces)
@@ -53,4 +53,4 @@
                                      (knob-pose ?pose)
                                      (open-drawer ?open-drawer)
                                      (collision-mode :allow-all))))))
-               (roslisp-utilities:shutdown-ros))))
+               (roslisp-utilities:shutdown-ros)))

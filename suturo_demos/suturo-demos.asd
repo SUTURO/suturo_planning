@@ -75,5 +75,6 @@
              (:file "cleanup-demo" :depends-on ("package"))
              (:file "storing-groceries-demo" :depends-on ("package"))
              (:file "set-the-table-demo" :depends-on ("package"))
+             (:file "serve-breakfast-demo" :depends-on ("package"))
              (:file "take-pose-client" :depends-on ("package"))
              (:file "clean-the-table-demo" :depends-on ("package"))))))

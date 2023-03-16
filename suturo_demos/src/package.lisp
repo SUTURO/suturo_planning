@@ -12,6 +12,8 @@
 
    #:set-the-table-demo
 
+   #:serve-breakfast-demo
+
    #:clean-the-table-demo
 
    ;; Make sure that exported functions are always working and up to date

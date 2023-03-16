@@ -44,6 +44,8 @@
   (roslisp:ros-info (nav-action-client)
                     "Navigation action client created."))
 
+(roslisp-utilities:register-ros-init-function init-nav-client)
+
 (defun get-nav-action-client ()
   "Returns the navigation action client. If none exists yet, one will be created"
   (when (null *nav-client*)

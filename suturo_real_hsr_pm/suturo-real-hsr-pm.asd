@@ -19,4 +19,7 @@
   ((:module "src"
             :components
             ((:file "package")
-             (:file "with-real-hsr-pm" :depends-on ("package"))))))
+             (:file "with-real-hsr-pm" :depends-on ("package"))
+             (:file "live-demo" :depends-on ("package"))
+             (:file "suturo-designators" :depends-on ("package"))
+             (:file "suturo-plans" :depends-on ("package"))))))

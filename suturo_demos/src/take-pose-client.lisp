@@ -31,7 +31,7 @@ action server."
   (roslisp:ros-info (take-pose-action-client)
                     "Take pose action client initialised"))
 
-;;(roslisp-utilities:register-ros-init-function init-take-pose-action-client)
+(roslisp-utilities:register-ros-init-function init-take-pose-action-client)
 
 ;; (defun make-giskard-action-client ()
 ;;   (actionlib-client:make-simple-action-client
@@ -156,5 +156,72 @@ uses the optional values to create a custom pose."
 
 
 
-(defun take-default ()
-  (call-take-pose-action 1))
+(defun park-robot ()
+  (call-take-pose-action 0 0 0 0 0 1.5 -1.5 0))
+
+(defun take-new-default1 ()
+  (call-take-pose-action 0 0 0 0.3 -2.6 0 1 0))
+
+(defun take-new-default2 ()
+  (call-take-pose-action 0 0 0 0.3 -2.6 1.5 -1.5 0.5))
+
+
+
+
+(defun nav-table-perc-pos2 ()
+  (let ((vector (cl-tf2::make-3d-vector -1.5 -1.3 0))
+        (rotation (cl-tf2::make-quaternion 0 0 1 0)))
+    (move-hsr (cl-tf2::make-pose-stamped "map" 0 vector rotation))))
+
+(defun nav-shelf-perc-pos ()
+  (let ((vector (cl-tf2::make-3d-vector 0 0.8 0))
+        (rotation (cl-tf2::make-quaternion 0 0 1 1)))
+    (move-hsr (cl-tf2::make-pose-stamped "map" 0 vector rotation))))
+
+
+(defun nav-zero-pos ()
+  (let ((vector (cl-tf2::make-3d-vector 0 0 0))
+        (rotation (cl-tf2::make-quaternion 0 0 0 1)))
+    (move-hsr (cl-tf2::make-pose-stamped "map" 0 vector rotation))))
+
+(defun nav-table-place-pos ()
+  (let ((vector (cl-tf2::make-3d-vector 0.75 -1.1 0))
+        (rotation (cl-tf2::make-quaternion 0 0 0 1)))
+    (move-hsr (cl-tf2::make-pose-stamped "map" 0 vector rotation))))
+
+(defun get-target-pos ()
+  (cl-tf2::make-pose-stamped
+   "map" 0
+   (cl-tf2::make-3d-vector 1.5 -1.1 0.75)
+   (cl-tf2::make-quaternion 0 0 0 1)))
+
+(defun get-target-pos2 ()
+  (cl-tf2::make-pose-stamped
+   "map" 0
+   (cl-tf2::make-3d-vector -0.092 1.65 0.75)
+   (cl-tf2::make-quaternion 0 0 0 1)))
+
+(defun get-target-pos3 ()
+  (cl-tf2::make-pose-stamped
+   "map" 0
+   (cl-tf2::make-3d-vector -2.2 -1.3 0.75)
+   (cl-tf2::make-quaternion 0 0 0 1)))
+
+;;-0.09150868319941155d0 1.6457985693547386d0 0.8934701539379541d0
+
+(defun test-plan ()
+  (sleep 5)
+  (take-new-default1)
+  (nav-table-perc-pos)
+  (take-table-grasp1)
+  (nav-table-grasp-pos)
+  (break)
+  (take-table-pickup1)
+  (nav-table-perc-pos)
+  (take-new-default1))
+
+
+;; LUCA TODO
+;; rewrite planning_ws/src/suturo_planning/suturo_demos/src/collision-scene.lisp to function without using the bulletworld as reasoning tool, but rather use knowledge as reasoning tool. For example "update-object-pose-in-collision-scene" 
+
+

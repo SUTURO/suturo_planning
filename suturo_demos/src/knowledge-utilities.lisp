@@ -28,3 +28,14 @@
     (list (mapcar #'fix-prolog-string prolog-symbol))
     (t prolog-symbol)))
     
+;; @author Luca Krohm
+(defun create-pose (knowledge-pose)
+  (let ((?frame (first knowledge-pose))
+        (?origin (second knowledge-pose))
+        (?orientation (third knowledge-pose)))
+    (multiple-value-bind (x y z) (values-list ?origin)
+      (multiple-value-bind (w1 w2 w3 w4) (values-list ?orientation)
+        (cl-tf2::make-pose-stamped
+         ?frame 0
+         (cl-tf2::make-3d-vector x y z)
+         (cl-tf2::make-quaternion w1 w2 w3 w4))))))

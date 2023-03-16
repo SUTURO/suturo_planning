@@ -46,7 +46,8 @@
 ;; code to test specific parts, although this also has its limits, for example we currently cant test perception
 ;; and manipulation with just one call, without using 'all', which obviously also triggers navigation
 (defun set-the-table-demo(mode)
-  (with-hsr-process-modules
+  ;;(with-hsr-process-modules
+  ;;(urdf-proj:with-simulated-robot
     (unwind-protect
          (progn
            (roslisp-utilities:startup-ros)
@@ -149,5 +150,5 @@
                                              (knob-pose ?pose)
                                              (open-drawer ?open-drawer)
                                              (collision-mode :allow-all)))))))))
-      (roslisp-utilities:shutdown-ros))))
+      (roslisp-utilities:shutdown-ros)))
          
