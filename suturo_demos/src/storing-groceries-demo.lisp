@@ -77,6 +77,9 @@
                                   (type detecting)
                                   (object ?source-object-desig))))
          (?target-pose (create-pose (call-knowledge "object_dest_pose_2" :result 'pose))))
+    (exe:perform (desig:an action
+                           (type detecting)
+                           (object ?source-object-desig)))
     ;; Extracts pose from the return value of the detecting Designator.
     (roslisp:with-fields 
         ((?pose
@@ -103,6 +106,8 @@
                              (target-pose ?target-pose)
                              (object-height ?object-height)
                              (collision-mode :allow-all))))
+
+    (move-hsr (create-pose (call-knowledge "hsr_pose_shelf" :result 'pose)))
     
     (park-robot)
     ;; (roslisp-utilities:shutdown-ros))

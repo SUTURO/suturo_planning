@@ -1,5 +1,7 @@
 (in-package :su-real)
 
+;; @author Luca Krohm
+;; @TODO failurehandling
 (defun pick-up (&key
                   ((:collision-mode ?collision-mode))
                   ((:collision-object-b ?collision-object-b))
@@ -13,14 +15,14 @@
                   ((:precise-tracking ?precise-tracking))
                   ((:object-pose ?object-pose))
                   ((:object-size ?object-size))
-                  &allow-other-keys)
+                &allow-other-keys)
+  "Receives parameters from action-designator, and then executes the corresponding motions"
   (declare (type boolean ?move-base ?prefer-base ?straight-line ?precise-tracking
                  ?align-planes-left ?align-planes-right))
 
   (exe:perform (desig:a motion
                         (type :opening-gripper)))
       
-  ;;Moves the gripper to the cereal box, implicitly opens the gripper beforehand.
   (exe:perform (desig:a motion
                         (type reaching)
                         (collision-mode ?collision-mode)
@@ -67,7 +69,8 @@
                         (precise-tracking ?precise-tracking)
                         (object-pose ?object-pose))))
 
-
+;; @author Luca Krohm
+;; @TODO failurehandling
 (defun place (&key
                   ((:collision-mode ?collision-mode))
                   ((:collision-object-b ?collision-object-b))
@@ -81,11 +84,11 @@
                   ((:precise-tracking ?precise-tracking))
                   ((:target-pose ?target-pose))
                   ((:object-height ?object-height))
-                  &allow-other-keys)
+              &allow-other-keys)
+  "Receives parameters from action-designator, and then executes the corresponding motions"
   (declare (type boolean ?move-base ?prefer-base ?straight-line ?precise-tracking
                  ?align-planes-left ?align-planes-right))
 
-  ;; replace place MOTION with "torso on level with targetpose" "placing motion"
   (exe:perform (desig:a motion
                         (type prepare-placing)
                         (collision-mode ?collision-mode)
@@ -101,7 +104,6 @@
                         (target-pose ?target-pose)
                         (object-height ?object-height)))
 
-  ;; replace place MOTION with "torso on level with targetpose" "placing motion"
   (exe:perform (desig:a motion
                         (type placing)
                         (collision-mode ?collision-mode)

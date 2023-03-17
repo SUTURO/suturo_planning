@@ -1,7 +1,7 @@
 (in-package :su-real)
-
+;; @author Luca Krohm
 (def-fact-group suturo-plans (desig:action-grounding)
-  
+  ;; @author Luca Krohm
   (<- (action-grounding ?designator (su-real:pick-up ?resolved-action-designator))
     (spec:property ?designator (:type :picking-up))
     (once (or (desig:desig-prop ?designator (:collision-mode ?collision-mode))
@@ -45,6 +45,7 @@
                                (:object-size ?object-size))
                       ?resolved-action-designator))
 
+  ;; @author Luca Krohm
   (<- (action-grounding ?designator (su-real:place ?resolved-action-designator))
     (spec:property ?designator (:type :placing))
     (once (or (desig:desig-prop ?designator (:collision-mode ?collision-mode))

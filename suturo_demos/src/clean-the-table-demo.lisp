@@ -104,6 +104,8 @@
                              (target-pose ?target-pose)
                              (object-height ?object-height)
                              (collision-mode :allow-all))))
+
+    (move-hsr (create-pose (call-knowledge "hsr_pose_other_table" :result 'pose)))
     
     (park-robot)
     ;; (roslisp-utilities:shutdown-ros))

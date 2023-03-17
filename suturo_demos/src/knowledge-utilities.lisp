@@ -30,6 +30,7 @@
     
 ;; @author Luca Krohm
 (defun create-pose (knowledge-pose)
+  "Receives knowledge-pose in form (FRAME (x y z) (w1 w2 w3 w4)). Retrieves those coordinates and puts them into pose"
   (let ((?frame (first knowledge-pose))
         (?origin (second knowledge-pose))
         (?orientation (third knowledge-pose)))
