@@ -61,6 +61,7 @@
                manipulation_msgs-msg
 	       navigation_msgs-msg
                move_base_msgs-msg
+               tmc_control_msgs-msg
                )
   
   :components
@@ -76,5 +77,6 @@
              (:file "storing-groceries-demo" :depends-on ("package"))
              (:file "set-the-table-demo" :depends-on ("package"))
              (:file "serve-breakfast-demo" :depends-on ("package"))
+             (:file "poke-demo" :depends-on ("package"))
              (:file "take-pose-client" :depends-on ("package"))
              (:file "clean-the-table-demo" :depends-on ("package"))))))
