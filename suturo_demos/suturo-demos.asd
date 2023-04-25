@@ -57,6 +57,7 @@
                ;;cram-robokudo
                ;;cram-giskard
 
+               tmc_msgs-msg
                nav_msgs-msg
                manipulation_msgs-msg
 	       navigation_msgs-msg
@@ -77,4 +78,5 @@
              (:file "set-the-table-demo" :depends-on ("package"))
              (:file "serve-breakfast-demo" :depends-on ("package"))
              (:file "take-pose-client" :depends-on ("package"))
+             (:file "text-to-speech" :depends-on ("package"))
              (:file "clean-the-table-demo" :depends-on ("package"))))))

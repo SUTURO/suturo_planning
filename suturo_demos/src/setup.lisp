@@ -53,7 +53,7 @@
   ;; (setf cram-tf:*transformer* (make-instance 'cl-tf2:buffer-client))
   ;;(setf cram-tf:*tf-default-timeout* 0.5) ; projection tf is very fast
 
-  (coe:clear-belief)
+  ;;(coe:clear-belief)
 
 
   (def-fact-group costmap-metadata (costmap:costmap-size

@@ -53,7 +53,7 @@
   <depend>cram_boxy_description</depend>
   <depend>cram_donbot_description</depend>
   <depend>cram_hsrb_description</depend>
-
+  <exec_depend>tmc_msgs</exec_depend>
 
 
   <export>
