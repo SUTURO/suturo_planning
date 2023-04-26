@@ -21,7 +21,7 @@
 
   <!-- occupancy map -->
   <group if="$(eval arg('upload_map') == true)">
-    <node name="map_server" pkg="map_server" type="map_server" args="/home/suturo/maps/map3-door-open-cleaned.yaml" />
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find suturo_resources)/maps/hsr_lab_master_2022/map3-door-open-cleaned.yaml" />
   </group>  
   
   <!-- kitchen URDF 
