@@ -17,6 +17,29 @@
 ;;====================================================================================================
 ;;knowledge
 
+;; (with-knowledge-result (a b) '(= (list 1 2) (list a b))
+;;             (print a)
+;;             (print b))
+;;@author Tede von Knorre, Felix Krause
+(defmacro with-knowledge-result (vars query &body body)
+  `(let ((raw-response (simple-knowledge ,query )))
+     (if (eq raw-response 1)
+         (error "Knowledge query failed at the macro with-knowledge-result")
+         (unwind-protect
+              (let ,(loop for x in vars
+                          collect `(,x (fix-prolog-string (cdr (assoc ',(match-prolog-symbol x) (car raw-response))))))
+                ,@body
+                )
+           (json-prolog:finish-query raw-response)))))
+
+
+
+;;@author Tede von Knorre, Felix Krause
+(defun simple-knowledge (query)
+  (with-safe-prolog
+    (json-prolog:prolog query)))
+
+
 ;; TODO add list of possible querys
 ;; @author Luca Krohm
 (defun call-knowledge (query &key param-list result)
