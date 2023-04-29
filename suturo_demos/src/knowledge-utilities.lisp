@@ -16,9 +16,9 @@
 
 
 ;; @author Luca Krohm
-(defun match-prolog-symbol (symbol)
+(defun match-prolog-symbol (symbol &optional (package *package*))
   "Adds a '?' to the symbol, since prolog takes the value of the variable 'result' in CALL-KNOWLEDGE, and does this too. For example: FRAME -> ?FRAME"
-   (intern (concatenate 'string "?" (symbol-name symbol))))
+   (intern (concatenate 'string "?" (symbol-name symbol)) package))
 
 ;; @author Luca Krohm
 (defun fix-prolog-string (prolog-symbol)

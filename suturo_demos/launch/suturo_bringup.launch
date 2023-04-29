@@ -53,8 +53,8 @@
   </group>
 
   <group if="$(arg publish_joint_state)">
-    <node pkg="tf2_ros" type="static_transform_publisher" name="map_to_base_footprint_broadcaster" args="0 0 0 0 0 0 map base_footprint"/>
-    <node pkg="joint_state_publisher" type="joint_state_publisher"
+    <node pkg="tf" type="static_transform_publisher" name="map_to_base_footprint_broadcaster" args="0 0 0.08 0 0 0 1 hand_palm_link hand_gripper_tool_frame 100"/>
+    <!--node pkg="joint_state_publisher" type="joint_state_publisher"
           name="robot_joint_state_publisher" output="screen">
       <param name="rate" value="25"/>
       <param name="use_gui" value="False"/>
@@ -62,7 +62,7 @@
     <node pkg="robot_state_publisher" type="robot_state_publisher"
           name="robot_state_publisher" output="screen">
       <param name="publish_frequency" value="25"/>
-    </node>
+    </node-->
   </group>
 
   <group if="$(eval arg('use_rviz') == true)">
