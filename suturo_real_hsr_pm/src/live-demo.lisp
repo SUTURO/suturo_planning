@@ -19,7 +19,4 @@
   ;; starts the plan within the correct environment
    (with-hsr-process-modules
     (unwind-protect
-         (progn
-           (roslisp-utilities:startup-ros)
-           (mapc #'funcall *plan*)
-      (roslisp-utilities:shutdown-ros)))))
+         (mapc #'funcall *plan*))))
