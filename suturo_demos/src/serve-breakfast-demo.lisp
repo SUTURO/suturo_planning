@@ -1,92 +1,125 @@
 (in-package :su-demos)
 
-(defun serve-breakfast-demo()
- "Demo for the 'serve breakfast' challenge for the first stage of the robocup. Full plan will look roughly as follows:
-- move to shelf
-- open shelf
-- perceive items in shelf
-- pick up relevant items and transport them towards dinner table one after another
-- pick up cerealbox
-- pour cereals into the breakfast bowl
-- place down cerealbox"
-  
-  ;; Takes standard pose
-  (park-robot)
 
-  ;; Calls knowledge to receive coordinates of the shelf pose, then relays that pose to navigation
-  (move-hsr (create-pose (call-knowledge "hsr_pose_shelf" :result 'pose)))
-
-  (park-robot)
-
-  (let* ((?source-object-desig
-           (desig:an object
-                     (type :muesli)))
-         ;; detect object and safe the return value
-         (?object-desig
-           (exe:perform (desig:an action
-                                  (type detecting)
-                                  (object ?source-object-desig))))
-         (?target-pose (create-pose (call-knowledge "object_dest_pose_1" :result 'pose))))
-    
-    ;; TO BE REMOVED ONCE FIXED
-    ;; perception currently publishes two seperate packages of returnvalues.
-    ;; The second one is not usable to us, so we need to extract it to clear out the pipeline.
-    (exe:perform (desig:an action
-                           (type detecting)
-                           (object ?source-object-desig)))
-    
-    ;; Extracts pose from the return value of the detecting Designator.
-    (roslisp:with-fields 
-        ((?pose
-          (cram-designators::pose cram-designators:data))) 
-        ?object-desig
-
-      
-      ;; picks up the object by executing the following motions:
-      ;; - opening the gripper
-      ;; - reaching for the object
-      ;; - closing the gripper, thus gripping the object
-      ;; - lifting the object
-      ;; - retracting the arm to retrieve the object from, for example, a shelf
-      (let ((?object-size
-              (cl-tf2::make-3d-vector 0.04 0.1 0.2)))
-        (exe:perform (desig:an action
-                               (type picking-up)
-                               (object-pose ?pose)
-                               (object-size ?object-size)
-                               (collision-mode :allow-all)))))
-
-    (park-robot)
-
-    ;; Calls knowledge to receive coordinates of the dinner table pose, then relays that pose to navigation
-    (move-hsr (create-pose (call-knowledge "hsr_pose_dinner_table" :result 'pose)))
-
-    ;; places the object by executing the following motions:
-    ;; - preparing to place the object, by lifting the arm to an appropriate height
-    ;; - placing the object
-    ;; - opening the gripper, thus releasing the object
-    (let ((?object-height 0.28d0))    
-      (exe:perform (desig:an action
-                             (type :placing)
-                             (target-pose ?target-pose)
-                             (object-height ?object-height)
-                             (collision-mode :allow-all))))
-
-    ;; Calls knowledge to receive coordinates of the dinner table pose, then relays that pose to navigation
-    (move-hsr (create-pose (call-knowledge "hsr_pose_dinner_table" :result 'pose)))
-
-    (park-robot)
-))
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; LUCA TODO
-;; rewrite~/SUTURO/SUTURO_WSS/planning_ws/src/cram/cram_external_interfaces/cram_giskard/src/collision-scene.lisp to function without using the bulletworld as reasoning tool, but rather use knowledge as reasoning tool. For example "update-object-pose-in-collision-scene" 
+;; rewrite~/SUTURO/SUTURO_WSS/planning_ws/src/cram/cram_external_interfaces/cram_giskard/src/collision-scene.lisp to function without using the bulletworld as reasoning tool, but rather use knowledge as reasoning tool. For example "update-object-pose-in-collision-scene"
+
+;; Rewrite or duplicate and change the following functions (in order to preserve the original implementation in case its vital to other plans):
+;; make-giskard-environment-request, uses btr in on the very bottom
+
+;; reset-collision-scene
+
+;; update-object-pose-in-collision-scene
+
+;; add-object-to-collision-scene
+
+;; detach-object-in-collision-scene
+
+;; attach-object-to-arm-in-collision-scene
+
+;; full-update-collision-scene
 
 ;; (cram-occasions-events:on-event
 ;;      (make-instance 'cram-plan-occasions-events:object-perceived-event
 ;;                          :object-designator desig
 ;;                          :perception-source :whatever))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(defparameter *objects* '(:muesli :milk :spoon :bowl))
+
+(defun serve-breakfast-demo()
+  (call-text-to-speech-action "Starting demo")
+  
+  (park-robot)
+
+  ;; Calls knowledge to receive coordinates of the shelf pose, then relays that pose to navigation
+  (move-hsr (get-shelf-pos)) ;;(create-pose (call-knowledge "hsr_pose_shelf" :result 'pose)))
+
+  (park-robot)
+
+  (let ((?handle-link "iai_kitchen/shelf:shelf:shelf_door_left:handle")
+        (?joint-angle -1.1))
+    
+    (exe:perform (desig:an action
+                           (type opening-door)
+                           (handle-link ?handle-link)
+                           (joint-angle ?joint-angle)
+                           (tip-link t)
+                           (collision-mode :allow-all))))
+
+  (park-robot)
+
+  (move-hsr (get-shelf-pos))
+
+  (park-robot)
+
+  (mapc #'(lambda (?object-type)
+        (let* ((?source-object-desig
+                 (desig:an object
+                           (type ?object-type)))
+               ;; detect object and safe the return value
+               (?object-desig
+                 (exe:perform (desig:an action
+                                        (type detecting)
+                                        (object ?source-object-desig))))
+               (?target-pose (get-target-pos)))
+          
+          ;; Extracts pose from the return value of the detecting Designator.
+          (roslisp:with-fields 
+              ((?pose
+                (cram-designators::pose cram-designators:data))) 
+              ?object-desig
+            
+            ;; picks up the object by executing the following motions:
+            ;; - opening the gripper
+            ;; - reaching for the object
+            ;; - closing the gripper, thus gripping the object
+            ;; - lifting the object
+            ;; - retracting the arm to retrieve the object from, for example, a shelf
+            (let ((?object-size
+                    (cl-tf2::make-3d-vector 0.06 0.145 0.215)))
+              (exe:perform (desig:an action
+                                     (type picking-up)
+                                     (object-type ?object-type)
+                                     (object-pose ?pose)
+                                     (object-size ?object-size)
+                                     (collision-mode :allow-all)))))
+          (park-robot)
+
+          ;; Calls knowledge to receive coordinates of the dinner table pose, then relays that pose to navigation
+          (move-hsr (create-pose (call-knowledge "hsr_pose_dinner_table" :result 'pose)))
+          
+          ;; places the object by executing the following motions:
+          ;; - preparing to place the object, by lifting the arm to an appropriate height
+          ;; - placing the object
+          ;; - opening the gripper, thus releasing the object
+          (let ((?object-height 0.215d0))    
+            (exe:perform (desig:an action
+                                   (type :placing)
+                                   (target-pose ?target-pose)
+                                   (object-height ?object-height)
+                                   (collision-mode :allow-all))))
+          
+          ;; Calls knowledge to receive coordinates of the dinner table pose, then relays that pose to navigation
+          (move-hsr (create-pose (call-knowledge "hsr_pose_dinner_table" :result 'pose)))
+          
+          (park-robot)))
+        *objects*)
+  
+  ;; Pouring corn from bowl in the popcorn pot
+  ;; from popcorn demo
+  ;; (pour-into :popcorn-pot '(:right) :right-side)
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;; Hardcoded stuff for debugging ;;;;;;;;;;;;
@@ -108,3 +141,117 @@
   (let ((vector (cl-tf2::make-3d-vector 0 0 0))
         (rotation (cl-tf2::make-quaternion 0 0 0 1)))
     (move-hsr (cl-tf2::make-pose-stamped "map" 0 vector rotation))))
+
+(defun get-shelf-pos ()
+  (cl-tf2::make-pose-stamped
+   "map" 0
+   (cl-tf2::make-3d-vector 0.01 0.95 0)
+   (cl-tf2::make-quaternion 0 0 1 1)))
+
+(defun get-table-pos ()
+  (cl-tf2::make-pose-stamped
+   "map" 0
+   (cl-tf2::make-3d-vector 0.7 -0.95 0)
+   (cl-tf2::make-quaternion 0 0 0 1)))
+
+(defun get-target-pos ()
+  (cl-tf2::make-pose-stamped
+   "map" 0
+   (cl-tf2::make-3d-vector 1.5 -0.95 0.7)
+   (cl-tf2::make-quaternion 0 0 0 1)))
+        
+(defun serve-breakfast-demo-alt()
+ "Demo for the 'serve breakfast' challenge for the first stage of the robocup. Full plan will look roughly as follows:
+- move to shelf
+- open shelf
+- perceive items in shelf
+- pick up relevant items and transport them towards dinner table one after another
+- pick up cerealbox
+- pour cereals into the breakfast bowl
+- place down cerealbox"
+  
+  ;; Takes standard pose
+  (park-robot)
+
+  ;; Calls knowledge to receive coordinates of the shelf pose, then relays that pose to navigation
+  (move-hsr (get-shelf-pos)) ;;(create-pose (call-knowledge "hsr_pose_shelf" :result 'pose)))
+
+  (park-robot)
+
+  (let ((?handle-link "iai_kitchen/shelf:shelf:shelf_door_left:handle")
+        (?joint-angle -1.1))
+    
+    (exe:perform (desig:an action
+                           (type opening-door)
+                           (handle-link ?handle-link)
+                           (joint-angle ?joint-angle)
+                           (tip-link t)
+                           (collision-mode :allow-all))))
+
+  (park-robot)
+
+  (move-hsr (get-shelf-pos))
+
+  (park-robot)
+    
+
+  (let* ((?object-type :muesli)
+         (?source-object-desig
+           (desig:an object
+                     (type ?object-type)))
+         ;; detect object and safe the return value
+         (?object-desig
+           (exe:perform (desig:an action
+                                  (type detecting)
+                                  (object ?source-object-desig))))
+         (?target-pose (get-target-pos)));;(create-pose (call-knowledge "object_dest_pose_1" :result 'pose))))
+    
+    ;; Extracts pose from the return value of the detecting Designator.
+    (roslisp:with-fields 
+        ((?pose
+          (cram-designators::pose cram-designators:data))) 
+        ?object-desig
+;;       ;;(giskard::add-object-to-collision-scene2 :muesli-1)
+;;       ;; (coe:on-event (make-instance 'cram-plan-occasions-events:object-perceived-event
+;;       ;;                    :object-designator ?object-desig
+;;       ;;                    :perception-source :whatever))
+      
+;;       ;; picks up the object by executing the following motions:
+;;       ;; - opening the gripper
+;;       ;; - reaching for the object
+;;       ;; - closing the gripper, thus gripping the object
+;;       ;; - lifting the object
+;;       ;; - retracting the arm to retrieve the object from, for example, a shelf
+      (let ((?object-size
+              (cl-tf2::make-3d-vector 0.06 0.145 0.215)))
+        (exe:perform (desig:an action
+                               (type picking-up)
+                               (object-type ?object-type)
+                               (object-pose ?pose)
+                               (object-size ?object-size)
+                               (collision-mode :allow-all)))))
+
+    (park-robot)
+
+    ;; Calls knowledge to receive coordinates of the dinner table pose, then relays that pose to navigation
+    (move-hsr (get-table-pos)) ;; (create-pose (call-knowledge "hsr_pose_dinner_table" :result 'pose)))
+
+    ;; places the object by executing the following motions:
+    ;; - preparing to place the object, by lifting the arm to an appropriate height
+    ;; - placing the object
+    ;; - opening the gripper, thus releasing the object
+    (let ((?object-height 0.215d0))    
+      (exe:perform (desig:an action
+                             (type :placing)
+                             (target-pose ?target-pose)
+                             (object-height ?object-height)
+                             (collision-mode :allow-all))))
+
+    ;; Calls knowledge to receive coordinates of the dinner table pose, then relays that pose to navigation
+    (move-hsr (get-table-pos));; (create-pose (call-knowledge "hsr_pose_dinner_table" :result 'pose)))
+
+    (park-robot)))
+
+
+    
+  
