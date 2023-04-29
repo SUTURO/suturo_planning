@@ -22,26 +22,26 @@
       (cram-common-designators:move-base
        (su-demos::call-nav-action-ps argument)))));;change package in the future
 
-(cpm:def-process-module suturo-pm (action-designator)
+(cpm:def-process-module suturo-pm (motion-designator)
   (destructuring-bind (command argument-1 &rest rest-args)
-      (desig:reference action-designator)
+      (desig:reference motion-designator)
     (ecase command
-      (su-real:pick-up
-        :goal-pose-left argument-1
-        :goal-pose-right (first rest-args)
-        :collision-mode (second rest-args)
-        :collision-object-b (third rest-args)
-        :collision-object-b-link (fourth rest-args)
-        :collision-object-a (fifth rest-args)
-        :move-base (sixth rest-args)
-        :prefer-base (seventh rest-args)
-        :straight-line (tenth rest-args)
-        :align-planes-left (eighth rest-args)
-        :align-planes-right (ninth rest-args)
-        :precise-tracking (nth 10 rest-args); that's eleventh element
-        :object-pose (nth 11 rest-args)
-        :object-size (nth 12 rest-args)
-        ))))
+      (cram-common-designators:open-gripper
+       (su-real:open-gripper
+        :effort argument-1))
+      (cram-common-designators:close-gripper
+       (su-real:close-gripper
+        :effort argument-1)))))
+
+;; Suturo
+(prolog:def-fact-group suturo-fact (cpm:matching-process-module
+                                   cpm:available-process-module)
+
+  (prolog:<- (cpm:matching-process-module ?motion-designator su-real::suturo-pm)
+    (or (desig:desig-prop ?motion-designator (:type :gripper-motion))))
+
+  (prolog:<- (cpm:available-process-module su-real::suturo-pm)
+    (prolog:not (cpm:projection-running ?_))))
 
 ;;Denotes the PM as avaivailable
 (cram-prolog:def-fact-group available-hsr-process-modules (cpm:available-process-module
@@ -75,7 +75,7 @@
         (desig:desig-prop ?motion-designator (:type :reaching))
         (desig:desig-prop ?motion-designator (:type :lifting))
         (desig:desig-prop ?motion-designator (:type :retracting))
-        (desig:desig-prop ?motion-designator (:type :prepare-placing))
+        (desig:desig-prop ?motion-designator (:type :aligning-height))
         (desig:desig-prop ?motion-designator (:type :placing))
         (desig:desig-prop ?motion-designator (:type :moving-gripper))
         (desig:desig-prop ?motion-designator (:type :moving-gripper-joint))
