@@ -4,11 +4,17 @@
   (:use #:common-lisp #:cram-prolog #:cram-designators #:cram-executive #:cram-giskard)
   (:export
    #:with-real-hsr-pm
+   #:wait-for-startsignal
    ;; Make sure that exported functions are always working and up to date
    ;; Functions that are not exported may be WIP
 
+   #:demo
+
+   ;; designator plan functions
    #:pick-up
    #:place
-   #:demo
+   #:open-door
+   #:open-gripper
+   #:close-gripper
    
 ))
