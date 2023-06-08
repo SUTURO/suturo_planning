@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="publish_environment" default="true" />
-  <arg name="env_model_yaml" default="rw_lab_master_2022.yaml" />
+  <arg name="env_model_yaml" default="rw_lab_master_2022.yaml" /> <!--rw_suturocup or rw_lab_master_2022 -->
   <arg name="upload_hsrb" default="false" /> <!-- Set true if robot has publishes faulty robot_description -->
   <arg name="publish_joint_state" default="false" />
   <arg name="upload_map" default="true" />
-  <arg name="run_snap_map" default="true" />
+  <arg name="run_snap_map" default="false" />
   <arg name="use_rviz" default="false"/>
 
   
@@ -20,6 +20,8 @@
   </group>
 
   <!-- occupancy map -->
+ <!--Either /maps/hsr_lab_master_2022/map3-door-open-cleaned.yaml -->
+ <!-- or /maps/suturobocup-2023/SuturoApartLab-cleaned.yaml -->
   <group if="$(eval arg('upload_map') == true)">
     <node name="map_server" pkg="map_server" type="map_server" args="$(find suturo_resources)/maps/hsr_lab_master_2022/map3-door-open-cleaned.yaml" />
   </group>  
@@ -64,7 +66,7 @@
       <param name="publish_frequency" value="25"/>
     </node-->
   </group>
-
+  
   <group if="$(eval arg('use_rviz') == true)">
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find suturo_resources)/rviz_configs/suturo.rviz" />
   </group>
@@ -76,40 +78,4 @@
   <!-- IK solver --> 
   <include file="$(find kdl_ik_service)/launch/kdl_ik.launch" />
 
-  <group if="$(eval arg('run_snap_map') == true)">
-    <node pkg="snap_map_icp" type="snap_map_icp" name="snap_map_icp" output="screen">
-      <remap from="/snap_map_icp/base_scan" to="/hsrb/base_scan"/>
-      <remap from="/snap_map_icp/map" to="map"/>
-      <!-- relevant scan frames -->
-      <param name="odom_frame" value="odom"/>
-      <param name="base_laser_frame" value="base_range_sensor_link"/>
-      <remap from="/snap_map_icp/initialpose" to="laser_2d_correct_pose"/>
-      
-      <!-- defines minimum fitness for candidates for pose publishing -->
-      <param name="icp_fitness_threshold" value="100"/>
-      
-      <!-- accept only scans one second old or younger -->
-      <param name="age_threshold" value="1"/>
-      <param name="update_age_threshold" value="1"/>
-      
-      <!-- thresholds over distance btw amcl icp pose to trigger pose publishing -->
-      <!-- translation -->
-      <param name="dist_threshold" value="0.025"/>
-      <!-- rotation -->
-      <param name="angle_threshold" value="0.025"/>
-      <param name="angle_upper_threshold" value="0.5"/>
-      
-      <!-- various icp parameters -->
-      <!-- consult with icp algorithm from pcl for details -->
-      <param name="icp_inlier_threshold" value="0.60"/>
-      <param name="icp_inlier_dist" value="0.1"/>
-      <param name="icp_num_iter" value="250"/>
-      
-      <!-- who knows??? -->
-      <param name="pose_covariance_trans" value="0.5"/>
-      
-      <!-- rate at which scans are taken -->
-      <param name="scan_rate" value="2"/>
-    </node>
-  </group>
 </launch>
