@@ -1,7 +1,11 @@
 (in-package :su-demos)
 
-;;@author Felix Krause, Tim Rienits
-(defun storing-groceries-demo ()
+
+
+(defun start-ros () (roslisp-utilities:startup-ros))
+
+;;@author Felix Krause
+(defun storing-groceries-demo-alt ()
   (roslisp-utilities:startup-ros)
   ;;(su-real::with-hsr-process-modules
     (unwind-protect
@@ -221,74 +225,219 @@
 
 
 
-
-
-
-     
-
-
-
-;; ;;All of the following is Designator/PM stuff.
-;; (defmacro with-hsr-process-modules (&body body)
-;;   "Receives a body of lisp code `body'. Runs the code contained in `body' with all the necessary process modules"
-;;   `(cram-process-modules:with-process-modules-running
-;;        (hsr-navigation
-;;         giskard::giskard-pm
-;;         common-desig:wait-pm
-;;         rk:robokudo-perception-pm)
-;;      (cpl-impl::named-top-level (:name :top-level),@body)))
-
-
-;; ;;Process module itself
-;; (cram-process-modules:def-process-module hsr-navigation (motion-designator)
-;;   "Receives motion-designator `motion-designator'. Calls the process module HSR-NAVIGATION with the appropriate designator."
-;;   (destructuring-bind (command argument &rest args)
-;;       (desig:reference motion-designator)
-;;     (declare (ignore args))
-;;     (ecase command
-;;       (cram-common-designators:move-base
-;;        (su-demos::call-nav-action-ps argument)))));;change package in the future
-
-;; ;;Denotes the PM as avaivailable
-;; (cram-prolog:def-fact-group available-hsr-process-modules (cpm:available-process-module
-;;                                                            cpm:matching-process-module)
-
-;;   (cram-prolog:<- (cpm:available-process-module hsr-navigation))
+(defun test ()
   
-;;   (cram-prolog:<- (cpm:matching-process-module ?desig  hsr-navigation)
-;;     (desig:desig-prop ?desig (:type :going))))
+  (with-knowledge-result (result)
+      `(and ("has_urdf_name" object ,"left_table:table:table_front_edge_center")
+            ("object_rel_pose" object "perceive" result))
+    (move-hsr (make-pose-stamped-from-knowledge-result result)))
+   
+    (let ((?arm :left)
+          (?handle-link "iai_kitchen/shelf:shelf:shelf_door_left:handle")
+          (?poses  (list (cl-tf:make-pose-stamped
+                    "map" 0.0
+                    (cl-tf:make-3d-vector 0 0.8 0.0)
+                    (cl-tf:make-quaternion 0 0 1 1)))))
 
 
-;; ;;Designator inference rules
-;; (cram-prolog:def-fact-group hsr-motion-designators (desig:motion-grounding)
 
-;;   (cram-prolog:<- (desig:motion-grounding ?designator (going ?pose))
-;;     (desig:desig-prop ?designator (:type :going))
-;;     (desig:desig-prop ?designator (:target ?pose)))
+      ;(su-real::call-gripper-action 0.1)
+      (park-robot)
+     ;; (exe:perform (desig:an action
+     ;;                        (type :pulling)
+     ;;                        (arm ?arm)
+     ;;                        (collision-mode :allow-all)
+     ;;                        ))
 
-;;   (cram-prolog:<- (desig:motion-grounding ?designator (going goal-pose))
-;;     (desig:desig-prop ?designator (:type :going))
-;;     (desig:desig-prop ?designator (:x ?x))
-;;     (desig:desig-prop ?designator (:y ?y))
-;;     (desig:desig-prop ?designator (:angle ?angle))))
+       
 
-;; ;; ------
-;; (prolog:def-fact-group giskard-pm (cpm:matching-process-module
-;;                                    cpm:available-process-module)
+       
 
-;;   (prolog:<- (cpm:matching-process-module ?motion-designator giskard:giskard-pm)
-;;     (or (desig:desig-prop ?motion-designator (:type :moving-tcp))
-;;         (desig:desig-prop ?motion-designator (:type :moving-gripper-joint))
-;;         (desig:desig-prop ?motion-designator (:type :moving-arm-joints))
-;;         (desig:desig-prop ?motion-designator (:type :pulling))
-;;         (desig:desig-prop ?motion-designator (:type :pushing))
-;;         (desig:desig-prop ?motion-designator (:type :going))
-;;         (desig:desig-prop ?motion-designator (:type :moving-torso))
-;;         (desig:desig-prop ?motion-designator (:type :moving-custom))
-;;         (desig:desig-prop ?motion-designator (:type :looking))
-;;         (desig:desig-prop ?motion-designator (:type :closing-gripper))
-;;         (desig:desig-prop ?motion-designator (:type :opening-gripper))))
+      
+      (exe:perform (desig:a motion
+                            (type reaching)
+                            (collision-mode :allow-all)
+                            (object-name ?handle-link)
+                            )
+                     )
 
-;;   (prolog:<- (cpm:available-process-module giskard:giskard-pm)
-;;     (prolog:not (cpm:projection-running ?_))))
+      ;; (exe:perform (desig:a motion
+      ;;                       (type :closing-gripper)))
 
+         ;(su-real::call-gripper-action -0.1)
+
+
+        ;(cram-giskard::call-environment-manipulation-action :open-or-close :open :arm :left :handle-link ?handle-link :joint-angle -0.5)
+        ;(su-real::call-gripper-action 0.1)
+
+      ;; (exe:perform (desig:a motion
+      ;;                   (type :retracting)(su-real::with-hsr-process-modules 
+      ;;                   (collision-mode :allow-fingers)
+      ;;                   (tip-link t)))
+       )
+
+
+  )
+
+
+
+
+
+(defun test-perception ()
+
+  ;;(park-robot)
+
+
+  ;; (with-knowledge-result (result)
+  ;;     `(and ("has_urdf_name" object ,"left_table:table:table_front_edge_center")
+  ;;           ("object_rel_pose" object "perceive" result))
+  ;;   (move-hsr (make-pose-stamped-from-knowledge-result result)))
+
+
+  
+  (let* ( (?source-object-desig
+           (desig:all object
+                     (type :everything)))
+         (?object-desig
+           (exe:perform (desig:an action
+                                  (type detecting)
+                                  (object ?source-object-desig)))))
+    (print ?object-desig))
+
+
+
+
+  )
+
+
+
+
+         ;; (roslisp:with-fields 
+         ;;     ((?pose
+         ;;       (cram-designators::pose cram-designators:data))) 
+         ;;     ?object-desig
+         
+      
+           ;;Moves the gripper to the cereal box, implicitly opens the gripper beforehand.
+           
+          ;; (let (;; (?pose (cl-tf2::make-pose-stamped
+                 ;;         "map" 0
+                 ;;         (cl-tf2::make-3d-vector 1.5990473514373078d0 -0.9011317748330292d0 0.715d0)
+                 ;;         (cl-tf2::make-quaternion 0 0 0 1)))
+                 ;; (?object-size
+                 ;;   (cl-tf2::make-3d-vector 0.08 0.08 0.06)))
+      
+    ;; (exe:perform (desig:a motion
+    ;;                       (type :opening-gripper)))
+      
+      ;; (exe:perform (desig:a motion
+       ;;                      (type reaching)
+       ;;                      (collision-mode :allow-hand)
+       ;;                      ;(collision-object-b-link "Shelf_OGTVKLRY")
+       ;;                      (object-name "Shelf_OGTVKLRY"))
+             ;; (exe:perform (desig:an action
+             ;;                        (type picking-up)
+             ;;                        (handle-link ?handle-link)
+             ;;                        (collision-mode :avoid-all)
+             ;;                        ()))
+             ;;))
+
+    ;;(park-robot)
+
+  ;;))  
+
+
+  
+
+(defun storing-groceries-demo (number-of-objects)
+  (print "Starting Storing Groceries Demo")
+
+
+  (park-robot)
+
+
+  ;;Wait for start signal
+
+  ;;Move to shelf
+    (with-knowledge-result (result)
+      `(and ("has_urdf_name" object "shelf:shelf:shelf_base_center")
+            ("object_rel_pose" object "perceive" result))
+    (move-hsr (make-pose-stamped-from-knowledge-result result)))
+
+  ;; ;;Open the shelf
+
+
+  ;; (let ((?handle-link "iai_kitchen/shelf:shelf:shelf_door_right:handle")
+  ;;       (?joint-angle 0.4))
+    
+  ;;   (exe:perform (desig:an action
+  ;;                          (type opening-door)
+  ;;                          (handle-link ?handle-link)
+  ;;                          (joint-angle ?joint-angle)
+  ;;                          (tip-link t)
+  ;;                          (collision-mode :allow-all))))
+
+
+  (park-robot)
+  
+
+  
+  ;;Move to table
+  (with-knowledge-result (result)
+      `(and ("has_urdf_name" object ,"left_table:table:table_front_edge_center")
+            ("object_rel_pose" object "perceive" result))
+    (move-hsr (make-pose-stamped-from-knowledge-result result)))
+
+
+
+  ;;Perceive and Pick up the Object
+  (let* ((?source-object-desig
+           (desig:an object
+                     (type :pringles)))
+         (?object-desig
+           (exe:perform (desig:an action
+                                  (type detecting)
+                                  (object ?source-object-desig)))))
+    
+
+
+    (roslisp:with-fields 
+        ((?pose
+          (cram-designators::pose cram-designators:data))) 
+        ?object-desig
+
+      (let ((?object-size
+              (cl-tf2::make-3d-vector 0.06 0.145 0.215)))
+        (exe:perform (desig:an action
+                               (type picking-up)
+                               (object-pose ?pose)
+                               (object-size ?object-size)
+                               (collision-mode :allow-all)))))
+
+
+    )
+
+
+
+  ;;Move back to the Shelf
+  (with-knowledge-result (result)
+      `(and ("has_urdf_name" object ,"iai_kitchen/shelf:shelf:shelf_center")
+            ("object_rel_pose" object "perceive" result))
+    (move-hsr (make-pose-stamped-from-knowledge-result result)))
+
+  (let ((?object-height 0.1)
+        (?target-pose (cl-tf:make-pose-stamped
+                       "map" 0.0
+                       (cl-tf:make-3d-vector 0.0839 1.68 0.725)
+                       (cl-tf:make-quaternion 0 0 0 1))))    
+    (exe:perform (desig:an action
+                           (type :placing)
+                           (target-pose ?target-pose)
+                           (object-height ?object-height)
+                           (collision-mode :allow-all))))
+
+
+
+
+
+      )

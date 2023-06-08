@@ -67,7 +67,7 @@
                                         ,(su-demos::round-for-knowrob w2)
                                         ,(su-demos::round-for-knowrob w3)
                                         ,(su-demos::round-for-knowrob w0)))
-                            (list ("shape" ("box" 0.19 0.07 0.29))))
+                            (list ("shape" ("box" 0.145 0.06 0.22))))
         (add-object-to-collision-scene-knowrob
          name)))))
 
@@ -228,3 +228,46 @@
                          (btr:get-robot-object)
                          object-name)))))))
           (btr:objects btr:*current-bullet-world*)))
+
+
+(defun giskard-testing ()
+     (let* ((?source-object-desig
+                     (desig:an object
+                               (type :muesli)))
+            (?object-desig
+              (exe:perform (desig:an action
+                                     (type detecting)
+                                     (object ?source-object-desig))))
+            (?knowledge-name 
+              (roslisp:with-fields ((frame (cl-transforms-stamped:frame-id cram-designators::pose cram-designators:data))
+                                    (w0 (w cl-transforms:orientation cram-designators::pose cram-designators:data))
+                                    (w1 (x cl-transforms:orientation cram-designators::pose cram-designators:data))
+                                    (w2 (y cl-transforms:orientation cram-designators::pose cram-designators:data))
+                                    (w3 (z cl-transforms:orientation cram-designators::pose cram-designators:data))
+                                    (x (x cl-transforms:origin cram-designators::pose cram-designators:data))
+                                    (y (y cl-transforms:origin cram-designators::pose cram-designators:data))
+                                    (z (z cl-transforms:origin cram-designators::pose cram-designators:data))
+                                    (type (cram-designators:description)))
+                  ?object-desig
+                (su-demos::with-knowledge-result (name)
+                    `("create_object" name (|:| "soma" "CerealBox")
+                            (list ,frame
+                                  (list ,(su-demos::round-for-knowrob x)
+                                        ,(su-demos::round-for-knowrob y)
+                                        ,(su-demos::round-for-knowrob z))
+                                  (list ,(su-demos::round-for-knowrob w1)
+                                        ,(su-demos::round-for-knowrob w2)
+                                        ,(su-demos::round-for-knowrob w3)
+                                        ,(su-demos::round-for-knowrob w0)))
+                            (list ("shape" ("box" 0.145 0.06 0.22))))
+                  name))))
+       (add-object-to-collision-scene-knowrob ?knowledge-name)
+       (print ?knowledge-name)
+       ;;(break)
+       (su-demos::with-knowledge-result (frame)
+           `("object_shape_workaround" ,?knowledge-name frame _ _ _)
+         (let ((?object-name frame))
+           (exe:perform (desig:an action
+                                  (type picking-up)
+                                  (object-name ?object-name)
+                                  (collision-mode :allow-all)))))))

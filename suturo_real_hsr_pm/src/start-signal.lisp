@@ -28,7 +28,7 @@
                (when (> (nth 481 (coerce ?ranges 'list)) 1.0)
                   (setf (cpl:value fl) t)
                   (roslisp:unsubscribe *current-subscriber*)))))
-       (su-demos:call-text-to-speech-action "Waiting for startingsignal.")
+       ;;(su-demos:call-text-to-speech-action "Waiting for startingsignal.")
        (setf *current-subscriber* (roslisp:subscribe "hsrb/base_scan" "sensor_msgs/LaserScan" #'laser-scan))
        (roslisp:ros-info (Start-Signal) "Waiting for door to open")
        

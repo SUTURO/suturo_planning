@@ -35,21 +35,25 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(defparameter *objects* '(:muesli :milk :spoon :bowl))
+(defparameter *objects* '(:muesli));; :milk :spoon :bowl))
 
 (defun serve-breakfast-demo()
-  (call-text-to-speech-action "Starting demo")
+  ;;(call-text-to-speech-action "Starting demo")
   
   (park-robot)
 
+  ;; (call-text-to-speech-action "Positioning in front of shelf")
   ;; Calls knowledge to receive coordinates of the shelf pose, then relays that pose to navigation
   (move-hsr (get-shelf-pos)) ;;(create-pose (call-knowledge "hsr_pose_shelf" :result 'pose)))
 
+  
+  
   (park-robot)
 
   (let ((?handle-link "iai_kitchen/shelf:shelf:shelf_door_left:handle")
-        (?joint-angle -1.1))
-    
+        (?joint-angle -1.2))
+
+    ;;(call-text-to-speech-action "Opening shelf door")
     (exe:perform (desig:an action
                            (type opening-door)
                            (handle-link ?handle-link)
@@ -63,6 +67,7 @@
 
   (park-robot)
 
+  ;;(call-text-to-speech-action "Trying to detect the object Cereal-Box")
   (mapc #'(lambda (?object-type)
         (let* ((?source-object-desig
                  (desig:an object
@@ -73,7 +78,8 @@
                                         (type detecting)
                                         (object ?source-object-desig))))
                (?target-pose (get-target-pos)))
-          
+
+          ;;(call-text-to-speech-action "Found object Cereal-Box")
           ;; Extracts pose from the return value of the detecting Designator.
           (roslisp:with-fields 
               ((?pose
@@ -86,8 +92,9 @@
             ;; - closing the gripper, thus gripping the object
             ;; - lifting the object
             ;; - retracting the arm to retrieve the object from, for example, a shelf
+            ;;(call-text-to-speech-action "Picking up the object Cereal-Box")
             (let ((?object-size
-                    (cl-tf2::make-3d-vector 0.06 0.145 0.215)))
+                    (cl-tf2::make-3d-vector 0.16 0.06 0.215)))
               (exe:perform (desig:an action
                                      (type picking-up)
                                      (object-type ?object-type)
@@ -96,14 +103,16 @@
                                      (collision-mode :allow-all)))))
           (park-robot)
 
+          ;;(call-text-to-speech-action "Moving to target location")
           ;; Calls knowledge to receive coordinates of the dinner table pose, then relays that pose to navigation
-          (move-hsr (create-pose (call-knowledge "hsr_pose_dinner_table" :result 'pose)))
+          (move-hsr (get-table-pos)) ;; (create-pose (call-knowledge "hsr_pose_dinner_table" :result 'pose)))
           
           ;; places the object by executing the following motions:
           ;; - preparing to place the object, by lifting the arm to an appropriate height
           ;; - placing the object
           ;; - opening the gripper, thus releasing the object
-          (let ((?object-height 0.215d0))    
+          (let ((?object-height 0.215d0))
+            ;;(call-text-to-speech-action "Placing object Cereal-Box")
             (exe:perform (desig:an action
                                    (type :placing)
                                    (target-pose ?target-pose)
@@ -111,7 +120,7 @@
                                    (collision-mode :allow-all))))
           
           ;; Calls knowledge to receive coordinates of the dinner table pose, then relays that pose to navigation
-          (move-hsr (create-pose (call-knowledge "hsr_pose_dinner_table" :result 'pose)))
+          (move-hsr (get-table-pos)) ;; (create-pose (call-knowledge "hsr_pose_dinner_table" :result 'pose)))
           
           (park-robot)))
         *objects*)
@@ -255,3 +264,43 @@
 
     
   
+(defun pouring-test ()
+  (let* ((?source-object-desig
+           (desig:an object
+                     (type bowl)))
+         (?object-desig
+           (exe:perform (desig:an action
+                                  (type detecting)
+                                  (object ?source-object-desig))))
+         (?object-size1 (cl-tf2::make-3d-vector 0.09 0.09 0.05))
+         (?object-size2 (cl-tf2::make-3d-vector 0.06 0.16 0.215))
+         (?new-origin (cl-transforms:make-3d-vector
+                       (/ (+ (cl-transforms:x ?object-size1)
+                             (cl-transforms:x ?object-size2))
+                          2)
+                       0
+                       (/ (+ (cl-transforms:z ?object-size1)
+                             (cl-transforms:z ?object-size2))
+                          2)))
+         (?object-transform (man-int::get-object-transform ?object-desig))
+         (?temp-transform (cl-tf2::make-pose-stamped
+                           "base_footprint" 0
+                           ?new-origin
+                           (cl-tf2::make-quaternion 0 0 0 1)))
+         (?reach-transform (cram-tf:apply-transform
+                            (cl-tf:lookup-transform cram-tf:*transformer* "map" "base_footprint")
+                            (cram-tf:apply-transform ?object-transform
+                                                    (cram-tf:pose-stamped->transform-stamped
+                                                     ?temp-transform
+                                                     "base_footprint"))))
+         (?reach-pose (cram-tf:transform->pose-stamped
+                       "map" 0
+                       ?reach-transform)))
+    ?reach-pose))
+
+
+
+;; Idea:
+;; Change Reaching to approaching to generalize that kind of motion.
+;; Planning also give the "context" to manipulation, so manipulation can differentiate
+;; between for example, picking up and pouring

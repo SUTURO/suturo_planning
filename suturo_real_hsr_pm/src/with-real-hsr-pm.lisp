@@ -8,7 +8,9 @@
         suturo-pm
         giskard::giskard-pm
         common-desig:wait-pm
-        rk:robokudo-perception-pm)
+        rk:robokudo-perception-pm
+        joints:joint-state-pm
+        )
      (cpl-impl::named-top-level (:name :top-level),@body)))
 
 
@@ -77,6 +79,8 @@
         (desig:desig-prop ?motion-designator (:type :retracting))
         (desig:desig-prop ?motion-designator (:type :aligning-height))
         (desig:desig-prop ?motion-designator (:type :placing))
+        (desig:desig-prop ?motion-designator (:type :placing-neatly))
+        (desig:desig-prop ?motion-designator (:type :tilting))
         (desig:desig-prop ?motion-designator (:type :moving-gripper))
         (desig:desig-prop ?motion-designator (:type :moving-gripper-joint))
         (desig:desig-prop ?motion-designator (:type :moving-arm-joints))
@@ -93,6 +97,12 @@
   (prolog:<- (cpm:available-process-module giskard:giskard-pm)
     (prolog:not (cpm:projection-running ?_))))
 
+(prolog:def-fact-group joint-state-pm-facts (cpm:matching-process-module
+                                             cpm:available-process-module)
 
+  (prolog:<- (cpm:matching-process-module ?motion-designator joint-state-pm)
+    (or (desig:desig-prop ?motion-designator (:type :monitoring-joint-state))))
 
+  (prolog:<- (cpm:available-process-module joint-state-pm)
+    (prolog:not (cpm:projection-running ?_))))
 
