@@ -1,250 +1,278 @@
 (in-package :su-demos)
 
-(defun clean-the-table-demo ()
+;; @author Tim Alexander Rienits
+;;
+;; Perceives and picks up items from a table and places them inside a diswasher object in the urdf file.
+;; Thereafter, it places the dishwasher tab inside as well.
+;;
+;; "max-objects" dictates the number of objects to be picked and placed into the dishwasher.
+;;
+(defun clean-the-table-demo (&key max-objects)
 
-   (park-robot)
+  (let ((table "left_table:table:table_front_edge_center")
+        (dishwasher "shelf:shelf:shelf_base_center")        ;; TODO: Mit echtem Dishwasher ersetzen.
+        ;;(dishwasher-handle "shelf:shelf:shelf_base_center") ;; TODO: Mit echtem Dishwasher handle  ersetzen.
+        )
 
-   (move-hsr (get-table-pos))
-  
-   (let* ((?source-object-desig
-           (desig:an object
-                     (type :bowl)))
-         (?object-desig
-           (exe:perform (desig:all action
-                                  (type detecting)
-                                  (object ?source-object-desig))))
-          
-          (?target-pose (get-target-pos)))
-     
-     (print ?object-desig)
+    ;; Puts the HSR into its default pose.
+    (park-robot)
 
-      (roslisp:with-fields 
-              ((?pose
-                (cram-designators::pose cram-designators:data))) 
-              ?object-desig
+    ;; Move to table to perceive objects.
+    (urdf-move-to table)
 
-            (let ((?object-size
-                    (cl-tf2::make-3d-vector 0.16 0.06 0.215))) ;; TODO: BOWL SIZE
-              (exe:perform (desig:an action
-                                     (type picking-up)
-                                     (object-pose ?pose)
-                                     (object-size ?object-size)
-                                     (collision-mode :allow-all)))))
+    ;; Puts the HSR into a pose which is suited to perceive objects.
+    (perc-robot)
 
-      (park-robot)
-
-     (move-hsr (get-dishwasher-pos))
-
-      (let ((?object-height 0.215d0)) ;; TODO: BOWL HEIGHT, SEE BOWL SIZE ABOVE
-            (exe:perform (desig:an action
-                                   (type :placing)
-                                   (target-pose ?target-pose)
-                                   (object-height ?object-height)
-                                   (collision-mode :allow-all))))
-     
-     )
-  )
-
-
-
-;; (defun get-table-pos ()
-;;   (cl-tf2::make-pose-stamped
-;;    "map" 0
-;;    (cl-tf2::make-3d-vector 3.8 8.4 0)
-;;    (cl-tf2::make-quaternion 0 0 0 1)))
-
-;; (defun get-dishwasher-pos ()
-;;   (cl-tf2::make-pose-stamped
-;;    "map" 0
-;;    (cl-tf2::make-3d-vector 4.7 8.9 0)
-;;    (cl-tf2::make-quaternion 0 0 0 1)))
-
-;; (defun get-target-pos ()
-;;   (cl-tf2::make-pose-stamped
-;;    "map" 0
-;;    (cl-tf2::make-3d-vector 4.65 8.25 0.8)
-;;    (cl-tf2::make-quaternion 0 0 0 1)))
-
-;;@author Tim Rienits, Felix Krause
-(defun clean-the-table-demo-old ()
-  
-  (park-robot)
-
-  (let* ((?source-object-desig
-           (desig:an object
-                     (type :bowl)))
-         (?object-desig
-           (exe:perform (desig:all action
+    ;; Perceives the objects on the table, saves them in a list.
+    (let* ((?source-object-desig (desig:all object (type :everything)))
+           
+           (?list-of-objects
+            (exe:perform (desig:all action
                                   (type detecting)
                                   (object ?source-object-desig)))))
-    (print ?object-desig))
-  
 
-  (roslisp:with-fields 
-              ((?pose
-                (cram-designators::pose cram-designators:data))) 
-              ?object-desig
+      ;; TODO: Create Objects in Knowledge.
+
+
+      ;; Pick and place objects n times, depending on max-objects.
+      (dotimes (n max-objects)
+
+        ;; Sets all necessary variables, using the list-of-objects we just perceived. Pick&Place first object in list until list ends.
+        ;; TODO: Pick up optimal item based on current dishwasher.
+        ;; TODO: Object size (and maybe height) can be extracted from Perception.
+        ;; TODO: Place pose can be extracted from Knowledge.
+        ;;
+        (let* ((?current-object (pop ?list-of-objects)) ;;retrieve first element of perceived list and remove it after.
+               (?current-object-pose (extract-pose ?current-object))
+               (?object-size (cl-tf2::make-3d-vector 0.06 0.145 0.215)) ;;(extract-size ?current-object))
+               (?object-height 0.22d0)
+               (?place-poses (get-hardcoded-place-poses)) ;; Hardcoded poses inside the dishwasher.
+               (?place-pose (pop ?place-poses)))
+
+
+          ;; Pick up current object in perceived list.
+          (su-pick-up ?current-object-pose ?object-size)
+
+          (park-robot)
+
+          (urdf-move-to dishwasher)
+
+          ;; Place current object in perceived list into hardcoded pose inside the dishwasher.
+          (su-place ?place-pose ?object-height)
+
+          (park-robot)
+
+          (urdf-move-to table)
+
+          (print "I placed an object into the dishwasher. Will do the next one.")
             
-            ;; picks up the object by executing the following motions:
-            ;; - opening the gripper
-            ;; - reaching for the object
-            ;; - closing the gripper, thus gripping the object
-            ;; - lifting the object
-            ;; - retracting the arm to retrieve the object from, for example, a shelf
-            ;;(call-text-to-speech-action "Picking up the object Cereal-Box")
-            (let ((?object-size
-                    (cl-tf2::make-3d-vector 0.16 0.06 0.215)))
-              (exe:perform (desig:an action
-                                     (type picking-up)
-                                     (object-type ?object-type)
-                                     (object-pose ?pose)
-                                     (object-size ?object-size)
-                                     (collision-mode :allow-all)))))
- )
+          )))
 
-(defun clean-the-table-demo2()
-  ;;(with-hsr-process-modules
-  ;;(urdf-proj:with-simulated-robot
-    ;; (unwind-protect
-    ;;      (progn
-  ;;        (roslisp-utilities:startup-ros)
+    (print "I finished putting all the items inside the dishwasher. Will now put the dishwasher tab inside.")
 
-  (park-robot)
-
-  (move-hsr (create-pose (call-knowledge "hsr_pose_dinner_table" :result 'pose)))
-
-  (park-robot)
-  
-  (let* ((?source-object-desig
-           (desig:an object
-                     (type :muesli)))
-         (?object-desig
-           (exe:perform (desig:an action
-                                  (type detecting)
-                                  (object ?source-object-desig))))
-         (?target-pose (create-pose (call-knowledge "object_dest_pose_3" :result 'pose))))
-    (exe:perform (desig:an action
-                                  (type detecting)
-                                  (object ?source-object-desig)))
-    ;; Extracts pose from the return value of the detecting Designator.
-    (roslisp:with-fields 
-        ((?pose
-          (cram-designators::pose cram-designators:data))) 
-        ?object-desig
-
-      ;;Moves the gripper to the cereal box, implicitly opens the gripper beforehand.
-      (let ((?object-size
-              (cl-tf2::make-3d-vector 0.04 0.1 0.2)))
-        (exe:perform (desig:an action
-                               (type picking-up)
-                               (object-pose ?pose)
-                               (object-size ?object-size)
-                               (collision-mode :allow-all)))))
-
-    (park-robot)
+   ;; ======================================= DISHWASHER TAB =======================================================================
     
-    (move-hsr (create-pose (call-knowledge "hsr_pose_other_table" :result 'pose)))
-
-    (let ((?object-height 0.28d0))    
-      (exe:perform (desig:an action
-                             (type :placing)
-                             (target-pose ?target-pose)
-                             (object-height ?object-height)
-                             (collision-mode :allow-all))))
-
-    (move-hsr (create-pose (call-knowledge "hsr_pose_other_table" :result 'pose)))
+    (perc-robot)
     
-    (park-robot)
-    ;; (roslisp-utilities:shutdown-ros))
+    ;; Perceive the dishwasher tab.
+    (let* ((?source-object-desig (desig:an object (type :dishwashertab))) ;; TODO: type :tab
+           
+           (?dishwasher-tab
+            (exe:perform (desig:an action
+                                  (type detecting)
+                                  (object ?source-object-desig)))))
+      
+      ;; Same as above, but only for the tab instead.
+      (let* ((?dishwasher-tab-pose (extract-pose ?dishwasher-tab))
+             (?dishwasher-tab-size (cl-tf2::make-3d-vector 0.06 0.145 0.215)) ;; TODO: Insert Tab size.
+             (?dishwasher-tab-height 0.22d0)                                  ;; TODO: Insert Tab Height.
+             (?tab-place-pose (get-hardcoded-tab-pose)))
+
+
+
+        (su-pick-up ?dishwasher-tab-pose ?dishwasher-tab-size)
+        
+        (park-robot)
+
+        (urdf-move-to dishwasher)
+
+        (su-place ?tab-place-pose ?dishwasher-tab-height)
+
+        (print "I placed the tab into the dishwasher. Demo finished.")))
+    
     ))
 
 ;;@author Tim Rienits
-(defun clean-the-table-demo-bw ()
+;; Tests the functionality of placing the dishwasher tab inside le dishwasher.
+(defun test-tab ()
+
+   (let ((table "left_table:table:table_front_edge_center")
+        (dishwasher "shelf:shelf:shelf_base_center")        ;; TODO: Mit echtem Dishwasher ersetzen.
+        ;;(dishwasher-handle "shelf:shelf:shelf_base_center") ;; TODO: Mit echtem Dishwasher handle ersetzen.
+        )
+
+    (urdf-move-to table)  
   
-  (roslisp-utilities:startup-ros)
-   (urdf-proj:with-simulated-robot
-           (unwind-protect
-                (progn
-                 ;; (init-interfaces)
-                  (terpri)
-                  (format T "!PLAN WIRD GESTARTET!")
-                  (terpri)
-                  (spawn-pringles-on-table)
-                  (sleep 3)
-                  (move-in-front-of-pringles)
-                  (sleep 3)
-                  (pick-up-the-pringles)
-                  (sleep 3)
-
-                  ;;(let*((?first-pose (knowledge-get-drawer-pose)))
-                  ;;  (exe:perform
-                  ;;   (desig:an action
-                  ;;             (type going)
-                  ;;             (target (desig:a location (pose ?first-pose))))))
-                  
-                  ))))
-
-(defun spawn-pringles-on-table ()
-  "Spawn primitive cylinder as :pringles item."
-    (btr:add-object btr:*current-bullet-world* :cylinder-item 'cylinder-1
-                    '((1.6 -1.4 0.987) (0 0 1 1))
-                    :mass 0.2 :size (cl-transforms:make-3d-vector 0.03 0.03 0.08)
-                    :item-type :pringles))
-
-(defun move-in-front-of-pringles ()
-  "Move in front of les pringles."
-  (let* ((vector  (cl-tf2::make-3d-vector 1.0d0 -1.4d0 0d0))
-         (rotation (cl-tf2::make-quaternion 0.0 0.0 0.0 1.0)))
+    (perc-robot)
     
-    (move-hsr (cl-tf2::make-pose-stamped "map" 0 vector rotation))
-    ))
+    ;; Perceive the dishwasher tab.
+    (let* ((?source-object-desig (desig:an object (type :dishwashertab))) ;; TODO: type :tab
+           
+           (?dishwasher-tab
+            (exe:perform (desig:an action
+                                  (type detecting)
+                                  (object ?source-object-desig)))))
 
-(defun pick-up-the-pringles ()
-  "Detect and pick up les pringles."
-  (let*((?pringles-desig
-                    (desig:an object
-                              (type :pringles)))
-       (?perceived-object-desig
-                    (exe:perform (desig:an action
-                                           (type detecting)
-                                           (object ?pringles-desig)))))
+
+      (print ?dishwasher-tab)
+
+      (let* ((?dishwasher-tab-pose (extract-pose ?dishwasher-tab))
+             (?dishwasher-tab-size (cl-tf2::make-3d-vector 0.06 0.145 0.215)) ;; TODO: Insert Tab size.
+             (?dishwasher-tab-height 0.22d0)                                  ;; TODO: Insert Tab Height.
+             (?tab-place-pose (get-hardcoded-tab-pose)))
+
+
+
+        (su-pick-up ?dishwasher-tab-pose ?dishwasher-tab-size)
+        
+        (park-robot)
+
+        (urdf-move-to dishwasher)
+
+        (su-place ?tab-place-pose ?dishwasher-tab-height)
+
+        (print "I placed the tab into the dishwasher. Demo finished.")))
+     ))
+
+;;@author Tim Rienits
+;; Tests the functionality of placing the dishwasher tab inside le dishwasher.
+(defun test-object ()
+
+   (let ((table "left_table:table:table_front_edge_center")
+        (dishwasher "imaginary_dishwasher:dishwasher_door")        ;; TODO: Mit echtem Dishwasher ersetzen.
+        ;;(dishwasher-handle "shelf:shelf:shelf_base_center") ;; TODO: Mit echtem Dishwasher handle ersetzen.
+        )
+
+    ;;(urdf-move-to table)  
+  
+    ;;(perc-robot)
     
-    ;;(exe-perform-type :picking-up :arm :left :object ?perceived-object-desig)
-
-     (roslisp:with-fields 
-                 ((?pose
-                   (cram-designators::pose cram-designators:data))) 
-                 ?perceived-object-desig
-
-       ;;Moves the gripper to the cereal box, implicitly opens the gripper beforehand.
-
-       (let ((?superpose (list ?pose)))
-        (mapc
-         (lambda (?current-left-approach-poses)
-           (let ((?poses `(,?current-left-approach-poses)))
-             (exe:perform
-              (desig:an action
-                  (type poking)
-                  (left-poses ?poses)
-                  (collision-mode :allow-all)))))
-         ?superpose))
-       
-              ;; (exe:perform (desig:an action
-              ;;                       (type approaching)
-                                     ;;(box-pose ?pose)
-                                     ;;(grasp-type 0)
-              ;;                       (left-poses ?pose)
-              ;;                       (collision-mode :allow-all)
-              ;;                       ))
-
-               ;;Function call that closes the gripper.
-               ;;(giskard::call-custom-gripper-action :open-gripper 0)
-
-               ;;Takes the cereal box from the table.
-               )
+    ;; Perceive the dishwasher tab.
+    (let* ((?source-object-desig (desig:an object (type :cerealbox))) ;; TODO: type :tab
+           
+           (?dishwasher-tab
+            (exe:perform (desig:an action
+                                  (type detecting)
+                                  (object ?source-object-desig)))))
 
 
-   ;; (exe-perform-type :reaching :arm :left :object ?pringles-desig)
-    ))
+      (print ?dishwasher-tab)
+
+      (let* ((?dishwasher-tab-pose (extract-pose ?dishwasher-tab))
+             (?dishwasher-tab-size (cl-tf2::make-3d-vector 0.06 0.145 0.215)) ;; TODO: Insert Tab size.
+             (?dishwasher-tab-height 0.22d0)                                  ;; TODO: Insert Tab Height.
+             (?tab-place-pose (get-hardcoded-tab-pose)))
+
+
+
+        (su-pick-up ?dishwasher-tab-pose ?dishwasher-tab-size)
+        
+        (park-robot)
+
+        ;;(urdf-move-to dishwasher)
+
+        (move-hsr (cl-tf2::make-pose-stamped "map" 0 (cl-tf2::make-3d-vector -0.5d0 -1.0d0 0d0) (cl-tf2::make-quaternion 0.0 0.0 0.0 1.0)))
+        
+        (su-place ?tab-place-pose ?dishwasher-tab-height)
+
+        (print "I placed the tab into the dishwasher. Demo finished.")))
+ ))
+
+;;@author Tim Rienits
+;;
+;; Uses an action Designator to pick up an object.
+;;
+;; ?pose - The pose of the object to be picked up.
+;;
+;; ?size - The size of the object to be picked up.
+;;
+(defun su-pick-up (?pose ?size)
+   (exe:perform (desig:an action
+                          (type picking-up)
+                          (object-pose ?pose)
+                          (object-size ?size)
+                          (collision-mode :allow-all)))
+
+  )
+
+;;@author Tim Rienits
+;;
+;; Uses an action Designator to place an object.
+;;
+;; ?pose - The pose where the object should be placed.
+;;
+;; ?height - The height of the object to be placed.
+;;
+(defun su-place (?pose ?height)
+    (exe:perform (desig:an action
+                           (type :placing)
+                           (target-pose ?pose)
+                           (object-height ?height)
+                           (collision-mode :allow-all)))
+
+  )
+
+;;@author Felix Krause
+;; Extracts the pose from an Object Designator.
+(defun extract-pose (object)
+  (roslisp:with-fields 
+      ((?pose
+        (cram-designators::pose cram-designators:data))) 
+      object    
+    ?pose))
+
+;;@author Felix Krause
+(defun extract-type (object)
+  (roslisp:with-fields 
+      ((?type
+        (cram-designators::object-identifier cram-designators:data))) 
+      object    
+     (intern (string-trim "-1" ?type) :keyword)))
+
+;;@author Tim Rienits
+;; The hardcoded poses, where objects are to be placed into the dishwasher.
+(defun get-hardcoded-place-poses ()
+  (list (cl-tf:make-pose-stamped "map" 0.0  (cl-tf:make-3d-vector 0.15 1.73 0.725) (cl-tf:make-quaternion 0 0 0 1))
+        (cl-tf:make-pose-stamped "map" 0.0  (cl-tf:make-3d-vector 0.15 1.73 0.47) (cl-tf:make-quaternion 0 0 0 1))
+        (cl-tf:make-pose-stamped "map" 0.0  (cl-tf:make-3d-vector 0.15 1.73 0.11) (cl-tf:make-quaternion 0 0 0 1))))
+
+;;@author Tim Rienits
+;; The hardcoded pose where the dishwasher tab should be placed.
+(defun get-hardcoded-tab-pose ()
+  (cl-tf:make-pose-stamped "map" 0.0  (cl-tf:make-3d-vector -1.0 1.25 0.52) (cl-tf:make-quaternion 0 0 0 1)))
+
+
+;;@author Tim Rienits
+;; Moves the HSR to urdf-object by querying the pose of it in Knowledge.
+(defun urdf-move-to (urdf-object)
+  
+ (with-knowledge-result (result)
+        `(and ("has_urdf_name" object ,urdf-object)
+              ("object_rel_pose" object "perceive" result))
+      (move-hsr (make-pose-stamped-from-knowledge-result result)))
+  )
+
+;;@author Tim Rienits
+;; Tests if object is cutlery (spoon, fork, knife) and instead of picking it up, it gets it handed instead.
+(defun do-you-even-cutlery (object)
+  
+  (when (or (equal (extract-type object) :spoon)
+            (equal (extract-type object) :fork)
+            (equal (extract-type object) :knife))
+
+    (wait-for-human-signal)
+
+    )
+  )
 
   

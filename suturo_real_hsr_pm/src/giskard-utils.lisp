@@ -1,6 +1,5 @@
 (in-package :su-real)
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;; KNOWROB EVENT HANDLERS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defmethod coe:on-event giskard-attach-object ((event cpoe:object-attached-robot-knowrob))
@@ -18,7 +17,8 @@
     (let ((object-name (cpoe:event-object-name event)))
       (if object-name
           ;; if object-name is given, detach given object
-          (detach-object-in-collision-scene-knowrob object-name)
+          ;; (detach-object-in-collision-scene-knowrob object-name)
+          (print "x")
           ;; otherwise detach all objects from the given arm
           (let* ((arm
                    (cpoe:event-arm event))
@@ -43,7 +43,28 @@
   ;; when we are not under timepressure when executing the plan, it might be good to perceive
   ;; the object again to confirm, which would give us the exact pose again.
   (unless cram-projection:*projection-environment*
-    (update-object-pose-in-collision-scene-knowrob (cpoe:event-object-name event))))
+    (roslisp:with-fields ((frame (cl-transforms-stamped:frame-id))
+                          (w0 (w cl-transforms:orientation))
+                          (w1 (x cl-transforms:orientation))
+                          (w2 (y cl-transforms:orientation))
+                          (w3 (z cl-transforms:orientation))
+                          (x (x cl-transforms:origin))
+                          (y (y cl-transforms:origin))
+                          (z (z cl-transforms:origin)))
+        (cpoe::event-pose event)
+      (su-demos::with-knowledge-result ()
+          `("object_pose" ,(cpoe::event-object-name event) (list ,frame
+                                  (list ,(su-demos::round-for-knowrob x)
+                                        ,(su-demos::round-for-knowrob y)
+                                        ,(su-demos::round-for-knowrob (+ z (/ (cpoe::event-height event) 2))))
+                                  (list ,(su-demos::round-for-knowrob w1)
+                                        ,(su-demos::round-for-knowrob w2)
+                                        ,(su-demos::round-for-knowrob w3)
+                                        ,(su-demos::round-for-knowrob w0))))
+        (print "updated")
+        (break)
+    ;; (update-object-pose-in-collision-scene-knowrob (cpoe:event-object-name event))
+        ))))
 
 (defmethod coe:on-event giskard-perceived ((event cpoe:object-perceived-event-knowrob))
   (unless cram-projection:*projection-environment*
@@ -55,10 +76,14 @@
                           (x (x cl-transforms:origin cram-designators::pose cram-designators:data))
                           (y (y cl-transforms:origin cram-designators::pose cram-designators:data))
                           (z (z cl-transforms:origin cram-designators::pose cram-designators:data))
-                          (type (cram-designators:description)))
+                          (description (cram-designators:description))
+                          (radius (robokudo_msgs-msg::radius cram-designators::objectsize cram-designators:data))
+                          (x-size (x_size robokudo_msgs-msg::dimensions cram-designators::objectsize cram-designators:data))
+                          (y-size (y_size robokudo_msgs-msg::dimensions cram-designators::objectsize cram-designators:data))
+                          (z-size (z_size robokudo_msgs-msg::dimensions cram-designators::objectsize cram-designators:data)))
         (cpoe:event-object-designator event)
       (su-demos::with-knowledge-result (name)
-          `("create_object" name (|:| "soma" "CerealBox")
+          `("create_object" name ,(su-demos::transform-key-to-string (second (second description)))  ;;TODO Extract keyword
                             (list ,frame
                                   (list ,(su-demos::round-for-knowrob x)
                                         ,(su-demos::round-for-knowrob y)
@@ -68,8 +93,10 @@
                                         ,(su-demos::round-for-knowrob w3)
                                         ,(su-demos::round-for-knowrob w0)))
                             (list ("shape" ("box" 0.145 0.06 0.22))))
-        (add-object-to-collision-scene-knowrob
-         name)))))
+        (print name)
+        ;; (add-object-to-collision-scene-knowrob
+        ;;  name)
+        ))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;; KNOWROB UTILS ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -233,7 +260,7 @@
 (defun giskard-testing ()
      (let* ((?source-object-desig
                      (desig:an object
-                               (type :muesli)))
+                               (type :crackerbox)))
             (?object-desig
               (exe:perform (desig:an action
                                      (type detecting)
@@ -247,10 +274,13 @@
                                     (x (x cl-transforms:origin cram-designators::pose cram-designators:data))
                                     (y (y cl-transforms:origin cram-designators::pose cram-designators:data))
                                     (z (z cl-transforms:origin cram-designators::pose cram-designators:data))
-                                    (type (cram-designators:description)))
+                                    (radius (robokudo_msgs-msg::radius cram-designators::objectsize cram-designators:data))
+                                    (x-size (x_size robokudo_msgs-msg::dimensions cram-designators::objectsize cram-designators:data))
+                                    (y-size (y_size robokudo_msgs-msg::dimensions cram-designators::objectsize cram-designators:data))
+                                    (z-size (z_size robokudo_msgs-msg::dimensions cram-designators::objectsize cram-designators:data)))
                   ?object-desig
                 (su-demos::with-knowledge-result (name)
-                    `("create_object" name (|:| "soma" "CerealBox")
+                    `("create_object" name (|:| "soma" "CrackerBox")
                             (list ,frame
                                   (list ,(su-demos::round-for-knowrob x)
                                         ,(su-demos::round-for-knowrob y)
@@ -259,11 +289,15 @@
                                         ,(su-demos::round-for-knowrob w2)
                                         ,(su-demos::round-for-knowrob w3)
                                         ,(su-demos::round-for-knowrob w0)))
-                            (list ("shape" ("box" 0.145 0.06 0.22))))
-                  name))))
+                            (list ("shape" ("box" ,(coerce y-size 'single-float)
+                                                  ,(coerce x-size 'single-float)
+                                                  ,(coerce z-size 'single-float)))))
+                  name)
+                (print frame))))
+       (break)
        (add-object-to-collision-scene-knowrob ?knowledge-name)
        (print ?knowledge-name)
-       ;;(break)
+       (break)
        (su-demos::with-knowledge-result (frame)
            `("object_shape_workaround" ,?knowledge-name frame _ _ _)
          (let ((?object-name frame))

@@ -24,18 +24,22 @@
 
   (cpl:with-retry-counters ((manip-retries 1))
     (cpl:with-failure-handling
-        ((common-fail:manipulation-low-level-failure (e)
+        ((common-fail:gripper-closed-completely (e)
            (roslisp:ros-warn (suturo-pickup grasp-object)
                              "Some manipulation failure happened: ~a"
                              e)
            (cpl:do-retry manip-retries
              (roslisp:ros-warn (suturo-pickup grasp-object) "Retrying...")
-             (su-demos:park-robot)
-             (let* ((?object-type :muesli)
-                    (?source-object-desig
+             (exe:perform (desig:a motion
+                        (type :retracting)
+                        (collision-mode ?collision-mode)
+                        (object-name ?object-name)))
+             (su-demos::perc-robot)
+             ;; add "looking" to old object-position before perceiving again
+             (let* ((?source-object-desig
                       (desig:an object
                                 (type ?object-type)))
-                    ;; detect object and safe the return value
+                    ;; detect object and save the return value
                     (?object-desig
                       (exe:perform (desig:an action
                                              (type detecting)
@@ -72,17 +76,32 @@
                         (:open-close :open)
                         (effort 0.1)))
       
-      (exe:perform (desig:a motion
-                            (type reaching)
-                            (collision-mode ?collision-mode)
-                            (object-pose ?object-pose)
-                            (object-size ?object-size)
-                            (object-name ?object-name)))
+        (exe:perform (desig:a motion
+                              (type reaching)
+                              (collision-mode ?collision-mode)
+                              (object-pose ?object-pose)
+                              (object-size ?object-size)
+                              (object-name ?object-name)))
+        
+        (cpl:pursue
+          (cpl:seq
+            (exe:perform (desig:a motion
+                                  (type gripper-motion)
+                                  (:open-close :close)
+                                  (effort 0.1)))
+            (sleep 1)
+            (su-demos::call-text-to-speech-action "Managed to grasp the object"))
+          (cpl:seq
+            (exe:perform
+             (desig:an action
+                       (type monitoring-joint-state)
+                       (joint-name "hand_l_proximal_joint")))
+            (su-demos::call-text-to-speech-action "Failed to grasp the object, retrying")
+            (sleep 1)
+            (cpl:fail 'common-fail:gripper-closed-completely
+                      :description "Object slipped")))
+          ))
       
-      (exe:perform (desig:a motion
-                        (type gripper-motion)
-                        (:open-close :close)
-                        (effort 0.1)))))
       
   (exe:perform (desig:a motion
                         (type :lifting)
@@ -110,7 +129,8 @@
                         (align-planes-left ?align-planes-left)
                         (align-planes-right ?align-planes-right)
                         (precise-tracking ?precise-tracking)
-                        (object-name ?object-name)))))
+                        (object-name ?object-name)))
+    ))
 
 ;; @author Luca Krohm
 ;; @TODO failurehandling
@@ -132,8 +152,40 @@
   (declare (type boolean ?move-base ?prefer-base ?straight-line ?precise-tracking
                  ?align-planes-left ?align-planes-right))
 
+  ;;von hier
+
+  (exe:perform (desig:a motion
+                        (type aligning-height)
+                        (collision-mode ?collision-mode)
+                        (collision-object-b ?collision-object-b)
+                        (collision-object-b-link ?collision-object-b-link)
+                        (collision-object-a ?collision-object-a)
+                        (allow-base ?move-base)
+                        (prefer-base ?prefer-base)
+                        (straight-line ?straight-line)
+                        (align-planes-left ?align-planes-left)
+                        (align-planes-right ?align-planes-right)
+                        (precise-tracking ?precise-tracking)
+                        (goal-pose ?target-pose)
+                        (object-height ?object-height)))
+
+  (exe:perform (desig:a motion
+                        (type placing)
+                        (collision-mode ?collision-mode)
+                        (collision-object-b ?collision-object-b)
+                        (collision-object-b-link ?collision-object-b-link)
+                        (collision-object-a ?collision-object-a)
+                        (allow-base ?move-base)
+                        (prefer-base ?prefer-base)
+                        (straight-line ?straight-line)
+                        (align-planes-left ?align-planes-left)
+                        (align-planes-right ?align-planes-right)
+                        (precise-tracking ?precise-tracking)
+                        (target-pose ?target-pose)
+                        (object-height ?object-height)))
+
   ;; (exe:perform (desig:a motion
-  ;;                       (type aligning-height)
+  ;;                       (type placing-neatly)
   ;;                       (collision-mode ?collision-mode)
   ;;                       (collision-object-b ?collision-object-b)
   ;;                       (collision-object-b-link ?collision-object-b-link)
@@ -144,42 +196,12 @@
   ;;                       (align-planes-left ?align-planes-left)
   ;;                       (align-planes-right ?align-planes-right)
   ;;                       (precise-tracking ?precise-tracking)
-  ;;                       (goal-pose ?target-pose)
-  ;;                       (object-height ?object-height)))
+  ;;                       (target-pose ?target-pose)))
 
-  ;; (exe:perform (desig:a motion
-  ;;                       (type placing)
-  ;;                       (collision-mode ?collision-mode)
-  ;;                       (collision-object-b ?collision-object-b)
-  ;;                       (collision-object-b-link ?collision-object-b-link)
-  ;;                       (collision-object-a ?collision-object-a)
-  ;;                       (allow-base ?move-base)
-  ;;                       (prefer-base ?prefer-base)
-  ;;                       (straight-line ?straight-line)
-  ;;                       (align-planes-left ?align-planes-left)
-  ;;                       (align-planes-right ?align-planes-right)
-  ;;                       (precise-tracking ?precise-tracking)
-  ;;                       (target-pose ?target-pose)
-  ;;                       (object-height ?object-height)))
-
-  ;; ;; (exe:perform (desig:a motion
-  ;; ;;                       (type placing-neatly)
-  ;; ;;                       (collision-mode ?collision-mode)
-  ;; ;;                       (collision-object-b ?collision-object-b)
-  ;; ;;                       (collision-object-b-link ?collision-object-b-link)
-  ;; ;;                       (collision-object-a ?collision-object-a)
-  ;; ;;                       (allow-base ?move-base)
-  ;; ;;                       (prefer-base ?prefer-base)
-  ;; ;;                       (straight-line ?straight-line)
-  ;; ;;                       (align-planes-left ?align-planes-left)
-  ;; ;;                       (align-planes-right ?align-planes-right)
-  ;; ;;                       (precise-tracking ?precise-tracking)
-  ;; ;;                       (target-pose ?target-pose)))
-
-  ;; (exe:perform (desig:a motion
-  ;;                       (type gripper-motion)
-  ;;                       (:open-close :open)
-  ;;                       (effort 0.1)))
+  (exe:perform (desig:a motion
+                        (type gripper-motion)
+                        (:open-close :open)
+                        (effort 0.1)))
   
   (exe:perform (desig:a motion
                         (type :retracting)
@@ -305,7 +327,7 @@
                              (cl-transforms:z ?object-size))
                           2)))
          ;; object pose to object transform
-         (?object-transform (man-int::get-object-transform ?target-object))
+         (?object-transform (cl-tf:lookup-transform cram-tf:*transformer* "base_footprint" ?target-object));; (man-int::get-object-transform ?target-object))
          ;; rel pose to rel transform
          (?rel-pose-transform (cl-tf2::make-pose-stamped
                                "base_footprint" 0
@@ -322,6 +344,14 @@
          (?pour-pose (cram-tf:transform->pose-stamped
                        "map" 0
                        ?pour-pose-transform)))
+
+    (let ((?height 0.2215))
+      (exe:perform (desig:a motion
+                            (type aligning-height)
+                            (collision-mode ?collision-mode)
+                            (goal-pose ?pour-pose)
+                            (object-height ?height)
+                            (object-name ?target-name))))
     
     (exe:perform (desig:a motion
                           (type reaching)
@@ -332,22 +362,23 @@
 
     (exe:perform (desig:a motion
                           (type tilting)
-                          (collision-mode ?collision-mode)
-                          (object-name ?target-name)))
+                          (tilt-direction "right")
+                          (tilt-angle 2.0d0)
+                          (collision-mode ?collision-mode)))
+                          
 
-    ;; TODO "level object"? basically reverse tilting
-    ;; (exe:perform (desig:a motion
-    ;;                       (type level)
-    ;;                       (collision-mode ?collision-mode)
-    ;;                       (object-name ?target-name)))
+    (exe:perform (desig:a motion
+                          (type tilting)
+                          (tilt-angle 0.0d0)
+                          (collision-mode ?collision-mode)))
 
     
-    ;; (exe:perform (desig:a motion
-    ;;                     (type :retracting)
-    ;;                     (collision-mode ?collision-mode)
-    ;;                     (collision-object-b ?collision-object-b)
-    ;;                     (collision-object-b-link ?collision-object-b-link)
-    ;;                     (collision-object-a ?collision-object-a)))
+    (exe:perform (desig:a motion
+                        (type :retracting)
+                        (collision-mode ?collision-mode)
+                        (collision-object-b ?collision-object-b)
+                        (collision-object-b-link ?collision-object-b-link)
+                        (collision-object-a ?collision-object-a)))
     ))      
 
 

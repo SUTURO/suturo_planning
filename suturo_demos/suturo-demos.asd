@@ -56,7 +56,7 @@
 
                ;;cram-robokudo
                ;;cram-giskard
-
+               robokudo_msgs-msg
                tmc_msgs-msg
                nav_msgs-msg
                manipulation_msgs-msg

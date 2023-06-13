@@ -1,5 +1,227 @@
 (in-package :su-demos)
 
+
+;;@author Felix Krause
+(defun start-ros () (roslisp-utilities:startup-ros))
+
+;;@author Felix Krause
+(defun transform-key-to-string (the-key)
+  
+  (case the-key
+        (:trashbin
+ 	"http://www.ease-crc.org/ont/SUTURO.owl#TrashBin")
+	(:plasticknife
+ 	"http://www.ease-crc.org/ont/SUTURO.owl#PlasticKnife")
+	(:designedchair
+	 "http://www.ease-crc.org/ont/SOMA-HOME.owl#DesignedChair")
+	(:cupboard
+	 "http://www.ease-crc.org/ont/SOMA.owl#Cupboard")
+	(:foambrick
+	 "http://www.ease-crc.org/ont/SUTURO.owl#FoamBrick")
+	(:fork
+	 "http://www.ease-crc.org/ont/SOMA.owl#Fork")
+	(:spatula
+	 "http://www.ease-crc.org/ont/SOMA.owl#Spatula")
+	(:pitcher
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Pitcher")
+	(:bleachcleanserbottle
+	 "http://www.ease-crc.org/ont/SUTURO.owl#BleachCleanserBottle")
+	(:kitchencabinet
+	 "http://www.ease-crc.org/ont/SOMA-HOME.owl#KitchenCabinet")
+	(:crackerbox
+	 "http://www.ease-crc.org/ont/SUTURO.owl#CrackerBox")
+	(:minisoccerball
+	 "http://www.ease-crc.org/ont/SUTURO.owl#MiniSoccerBall")
+	(:baseball
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Baseball")
+	(:tablecloth
+	 "http://www.ease-crc.org/ont/SUTURO.owl#TableCloth")
+	(:washer
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Washer")
+	(:designedhandle
+	 "http://www.ease-crc.org/ont/SOMA.owl#DesignedHandle")
+	(:pot
+	 "http://www.ease-crc.org/ont/SOMA.owl#Pot")
+	(:napkin
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Napkin")
+	(:mustardbottle
+	 "http://www.ease-crc.org/ont/SUTURO.owl#MustardBottle")
+	(:puddingbox
+	 "http://www.ease-crc.org/ont/SUTURO.owl#PuddingBox")
+	(:door
+	 "http://www.ease-crc.org/ont/SOMA.owl#Door")
+	(:servingmat
+	 "http://www.ease-crc.org/ont/SUTURO.owl#ServingMat")
+	(:dishwasher
+	 "http://www.ease-crc.org/ont/SOMA.owl#Dishwasher")
+	(:naturalperson
+	 "http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#NaturalPerson")
+	(:wineglass
+	 "http://www.ease-crc.org/ont/SOMA.owl#WineGlass")
+	(:shelf
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Shelf")
+	(:tray
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Tray")
+	(:orange
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Orange")
+	(:table
+	 "http://www.ease-crc.org/ont/SOMA.owl#Table")
+	(:bowl
+	 "http://www.ease-crc.org/ont/SOMA.owl#Bowl")
+	(:glass
+	 "http://www.ease-crc.org/ont/SOMA.owl#Glass")
+	(:coffeepack
+	 "http://www.ease-crc.org/ont/SUTURO.owl#CoffeePack")
+	(:golfball
+	 "http://www.ease-crc.org/ont/SUTURO.owl#GolfBall")
+	(:softball
+	 "http://www.ease-crc.org/ont/SUTURO.owl#SoftBall")
+	(:saltshaker
+	 "http://www.ease-crc.org/ont/SOMA.owl#SaltShaker")
+	(:metalplate
+	 "http://www.ease-crc.org/ont/SUTURO.owl#MetalPlate")
+	(:pringleschipscan
+	 "http://www.ease-crc.org/ont/SUTURO.owl#PringlesChipsCan")
+	(:strawberry
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Strawberry")
+	(:glasscleanerspraybottle
+	 "http://www.ease-crc.org/ont/SUTURO.owl#GlassCleanerSprayBottle")
+	(:tennisball
+	 "http://www.ease-crc.org/ont/SUTURO.owl#TennisBall")
+	(:spoon
+	 "http://www.ease-crc.org/ont/SOMA.owl#Spoon")
+	(:marble
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Marble")
+	(:bottle
+	 "http://www.ease-crc.org/ont/SOMA.owl#Bottle")
+	(:metalmug
+	 "http://www.ease-crc.org/ont/SUTURO.owl#MetalMug")
+	(:rope
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Rope")
+	(:stackingblocks
+	 "http://www.ease-crc.org/ont/SUTURO.owl#StackingBlocks")
+	(:abrasivesponge
+	 "http://www.ease-crc.org/ont/SUTURO.owl#AbrasiveSponge")
+	(:racquetball
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Racquetball")
+	(:jellobox
+	 "http://www.ease-crc.org/ont/SUTURO.owl#JelloBox")
+	(:dishwashertab
+	 "http://www.ease-crc.org/ont/SOMA.owl#DishwasherTab")
+	(:knife
+	 "http://www.ease-crc.org/ont/SOMA.owl#Knife")
+	(:plasticchain
+	 "http://www.ease-crc.org/ont/SUTURO.owl#PlasticChain")
+	(:plate
+	 "http://www.ease-crc.org/ont/SOMA.owl#Plate")
+	(:cup
+	 "http://www.ease-crc.org/ont/SOMA.owl#Cup")
+	(:dice
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Dice")
+	(:cerealbox
+	 "http://www.ease-crc.org/ont/SOMA.owl#CerealBox")
+	(:metalbowl
+	 "http://www.ease-crc.org/ont/SUTURO.owl#MetalBowl")
+	(:sugarbox
+	 "http://www.ease-crc.org/ont/SUTURO.owl#SugarBox")
+	(:skillet
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Skillet")
+	(:kiwi
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Kiwi")
+	(:drawer
+	 "http://www.ease-crc.org/ont/SOMA.owl#Drawer")
+	(:toyotahsr
+	 "http://www.ease-crc.org/ont/SUTURO.owl#ToyotaHSR")
+	(:coffeecan
+	 "http://www.ease-crc.org/ont/SUTURO.owl#CoffeeCan")
+	(:milkpack
+	 "http://www.ease-crc.org/ont/SOMA.owl#MilkPack")
+	(:toothpaste
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Toothpaste")
+	(:oreganoshaker
+	 "http://www.ease-crc.org/ont/SUTURO.owl#OreganoShaker")
+	(:apple
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Apple")
+	(:tomatosoupcan
+	 "http://www.ease-crc.org/ont/SUTURO.owl#TomatoSoupCan")
+	(:tunafishcan
+	 "http://www.ease-crc.org/ont/SUTURO.owl#TunaFishCan")
+	(:bag
+	 "http://www.ease-crc.org/ont/SUTURO.owl#Bag")
+	(:juicebox
+	 "http://www.ease-crc.org/ont/SUTURO.owl#JuiceBox")
+	(:pancakemixbottle
+	 "http://www.ease-crc.org/ont/SUTURO.owl#PancakeMixBottle")
+	(:jellostrawberrybox
+	 "http://www.ease-crc.org/ont/SUTURO.owl#JellOStrawberryBox")
+	(:teabagbox
+	 "http://www.ease-crc.org/ont/SUTURO.owl#TeaBagBox")
+	(:pastrybox
+	 "http://www.ease-crc.org/ont/SUTURO.owl#PastryBox")
+        ))
+
+
+
+;;OLD KEYS
+
+;; (:KoellnMuesliKnusperHonigNuss
+;;                :breakfast-cereal)
+;;               (:muesli
+;;                :breakfast-cereal)
+;;               (:cerealbox
+;;                :cerealbox)
+;;               (:milk
+;;                :milk)
+;;               (:TunaFishCan
+;;                :TunaFishCan)
+;;               (:everything
+;;                :everything)
+;;               (:CupEcoOrange
+;;                :cup)
+;;               (:EdekaRedBowl
+;;                :bowl)
+;;               (:IkeaRedBowl
+;;                :bowl)
+;;               (:SoupSpoon
+;;                :spoon)
+;;               (:apple
+;;                :apple)
+;;               (:spoon
+;;                :spoon)
+;;               (:IkeaRedCup
+;;                :cup)
+;;               (:bowl
+;;                :bowl)
+;;               (:mustard-bottle
+;;                :mustard-bottle)
+;;               (:cup
+;;                :cup)
+;;               (:mug
+;;                :cup)
+;;               (:WeideMilchSmall
+;;                :milk)
+;;               (:BLUEPLASTICSPOON
+;;                :spoon)
+;;               (:BALEAREINIGUNGSMILCHVITAL
+;;                :balea-bottle)
+;;               (:DENKMITGESCHIRRREINIGERNATURE
+;;                :dish-washer-tabs)
+;;               (:GarnierMineralUltraDry
+;;                :deodorant)
+;;               (:DMRoteBeteSaftBio
+;;                :juice-box)
+;;               (:JeroenCup
+;;                :jeroen-cup)
+;;               (:jeroen-cup
+;;                :jeroen-cup)
+;;               (:pringles
+;;                :pringles))))
+      
+
+
+
+
+
 ;;====================================================================================================
 ;;navigation
 

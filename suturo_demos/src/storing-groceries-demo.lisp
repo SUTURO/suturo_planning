@@ -2,285 +2,273 @@
 
 
 
-(defun start-ros () (roslisp-utilities:startup-ros))
+
+
+
 
 ;;@author Felix Krause
-(defun storing-groceries-demo-alt ()
-  (roslisp-utilities:startup-ros)
-  ;;(su-real::with-hsr-process-modules
-    (unwind-protect
-         (progn
-           ;;(init-interfaces)
-           ;;Calls knowledge to retrieve the percieve pose of the cereal box. Moves to the box immediatly afterwards.
-           (let* ((urdf (call-knowledge2 "has_urdf_name"
-                                         :param-list (list "tall_table:table:table_front_edge_center")
-                                         :result 'object))
-                  (pose (call-knowledge "object_rel_pose"
-                                        :param-list (list urdf "perceive")
-                                        :result 'pose))
-                  (frame (first pose))
-                  (vector (apply #'cl-tf2::make-3d-vector (second pose)))
-                  (rotation (apply #'cl-tf2::make-quaternion (third pose))))
-                      
-             (move-hsr (cl-tf2::make-pose-stamped frame 0 vector rotation)))
+;;max-objects dictates how many times the main loop from the table to the shelf should be performed.
+;;open-shelf dictates if the shelf door should be opened. open-shelf = 0 -> skip door, open-shelf > 0 -> open door.
+;;skip-shelf-perception dictates if the contents of the shelf should be perceived. Useful for testing. skip-shelf-perception = T -> skip perception of shelf contents, skip-shelf-perception = NIL -> perceive shelf contents.
+;;joint-angle: Dictates how far the door will be opened, Value range ~0.0 to ~1.2. A sensible value is 0.55. Positive value = open to the left, Negative value = open to the right.
+;;collision-mode: Different options, most common is :allow-all or :avoid-all
+(defun storing-groceries-demo (&key max-objects skip-open-shelf skip-shelf-perception joint-angle collision-mode)
 
-           ;;Detects the cereal box, the cereal box is defined as "muesli". Calls detecting Designator.
-           (let* ((?grasp-type 1)
-                  (?open-drawer 0)
-                  (?source-object-desig
-                    (desig:an object
-                              (type :muesli)))
-                  (?source-perceived-object-desig
-                    (exe:perform (desig:an action
-                                           (type detecting)
-                                           (object ?source-object-desig)))))
-             
-             ;;Extracts pose from the return value of the detecting Designator.
-             (roslisp:with-fields 
-                 ((?pose
-                   (cram-designators::pose cram-designators:data))) 
-                 ?source-perceived-object-desig
-
-               ;;Moves the gripper to the cereal box, implicitly opens the gripper beforehand.
-               (exe:perform (desig:a motion
-                                     (type :moving-tcp)
-                                     (box-pose ?pose)
-                                     (grasp-type ?grasp-type)
-                                     (collision-mode :allow-all)))
-
-               ;;Function call that closes the gripper.
-               ;;(giskard::call-custom-gripper-action :open-gripper 0)
-
-               ;;Takes the cereal box from the table.
-               (exe:perform (desig:a motion
-                                     (type :moving-tcp)
-                                     (knob-pose ?pose)
-                                     (open-drawer ?open-drawer)
-                                     (collision-mode :allow-all))))))
-               (roslisp-utilities:shutdown-ros)))
+  (let ((shelf "shelf:shelf:shelf_base_center")
+        (table "left_table:table:table_front_edge_center")
+        (handle-link "iai_kitchen/shelf:shelf:shelf_door_left:handle")
+        (all-designator (desig:all object (type :everything))))
 
 
-(defun storing-groceries-demo2()
-  ;;(with-hsr-process-modules
-  ;;(urdf-proj:with-simulated-robot
-    ;; (unwind-protect
-    ;;      (progn
-  ;;        (roslisp-utilities:startup-ros)
 
-  (park-robot)
-
-  (move-hsr (create-pose (call-knowledge "hsr_pose_dinner_table" :result 'pose)))
-
-  (park-robot)
-
-  (let* ((?source-object-desig
-           (desig:an object
-                     (type :muesli)))
-         (?object-desig
-           (exe:perform (desig:an action
-                                  (type detecting)
-                                  (object ?source-object-desig))))
-         (?target-pose (create-pose (call-knowledge "object_dest_pose_2" :result 'pose))))
-    (exe:perform (desig:an action
-                           (type detecting)
-                           (object ?source-object-desig)))
-    ;; Extracts pose from the return value of the detecting Designator.
-    (roslisp:with-fields 
-        ((?pose
-          (cram-designators::pose cram-designators:data))) 
-        ?object-desig
-
-      
-      ;;Moves the gripper to the cereal box, implicitly opens the gripper beforehand.
-      (let ((?object-size
-              (cl-tf2::make-3d-vector 0.04 0.1 0.2)))
-        (exe:perform (desig:an action
-                               (type picking-up)
-                               (object-pose ?pose)
-                               (object-size ?object-size)
-                               (collision-mode :allow-all)))))
-
+    ;;Init query for Knowledge.
+    (with-knowledge-result ()
+        `("init_storing_groceries")
+      (print "Storing groceries plan started."))
+  
     (park-robot)
-    
-    (move-hsr (create-pose (call-knowledge "hsr_pose_shelf" :result 'pose)))
 
-    (let ((?object-height 0.28d0))    
-      (exe:perform (desig:an action
-                             (type :placing)
-                             (target-pose ?target-pose)
-                             (object-height ?object-height)
-                             (collision-mode :allow-all))))
-
-    (move-hsr (create-pose (call-knowledge "hsr_pose_shelf" :result 'pose)))
-    
-    (park-robot)
-    ;; (roslisp-utilities:shutdown-ros))
-))
-
-(defun knowledge-get-drawer-pose()
-  (cl-tf:make-pose-stamped
-    "map" 0.0
-    (cl-tf:make-3d-vector 0 0.8 0.0)
-    (cl-tf:make-quaternion 0 0 1 1)))
-              
-
-
-(defun storing-groceries-demo-bw ()
-  
-  (roslisp-utilities:startup-ros)
-  (urdf-proj:with-simulated-robot
-    (spawn-pringles-on-table)
-    (sleep 2)
-    (move-in-front-of-pringles)
-    (sleep 2)
-    (pick-up-the-pringles)
-    (sleep 2)
-    
-    
-    ;; (btr:add-object btr:*current-bullet-world* :cylinder-item 'cylinder-1
-    ;;                 '((-0.7 -0.7 0.85) (0 0 1 1))
-    ;;                 :mass 0.2
-    ;;                 :size (cl-transforms:make-3d-vector 0.04 0.04 0.09)
-    ;;                 :item-type :pringles)
-    
-    (let*((?first-pose (knowledge-get-drawer-pose)))
-    (exe:perform
-       (desig:an action
-                 (type going)
-                 (target (desig:a location (pose ?first-pose))))))
-
-
-    ))
-
-
-
-
-(defun storing-groceries-demo-rw ()
-  
-  (roslisp-utilities:startup-ros)
-  ;;(with-hsr-process-modules
-
-    ;,This is where the correct frame goes
-    ;; (let* ((urdf (call-knowledge2 "has_urdf_name"
-    ;;                                      :param-list (list "left_table:table:table_front_edge_center")
-    ;;                                      :result 'object))
-    ;;               (pose (call-knowledge "object_rel_pose"
-    ;;                                     :param-list (list urdf "perceive")
-    ;;                                     :result 'pose))
-    ;;               (frame (first pose))
-    ;;               (vector (apply #'cl-tf2::make-3d-vector (second pose)))
-    ;;               (rotation (apply #'cl-tf2::make-quaternion (third pose))))
-                      
-    ;;   (move-hsr (cl-tf2::make-pose-stamped frame 0 vector rotation)))
-
-     ;; (let* ((urdf (call-knowledge2 "has_urdf_name"
-     ;;                                     :param-list (list "shelf:shelf:shelf_base_center")
-     ;;                                     :result 'object))
-     ;;              (pose (call-knowledge "object_rel_pose"
-     ;;                                    :param-list (list urdf "perceive")
-     ;;                                    :result 'pose))
-     ;;              (frame (first pose))
-    ;;
-    ;; (vector (apply #'cl-tf2::make-3d-vector (second pose)))
-     ;;              (rotation (apply #'cl-tf2::make-quaternion (third pose))))
-                      
-     ;;  (move-hsr (cl-tf2::make-pose-stamped frame 0 vector rotation)))
-    
-    
-    ;;Perceive the object
-    (let*
-        ((?grasp-type 1)
-         (?open-drawer 0)
-         (?source-object-desig
-                    (desig:an object
-                              (type :muesli)))
-        (?object-desig
-             (exe:perform (desig:an action
-                                    (type detecting)
-                                    (object ?source-object-desig)))))
-     ;; Extracts pose from the return value of the detecting Designator.
-             (roslisp:with-fields 
-                 ((?pose
-                   (cram-designators::pose cram-designators:data))) 
-                 ?object-desig
-
-               ;;Moves the gripper to the cereal box, implicitly opens the gripper beforehand.
-               (exe:perform (desig:a motion
-                                     (type :moving-tcp)
-                                     (box-pose ?pose)
-                                     (grasp-type ?grasp-type)
-                                     (collision-mode :allow-all)))
-
-               ;;Function call that closes the gripper.
-               ;;(giskard::call-custom-gripper-action :open-gripper 0)
-
-               ;;Takes the cereal box from the table.
-               (exe:perform (desig:a motion
-                                     (type :moving-tcp)
-                                     (knob-pose ?pose)
-                                     (open-drawer ?open-drawer)
-                                     (collision-mode :allow-all)))))
-  ;;)
-               (roslisp-utilities:shutdown-ros))
-
-
-
-(defun test ()
-  
-  (with-knowledge-result (result)
-      `(and ("has_urdf_name" object ,"left_table:table:table_front_edge_center")
-            ("object_rel_pose" object "perceive" result))
-    (move-hsr (make-pose-stamped-from-knowledge-result result)))
    
-    (let ((?arm :left)
-          (?handle-link "iai_kitchen/shelf:shelf:shelf_door_left:handle")
-          (?poses  (list (cl-tf:make-pose-stamped
-                    "map" 0.0
-                    (cl-tf:make-3d-vector 0 0.8 0.0)
-                    (cl-tf:make-quaternion 0 0 1 1)))))
+  ;;Move to the shelf to a perceive pose.
+    (with-knowledge-result (result)
+      `(and ("has_urdf_name" object ,shelf)
+            ("object_rel_pose" object "perceive" result))
+      (move-hsr (make-pose-stamped-from-knowledge-result result)))
+
+  (cond ((equal skip-open-shelf NIL)  
+         
+         (print "Performing sequence, door will be opened.")
+         ;;Open the shelf
+         (let ((?handle-link handle-link)
+               (?joint-angle joint-angle)
+               (?collision-mode collision-mode))
+    
+           (exe:perform (desig:an action
+                                  (type opening-door)
+                                  (handle-link ?handle-link)
+                                  (joint-angle ?joint-angle)
+                                  (tip-link t)
+                                  (collision-mode ?collision-mode))))
+         (park-robot))
+        ((equal skip-open-shelf T) 
+         (print "Skipping sequence, shelf door wont be opened.")))
+    
+   
+  (cond ((equal skip-shelf-perception NIL)
+         ;;Perceive the contents of the shelf.
+         ;;Returns all possible objects.
+         ;;Objects are then created in Knowledge.
+
+         
+         ;;Move to the shelf.
+         (with-knowledge-result (result)
+             `(and ("has_urdf_name" object ,shelf)
+                   ("object_rel_pose" object "perceive" result))
+           (move-hsr (make-pose-stamped-from-knowledge-result result)))
+
+         (perc-robot)
+         
+         (let* ((?source-object-desig-shelf all-designator)
+                (?object-desig-list-shelf
+                  (exe:perform (desig:all action
+                                          (type detecting)
+                                          (object ?source-object-desig-shelf)))))
+
+    
+           (park-robot)
+           
+           (print ?object-desig-list-shelf)))
+        ((equal skip-shelf-perception T)
+         (print "Skipping sequence, shelf contents wont be perceived.")))
 
 
+    ;;Move to the table to a perceive pose.
+    ;;(move-to-table T table)
+    (with-knowledge-result (result)
+        `(and ("has_urdf_name" object ,table)
+              ("object_rel_pose" object "perceive" result))
+      (move-hsr (make-pose-stamped-from-knowledge-result result)))
 
-      ;(su-real::call-gripper-action 0.1)
-      (park-robot)
-     ;; (exe:perform (desig:an action
-     ;;                        (type :pulling)
-     ;;                        (arm ?arm)
-     ;;                        (collision-mode :allow-all)
-     ;;                        ))
+    (perc-robot)
 
-       
-
-       
-
-      
-      (exe:perform (desig:a motion
-                            (type reaching)
-                            (collision-mode :allow-all)
-                            (object-name ?handle-link)
-                            )
-                     )
-
-      ;; (exe:perform (desig:a motion
-      ;;                       (type :closing-gripper)))
-
-         ;(su-real::call-gripper-action -0.1)
+    ;;Perceive the objects on the table. Put all objects into a list. 
+    (let* ((?source-object-desig all-designator)
+           (?list-of-objects
+             (exe:perform (desig:all action
+                                     (type detecting)
+                                     (object ?source-object-desig)))))
+    
 
 
-        ;(cram-giskard::call-environment-manipulation-action :open-or-close :open :arm :left :handle-link ?handle-link :joint-angle -0.5)
-        ;(su-real::call-gripper-action 0.1)
+    ;;Creates all objects in Knowledge
+    ;;Unnecessary for now.
+    
+    ;; (loop for x in ?list-of-objects
+    ;;       do
+    ;;          (let* ((?current-object x)
+    ;;                 (?current-pose (extract-pose ?current-object))
+    ;;                 (?current-size nil) ;;Size unused for now
+    ;;                 )
 
-      ;; (exe:perform (desig:a motion
-      ;;                   (type :retracting)(su-real::with-hsr-process-modules 
-      ;;                   (collision-mode :allow-fingers)
-      ;;                   (tip-link t)))
-       )
+    ;;            ;; (su-demos::with-knowledge-result (frame shape pose)
+    ;;            ;;     `(and ("object_shape_workaround" ,object-name frame shape _ _)
+    ;;            ;;           ("object_pose" ,object-name pose))
+                 
+    ;;          (with-knowledge-result (result)
+    ;;              `(and ("create_object" result ,(transform-key-to-string (extract-type ?current-object)) ,?current-pose
+    ;;                                     (list ;(shape (box 0.1 0.2 0.3))
+    ;;                                      ))) result)))
+    
+        
+
+;;=======================================MAIN=LOOP====================================================
+  
+        ;;Perform this loop max-objects amount of times.
+        (dotimes (n max-objects)
+          ;;Pick up the first object in the list.
+          ;;TODO - Filter the objects somehow when current-object is picked that the optimal item is picked up.
+          ;;TODO - Object size can be extracted from Perception.
+          ;;TODO - Place pose can be extracted from Knowledge.
+          ;;TODO - Its best if all properties of the current Designator are extracted here.
+          ;;TODO - Extract: Object size, object height, place pose.
+          ;;TODO - Next Object might not work like this, Otherwise random order + extract object name.
+          (let*  ((?collision-mode collision-mode)
+                  ;;HARDCODED
+                  (?object-size (cl-tf2::make-3d-vector 0.06 0.145 0.215));;(extract-size ?current-object))
+                  (?object-height 0.22)
+                  ;;DYNAMIC POSES
+                  (?next-object (get-next-object-storing-groceries))
+                  (?next-pick-up-pose (get-pick-up-pose ?next-object))
+                  (?next-place-pose (get-place-pose-in-shelf ?next-object))
+                  ;;HARDCODED/OLD PLACE POSES
+                  (?place-poses (get-hardcoded-place-poses))
+                  (?place-pose (pop ?place-poses))
+                  (?current-object (pop ?list-of-objects))
+                  (?current-object-pose (extract-pose ?current-object)))
+            
+
+            ;;Pick up the object.
+            (exe:perform (desig:an action
+                                   (type :picking-up)
+                                   (object-pose ?next-pick-up-pose)
+                                   (object-size ?object-size)
+                                   (collision-mode ?collision-mode)))
+           
+           
+            (park-robot)
+
+            ;;Move to the shelf
+            (with-knowledge-result (result)
+                `(and ("has_urdf_name" object ,shelf)
+                      ("object_rel_pose" object "perceive" result))
+              (move-hsr (make-pose-stamped-from-knowledge-result result)))
+
+            ;;Places the object currently held.
+            (exe:perform (desig:an action
+                                   (type :placing)
+                                   (target-pose ?next-place-pose)
+                                   (object-height ?object-height)
+                                   (collision-mode ?collision-mode)))
+
+            ;;Update object position in Knowledge.
+            (with-knowledge-result ()
+                `(and "object_pose" ,?next-object ,?next-place-pose))
 
 
-  )
+            
+            (park-robot)
+
+            ;;Move to the table to a perceive pose.
+            ;;(move-to-table T table)
+            
+            (with-knowledge-result (result)
+                `(and ("has_urdf_name" object ,table)
+                      ("object_rel_pose" object "perceive" result))
+              (move-hsr (make-pose-stamped-from-knowledge-result result)))
+            (print "Loop finished."))))
+
+        (print "Demo finished.")))
+
+;;@author Felix Krause
+(defun extract-pose (object)
+  (roslisp:with-fields 
+      ((?pose
+        (cram-designators::pose cram-designators:data))) 
+      object    
+    ?pose))
+
+;;@author Felix Krause
+(defun extract-type (object)
+  (roslisp:with-fields 
+      ((?type
+        (cram-designators::object-identifier cram-designators:data))) 
+      object    
+     (intern (string-trim "-1" ?type) :keyword)))
+
+;;@author Felix Krause
+;;doesnt work for now
+;; (defun extract-size (object)
+;;   (roslisp:with-fields 
+;;       ((?size
+;;         (cram-designators::size cram-designators:description))) 
+;;       object    
+;;     ?size))
 
 
+;;@author Felix Krause
+(defun move-to-table (side table)
+    (with-knowledge-result (result)
+        `(and ("has_urdf_name" object ,table)
+              ("object_rel_pose" object "perceive" result))
+      (move-hsr (make-pose-stamped-from-knowledge-result result))))
 
+;;@author Felix Krause
+(defun move-to-shelf (side shelf)
+  (with-knowledge-result (result)
+      `(and ("has_urdf_name" object ,shelf)
+            ("object_rel_pose" object "perceive" result))
+    (move-hsr (make-pose-stamped-from-knowledge-result result))))
+
+;;@author Felix Krause
+(defun get-next-object-storing-groceries ()
+  (with-knowledge-result (result)
+      `("next_object" result)
+    result))
+
+;;@author Felix Krause
+(defun get-place-pose-in-shelf (object)
+    (with-knowledge-result (result)
+      `("object_rel_pose" ,object "destination" (list) result)
+      (make-pose-stamped-from-knowledge-result result)))
+
+;;@author Felix Krause
+(defun get-pick-up-pose (object)
+  (with-knowledge-result (result)
+      `("object_pose" ,object result)
+    result))
+
+
+;;@author Felix Krause
+(defun get-hardcoded-place-poses ()
+  (list (cl-tf:make-pose-stamped "map" 0.0  (cl-tf:make-3d-vector 0.15 1.73 0.725) (cl-tf:make-quaternion 0 0 0 1)) (cl-tf:make-pose-stamped "map" 0.0  (cl-tf:make-3d-vector 0.15 1.73 0.47) (cl-tf:make-quaternion 0 0 0 1)) (cl-tf:make-pose-stamped "map" 0.0  (cl-tf:make-3d-vector 0.15 1.73 0.11) (cl-tf:make-quaternion 0 0 0 1))))
+
+;;@author Felix Krause
+(defun test-place ()
+
+  
+
+  
+  (park-robot)
+  (let* ((?collision-mode :allow-all)
+         (?object-height 0.2)
+         (?place-pose (third (get-hardcoded-place-poses))))
+  
+    
+    (exe:perform (desig:an action
+                           (type :placing)
+                           (target-pose ?place-pose)
+                           (object-height ?object-height)
+                           (collision-mode ?collision-mode)))))
 
 
 (defun test-perception ()
@@ -295,14 +283,29 @@
 
 
   
-  (let* ( (?source-object-desig
+  (let* ((?source-object-desig
            (desig:all object
                      (type :everything)))
          (?object-desig
-           (exe:perform (desig:an action
+           (exe:perform (desig:all action
                                   (type detecting)
                                   (object ?source-object-desig)))))
-    (print ?object-desig))
+    
+
+      (roslisp:with-fields 
+        ((?pose
+          (cram-designators::pose cram-designators:data))) 
+          ?object-desig
+
+        (print ?pose)))
+
+      ;; (let ((?object-size
+      ;;         (cl-tf2::make-3d-vector 0.06 0.145 0.215)))
+      ;;   (exe:perform (desig:an action
+      ;;                          (type picking-up)
+      ;;                          (object-pose ?pose)
+      ;;                          (object-size ?object-size)
+      ;;                          (collision-mode :allow-all))))))
 
 
 
@@ -310,134 +313,3 @@
   )
 
 
-
-
-         ;; (roslisp:with-fields 
-         ;;     ((?pose
-         ;;       (cram-designators::pose cram-designators:data))) 
-         ;;     ?object-desig
-         
-      
-           ;;Moves the gripper to the cereal box, implicitly opens the gripper beforehand.
-           
-          ;; (let (;; (?pose (cl-tf2::make-pose-stamped
-                 ;;         "map" 0
-                 ;;         (cl-tf2::make-3d-vector 1.5990473514373078d0 -0.9011317748330292d0 0.715d0)
-                 ;;         (cl-tf2::make-quaternion 0 0 0 1)))
-                 ;; (?object-size
-                 ;;   (cl-tf2::make-3d-vector 0.08 0.08 0.06)))
-      
-    ;; (exe:perform (desig:a motion
-    ;;                       (type :opening-gripper)))
-      
-      ;; (exe:perform (desig:a motion
-       ;;                      (type reaching)
-       ;;                      (collision-mode :allow-hand)
-       ;;                      ;(collision-object-b-link "Shelf_OGTVKLRY")
-       ;;                      (object-name "Shelf_OGTVKLRY"))
-             ;; (exe:perform (desig:an action
-             ;;                        (type picking-up)
-             ;;                        (handle-link ?handle-link)
-             ;;                        (collision-mode :avoid-all)
-             ;;                        ()))
-             ;;))
-
-    ;;(park-robot)
-
-  ;;))  
-
-
-  
-
-(defun storing-groceries-demo (number-of-objects)
-  (print "Starting Storing Groceries Demo")
-
-
-  (park-robot)
-
-
-  ;;Wait for start signal
-
-  ;;Move to shelf
-    (with-knowledge-result (result)
-      `(and ("has_urdf_name" object "shelf:shelf:shelf_base_center")
-            ("object_rel_pose" object "perceive" result))
-    (move-hsr (make-pose-stamped-from-knowledge-result result)))
-
-  ;; ;;Open the shelf
-
-
-  ;; (let ((?handle-link "iai_kitchen/shelf:shelf:shelf_door_right:handle")
-  ;;       (?joint-angle 0.4))
-    
-  ;;   (exe:perform (desig:an action
-  ;;                          (type opening-door)
-  ;;                          (handle-link ?handle-link)
-  ;;                          (joint-angle ?joint-angle)
-  ;;                          (tip-link t)
-  ;;                          (collision-mode :allow-all))))
-
-
-  (park-robot)
-  
-
-  
-  ;;Move to table
-  (with-knowledge-result (result)
-      `(and ("has_urdf_name" object ,"left_table:table:table_front_edge_center")
-            ("object_rel_pose" object "perceive" result))
-    (move-hsr (make-pose-stamped-from-knowledge-result result)))
-
-
-
-  ;;Perceive and Pick up the Object
-  (let* ((?source-object-desig
-           (desig:an object
-                     (type :pringles)))
-         (?object-desig
-           (exe:perform (desig:an action
-                                  (type detecting)
-                                  (object ?source-object-desig)))))
-    
-
-
-    (roslisp:with-fields 
-        ((?pose
-          (cram-designators::pose cram-designators:data))) 
-        ?object-desig
-
-      (let ((?object-size
-              (cl-tf2::make-3d-vector 0.06 0.145 0.215)))
-        (exe:perform (desig:an action
-                               (type picking-up)
-                               (object-pose ?pose)
-                               (object-size ?object-size)
-                               (collision-mode :allow-all)))))
-
-
-    )
-
-
-
-  ;;Move back to the Shelf
-  (with-knowledge-result (result)
-      `(and ("has_urdf_name" object ,"iai_kitchen/shelf:shelf:shelf_center")
-            ("object_rel_pose" object "perceive" result))
-    (move-hsr (make-pose-stamped-from-knowledge-result result)))
-
-  (let ((?object-height 0.1)
-        (?target-pose (cl-tf:make-pose-stamped
-                       "map" 0.0
-                       (cl-tf:make-3d-vector 0.0839 1.68 0.725)
-                       (cl-tf:make-quaternion 0 0 0 1))))    
-    (exe:perform (desig:an action
-                           (type :placing)
-                           (target-pose ?target-pose)
-                           (object-height ?object-height)
-                           (collision-mode :allow-all))))
-
-
-
-
-
-      )
