@@ -17,9 +17,9 @@
     (let ((object-name (cpoe:event-object-name event)))
       (if object-name
           ;; if object-name is given, detach given object
-          ;; (detach-object-in-collision-scene-knowrob object-name)
-          (print "x")
-          ;; otherwise detach all objects from the given arm
+          ;;(detach-object-in-collision-scene-knowrob object-name)
+          (print "IF dummy")
+          ;; otherwise detach all objects from the given arm (not being used in suturo
           (let* ((arm
                    (cpoe:event-arm event))
                  (link
