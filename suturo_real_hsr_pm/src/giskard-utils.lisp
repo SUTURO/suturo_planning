@@ -7,10 +7,12 @@
     (if (eq (cpoe:event-other-object-name event) (rob-int:get-environment-name))
         (roslisp:ros-warn (giskard coll-scene)
                           "Attaching objects to environment is not supported yet.")
-        (attach-object-to-arm-in-collision-scene-knowrob
-         (cpoe:event-object-name event)
-         (cpoe:event-arm event)
-         (cpoe:event-link event)))))
+        (progn
+          
+          (attach-object-to-arm-in-collision-scene-knowrob
+           (cpoe:event-object-name event)
+           (cpoe:event-arm event)
+           (cpoe:event-link event))))))
 
 (defmethod coe:on-event giskard-detach-object 1 ((event cpoe:object-detached-robot-knowrob))
   (unless cram-projection:*projection-environment*
@@ -223,6 +225,7 @@
                 ee-to-map-transform map-to-obj-transform))
              (ee-to-object-pose
                (cram-tf:strip-transform-stamped ee-to-object-transform)))
+        ;;(
         ;; remove the object first, maybe it was already attached to something
         (giskard::call-giskard-environment-service
          :detach
