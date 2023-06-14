@@ -23,7 +23,9 @@
  <!--Either /maps/hsr_lab_master_2022/map3-door-open-cleaned.yaml -->
  <!-- or /maps/suturobocup-2023/SuturoApartLab-cleaned.yaml -->
   <group if="$(eval arg('upload_map') == true)">
+
     <node name="map_server" pkg="map_server" type="map_server" args="$(find suturo_resources)/maps/hsr_lab_master_2023/hsr_lab_master_2023.yaml" /> <!-- map3-door-open-cleaned.yaml" /-->
+
   </group>  
   
   <!-- kitchen URDF 
